@@ -1,0 +1,6 @@
+[workspace]
+members = [
+	"igat",
+	"igat-dll",
+]
+resolver = "2"
