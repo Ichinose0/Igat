@@ -1,28 +1,22 @@
-use igat::{Application, Executable, frame::Frame, ApplicationEvent};
+use igat::{frame::Frame, Application, ApplicationEvent, Executable};
 
 #[derive(Debug)]
-pub enum Message {
-    
-}
+pub enum Message {}
 
 pub struct Poweredit {
-    frame: MyFrame
+    frame: MyFrame,
 }
 
 impl Application for Poweredit {
     type Message = Message;
 
-    fn init(&mut self,loader: &igat::plugin::PluginLoader) {
-        
-    }
+    fn init(&mut self, loader: &igat::plugin::PluginLoader) {}
 
-    fn route(&mut self,event: ApplicationEvent) -> &dyn Frame<Message = Self::Message> {
+    fn route(&mut self, event: ApplicationEvent) -> &dyn Frame<Message = Self::Message> {
         &self.frame
     }
 
-    fn on_close(&mut self) {
-
-    }
+    fn on_close(&mut self) {}
 }
 
 pub struct MyFrame {}
@@ -31,7 +25,7 @@ impl Frame for MyFrame {
     type Message = Message;
 
     fn bgr(&self) -> igat::Color {
-        igat::Color::ARGB(255,125,0,255)
+        igat::Color::ARGB(255, 125, 0, 255)
     }
 
     fn title(&self) -> String {
@@ -40,9 +34,9 @@ impl Frame for MyFrame {
 
     fn ui(&self) -> igat::widget::Target<Self::Message> {
         let text = igat::widget::Button::new()
-                                            .width(240)
-                                            .height(80)
-                                            .text(String::from("ボタン"));
+            .width(120)
+            .height(60)
+            .text(String::from("ボタン"));
 
         text.build()
     }

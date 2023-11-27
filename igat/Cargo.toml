@@ -7,15 +7,6 @@ edition = "2021"
 
 [dependencies]
 winit = "0.29.3"
+acure = { version = "0.1.0", git = "https://github.com/Ichinose0/acure", features = ["gdi"] }
 raw-window-handle = "0.6.0"
 log = "0.4.20"
-gdiplus-sys2 = "0.1.0"
-
-[dependencies.winapi]
-version = "0.3.9"
-features = [
-    "winuser",
-    "windef",
-    "wingdi",
-    "ntdef",
-]

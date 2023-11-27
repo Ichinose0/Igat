@@ -9,24 +9,22 @@ use crate::Color;
 pub enum WidgetType {
     Rectangle,
     Circle,
-    Text
+    Text,
 }
 
-pub struct Target<T>
-{
-    pub(crate) inner: Vec<Element<T>>
+pub struct Target<T> {
+    pub(crate) inner: Vec<Element<T>>,
 }
 
-impl<T> Target<T>
-{
+impl<T> Target<T> {
     pub fn get(&self) -> &[Element<T>] {
         &self.inner
     }
 }
 
 pub struct Element<T> {
-    pub(crate)widget: Box<dyn Widget>,
-    pub(crate)msg: Option<T>
+    pub(crate) widget: Box<dyn Widget>,
+    pub(crate) msg: Option<T>,
 }
 
 impl<T> Element<T> {
@@ -44,8 +42,8 @@ pub trait Widget {
     fn background_color(&self) -> Color;
     fn shadow(&self) -> Shadow {
         Shadow {
-            color: Color::ARGB(255,128,128,128),
-            border: 1
+            color: Color::ARGB(255, 128, 128, 128),
+            border: 2,
         }
     }
     fn widget_type(&self) -> WidgetType;
@@ -54,10 +52,10 @@ pub trait Widget {
 
 pub struct Shadow {
     pub(crate) color: Color,
-    pub(crate) border: u32
+    pub(crate) border: u32,
 }
 
-// pub struct Container<T> 
+// pub struct Container<T>
 // where
 //     T: Send + std::fmt::Debug
 // {
@@ -101,4 +99,3 @@ pub struct Shadow {
 //         WidgetType::Rectangle
 //     }
 // }
-

@@ -1,4 +1,7 @@
-use crate::{Color, widget::{Element, Target}};
+use crate::{
+    widget::{Element, Target},
+    Color,
+};
 use std::fmt::Debug;
 
 pub trait Frame {
