@@ -27,7 +27,7 @@ use winit::{
     window::WindowBuilder,
 };
 
-use cde::CDE;
+use cde::Cde;
 
 #[derive(Clone, Copy, Debug)]
 pub enum Color {
@@ -64,30 +64,33 @@ impl Executable {
     {
         app.set_up();
 
-        let cde = CDE::new(&self.window);
+        let cde = Cde::new(&self.window);
 
-        let result = self.event_loop.run(move |event, elwt| {
-            match event {
-                Event::WindowEvent { event, window_id } if window_id == self.window.id() => {
-                    match event {
-                        WindowEvent::CloseRequested => elwt.exit(),
-                        WindowEvent::RedrawRequested => {
-                            let mut frame = app.route(ApplicationEvent::RedrawRequested);
-                            let Element = frame.ui();
-                            cde.draw(frame.bgr(), &Element);
-                            self.window.set_title(&frame.title());
-                            self.window.pre_present_notify();
-                        }
-                        _ => (),
-                    }
+        let _result = self.event_loop.run(move |event, elwt| match event {
+            Event::WindowEvent { event, window_id } if window_id == self.window.id() => match event
+            {
+                WindowEvent::CloseRequested => elwt.exit(),
+                WindowEvent::RedrawRequested => {
+                    let frame = app.route(ApplicationEvent::RedrawRequested);
+                    let element = frame.ui();
+                    cde.draw(frame.bgr(), &element);
+                    self.window.set_title(&frame.title());
+                    self.window.pre_present_notify();
                 }
-                Event::AboutToWait => {
-                    self.window.request_redraw();
-                }
-
                 _ => (),
+            },
+            Event::AboutToWait => {
+                self.window.request_redraw();
             }
+
+            _ => (),
         });
+    }
+}
+
+impl Default for Executable {
+    fn default() -> Self {
+        Self::new()
     }
 }
 

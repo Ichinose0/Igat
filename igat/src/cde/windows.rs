@@ -1,10 +1,8 @@
-use std::ptr::{null, null_mut};
-
-use crate::widget::{Element, Shadow, Target};
+use crate::widget::Target;
 use acure::{Acure, AlignMode};
 use raw_window_handle::HasWindowHandle;
 
-pub struct CDE<T>
+pub struct Cde<T>
 where
     T: Send + std::fmt::Debug,
 {
@@ -13,7 +11,7 @@ where
     msg: Option<T>,
 }
 
-impl<T> CDE<T>
+impl<T> Cde<T>
 where
     T: Send + std::fmt::Debug,
 {
