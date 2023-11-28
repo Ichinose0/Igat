@@ -62,15 +62,11 @@ impl Executable {
     where
         T: Application,
     {
-        info!("Loading plugins...");
-        let mut loader = PluginLoader::new();
-        app.init(&loader);
-
-        loader.load();
+        app.set_up();
 
         let cde = CDE::new(&self.window);
 
-        self.event_loop.run(move |event, elwt| {
+        let result = self.event_loop.run(move |event, elwt| {
             match event {
                 Event::WindowEvent { event, window_id } if window_id == self.window.id() => {
                     match event {
@@ -80,8 +76,6 @@ impl Executable {
                             let Element = frame.ui();
                             cde.draw(frame.bgr(), &Element);
                             self.window.set_title(&frame.title());
-                            //self.window.set_resizable(*&frame.resizable());
-                            // Notify the windowing system that we'll be presenting to the window.
                             self.window.pre_present_notify();
                         }
                         _ => (),

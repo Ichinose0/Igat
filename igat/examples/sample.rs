@@ -12,11 +12,11 @@ impl Application for Poweredit {
 
     fn init(&mut self, loader: &igat::plugin::PluginLoader) {}
 
-    fn route(&mut self, event: ApplicationEvent) -> &dyn Frame<Message = Self::Message> {
+    fn route(&self, event: ApplicationEvent) -> &dyn Frame<Message = Self::Message> {
         &self.frame
     }
 
-    fn on_close(&mut self) {}
+    fn on_close(&self) {}
 }
 
 pub struct MyFrame {}
