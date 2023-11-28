@@ -51,7 +51,12 @@ where
 
     pub fn build(self) -> Target<T> {
         let string = &self.inner.text;
-        let text = Text::new().text(string.clone()).x(self.inner.x).y(self.inner.y).width(self.inner.width).height(self.inner.height);
+        let text = Text::new()
+            .text(string.clone())
+            .x(self.inner.x)
+            .y(self.inner.y)
+            .width(self.inner.width)
+            .height(self.inner.height);
 
         Target {
             inner: vec![

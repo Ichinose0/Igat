@@ -30,7 +30,8 @@ where
     }
 
     pub fn draw(&self, color: crate::Color, target: &Target<T>) {
-        self.acure.push(acure::Command::Clear(color_to_acure_color(color)));
+        self.acure
+            .push(acure::Command::Clear(color_to_acure_color(color)));
 
         for i in target.get() {
             match i.widget.widget_type() {
@@ -38,12 +39,31 @@ where
                     let shadow = i.widget.shadow();
                     let border = shadow.border;
                     self.acure.set_align_mode(AlignMode::CenterAligned);
-                    self.acure.push(acure::Command::FillRectangle(i.widget.x(),i.widget.y(),i.widget.width()+border*2,i.widget.height()+border*2,color_to_acure_color(shadow.color)));
-                    self.acure.push(acure::Command::FillRectangle(i.widget.x()+border,i.widget.y()+border,i.widget.width(),i.widget.height(),color_to_acure_color(i.widget.background_color())));
+                    self.acure.push(acure::Command::FillRectangle(
+                        i.widget.x(),
+                        i.widget.y(),
+                        i.widget.width() + border * 2,
+                        i.widget.height() + border * 2,
+                        color_to_acure_color(shadow.color),
+                    ));
+                    self.acure.push(acure::Command::FillRectangle(
+                        i.widget.x() + border,
+                        i.widget.y() + border,
+                        i.widget.width(),
+                        i.widget.height(),
+                        color_to_acure_color(i.widget.background_color()),
+                    ));
                 }
                 crate::widget::WidgetType::Circle => todo!(),
                 crate::widget::WidgetType::Text => {
-                    self.acure.push(acure::Command::WriteString(i.widget.x(), i.widget.y(), i.widget.width(), i.widget.height(), color_to_acure_color(i.widget.color()), i.widget.title().to_owned()));
+                    self.acure.push(acure::Command::WriteString(
+                        i.widget.x(),
+                        i.widget.y(),
+                        i.widget.width(),
+                        i.widget.height(),
+                        color_to_acure_color(i.widget.color()),
+                        i.widget.title().to_owned(),
+                    ));
                 }
             }
         }
@@ -51,7 +71,6 @@ where
         self.acure.clear();
     }
 }
-
 
 fn color_to_acure_color(color: crate::Color) -> acure::Color {
     match color {

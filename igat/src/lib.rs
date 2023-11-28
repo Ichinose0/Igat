@@ -1,9 +1,17 @@
 #[macro_use]
 extern crate log;
 
-pub mod cde;
+pub(crate) mod cde;
 pub mod frame;
+#[deprecated(
+    since = "0.0.1",
+    note = "Plugin function will be deprecated. Use the set_up method instead"
+)]
 pub mod plugin;
+#[deprecated(
+    since = "0.0.1",
+    note = "UI module is obsolete as it is no longer needed"
+)]
 pub mod ui;
 pub mod widget;
 
@@ -11,7 +19,6 @@ use std::fmt::Debug;
 
 use frame::Frame;
 use plugin::PluginLoader;
-use widget::Element;
 
 use winit::{
     event::{Event, WindowEvent},
@@ -93,9 +100,15 @@ impl Executable {
 pub trait Application: Sized {
     type Message: Send + Debug;
 
+    #[deprecated(
+        since = "0.0.1",
+        note = "Plugin function will be deprecated. Use the set_up method instead"
+    )]
     fn init(&mut self, loader: &PluginLoader);
 
-    fn route(&mut self, event: ApplicationEvent) -> &dyn Frame<Message = Self::Message>;
+    fn set_up(&mut self) {}
 
-    fn on_close(&mut self);
+    fn route(&self, event: ApplicationEvent) -> &dyn Frame<Message = Self::Message>;
+
+    fn on_close(&self);
 }
