@@ -12,6 +12,13 @@ pub enum WidgetType {
     Text,
 }
 
+pub struct Component<T> 
+where
+    T: Widget
+{
+    inner: T
+}
+
 pub struct Target<T> {
     pub(crate) inner: Vec<Element<T>>,
 }
@@ -53,4 +60,14 @@ pub trait Widget {
 pub struct Shadow {
     pub(crate) color: Color,
     pub(crate) border: u32,
+}
+
+
+pub fn build_component<T>(widget: T) -> Component<T>
+where
+    T: Widget
+{
+    Component {
+        inner: widget
+    }
 }

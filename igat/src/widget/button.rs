@@ -136,3 +136,46 @@ where
         &self.text
     }
 }
+
+
+pub struct NewButton {
+    width: u32,
+    height: u32,
+    x: u32,
+    y: u32,
+    text: String
+}
+
+impl Widget for NewButton {
+    fn width(&self) -> u32 {
+        self.width
+    }
+
+    fn height(&self) -> u32 {
+        self.height
+    }
+
+    fn x(&self) -> u32 {
+        self.x
+    }
+
+    fn y(&self) -> u32 {
+        self.y
+    }
+
+    fn color(&self) -> Color {
+        Color::Black
+    }
+
+    fn background_color(&self) -> Color {
+        Color::White
+    }
+
+    fn widget_type(&self) -> WidgetType {
+        WidgetType::Rectangle
+    }
+
+    fn title(&self) -> &str {
+        &self.text
+    }
+}
