@@ -16,29 +16,45 @@ pub enum WidgetType {
     Text,
 }
 
-pub struct Component<T> 
+pub struct Component<T,M> 
 where
-    T: Widget
+    T: Widget<M>
 {
     pub(crate) inner: T
 }
 
+#[deprecated(
+    since = "0.0.2",
+    note = "UI construction using Target will be discontinued"
+)]
 pub struct Target<T> {
     pub(crate) inner: Vec<Element<T>>,
 }
 
 impl<T> Target<T> {
+    #[deprecated(
+        since = "0.0.2",
+        note = "UI construction using Target will be discontinued"
+    )]
     pub fn get(&self) -> &[Element<T>] {
         &self.inner
     }
 }
 
+#[deprecated(
+    since = "0.0.2",
+    note = "UI construction using Element will be discontinued"
+)]
 pub struct Element<T> {
     pub(crate) widget: Box<dyn Widget>,
     pub(crate) msg: Option<T>,
 }
 
 impl<T> Element<T> {
+    #[deprecated(
+        since = "0.0.2",
+        note = "UI construction using Element will be discontinued"
+    )]
     pub fn get(&self) -> Vec<&Box<dyn Widget>> {
         vec![&self.widget]
     }
@@ -69,7 +85,7 @@ where
 }
 
 pub trait Parent {
-    
+
 }
 
 pub struct Shadow {
@@ -78,9 +94,9 @@ pub struct Shadow {
 }
 
 
-pub fn build_component<T>(widget: T) -> Component<T>
+pub fn build_component<T,M>(widget: T) -> Component<T>
 where
-    T: Widget + Parent
+    T: Widget<M> + Parent
 {
     Component {
         inner: widget

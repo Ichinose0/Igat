@@ -2,6 +2,10 @@ use crate::Color;
 
 use super::{Element, Target, Text, Widget, WidgetType};
 
+#[deprecated(
+    since = "0.0.2",
+    note = "Button widget will be discontinued. please use NewButton"
+)]
 pub struct Button<T>
 where
     T: Send + std::fmt::Debug,
