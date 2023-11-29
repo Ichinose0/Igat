@@ -1,8 +1,6 @@
 mod button;
-mod text;
 
 pub use button::*;
-pub use text::*;
 
 use crate::Color;
 
@@ -16,53 +14,13 @@ pub enum WidgetType {
     Text,
 }
 
-pub struct Component<T,M> 
-where
-    T: Widget<M>
-{
-    pub(crate) inner: T
-}
-
-#[deprecated(
-    since = "0.0.2",
-    note = "UI construction using Target will be discontinued"
-)]
-pub struct Target<T> {
-    pub(crate) inner: Vec<Element<T>>,
-}
-
-impl<T> Target<T> {
-    #[deprecated(
-        since = "0.0.2",
-        note = "UI construction using Target will be discontinued"
-    )]
-    pub fn get(&self) -> &[Element<T>] {
-        &self.inner
-    }
-}
-
-#[deprecated(
-    since = "0.0.2",
-    note = "UI construction using Element will be discontinued"
-)]
-pub struct Element<T> {
-    pub(crate) widget: Box<dyn Widget>,
-    pub(crate) msg: Option<T>,
-}
-
-impl<T> Element<T> {
-    #[deprecated(
-        since = "0.0.2",
-        note = "UI construction using Element will be discontinued"
-    )]
-    pub fn get(&self) -> Vec<&Box<dyn Widget>> {
-        vec![&self.widget]
-    }
+pub struct Component<M> {
+    pub(crate) inner: Box<dyn Widget<M>>
 }
 
 pub trait Widget<M> 
 where
-    T: Send + std::fmt::Debug
+    M: Send + std::fmt::Debug
 {
     fn width(&self) -> u32;
     fn height(&self) -> u32;
@@ -84,10 +42,6 @@ where
     fn message(&self,msg: ClientMessage);
 }
 
-pub trait Parent {
-
-}
-
 pub struct Shadow {
     pub(crate) color: Color,
     pub(crate) border: u32,
@@ -96,7 +50,8 @@ pub struct Shadow {
 
 pub fn build_component<T,M>(widget: T) -> Component<T>
 where
-    T: Widget<M> + Parent
+    M: Send + std::fmt::Debug,
+    T: Widget<M>
 {
     Component {
         inner: widget

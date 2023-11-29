@@ -3,22 +3,11 @@ extern crate log;
 
 pub(crate) mod cde;
 pub mod frame;
-#[deprecated(
-    since = "0.0.1",
-    note = "Plugin function will be deprecated. Use the set_up method instead"
-)]
-pub mod plugin;
-#[deprecated(
-    since = "0.0.1",
-    note = "UI module is obsolete as it is no longer needed"
-)]
-pub mod ui;
 pub mod widget;
 
 use std::fmt::Debug;
 
 use frame::Frame;
-use plugin::PluginLoader;
 
 use winit::{
     event::{Event, WindowEvent},
@@ -73,7 +62,8 @@ impl Executable {
                 WindowEvent::RedrawRequested => {
                     let frame = app.route(ApplicationEvent::RedrawRequested);
                     let element = frame.ui();
-                    cde.draw(frame.bgr(), &element);
+                    cde.bgr(frame.bgr());
+                    cde.write();
                     self.window.set_title(&frame.title());
                     self.window.pre_present_notify();
                 }
@@ -96,12 +86,6 @@ impl Default for Executable {
 
 pub trait Application: Sized {
     type Message: Send + Debug;
-
-    #[deprecated(
-        since = "0.0.1",
-        note = "Plugin function will be deprecated. Use the set_up method instead"
-    )]
-    fn init(&mut self, loader: &PluginLoader);
 
     fn set_up(&mut self) {}
 

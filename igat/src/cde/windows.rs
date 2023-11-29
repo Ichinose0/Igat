@@ -1,19 +1,22 @@
-use crate::widget::Target;
+use std::marker::PhantomData;
+
 use acure::{Acure, AlignMode};
 use raw_window_handle::HasWindowHandle;
 
-pub struct Cde<T>
+use crate::widget::{Component, Widget};
+
+pub struct Cde<M>
 where
-    T: Send + std::fmt::Debug,
+    M: Send + std::fmt::Debug,
 {
     acure: Acure,
     surface: acure::gdi::GDISurface,
-    msg: Option<T>,
+    phantom: PhantomData<M>
 }
 
-impl<T> Cde<T>
+impl<M> Cde<M>
 where
-    T: Send + std::fmt::Debug,
+    M: Send + std::fmt::Debug,
 {
     pub fn new(handle: &impl HasWindowHandle) -> Self {
         let handle = handle.window_handle().unwrap();
@@ -21,50 +24,53 @@ where
             raw_window_handle::RawWindowHandle::Win32(handle) => Self {
                 acure: Acure::new(),
                 surface: acure::gdi::GDISurface::new(isize::from(handle.hwnd)),
-                msg: None,
+                phantom: PhantomData,
             },
             _ => panic!("Error"),
         }
     }
 
-    pub fn draw(&self, color: crate::Color, target: &Target<T>) {
+    pub fn bgr(&self, color: crate::Color) {
         self.acure
             .push(acure::Command::Clear(color_to_acure_color(color)));
+    }
 
-        for i in target.get() {
-            match i.widget.widget_type() {
-                crate::widget::WidgetType::Rectangle => {
-                    let shadow = i.widget.shadow();
-                    let border = shadow.border;
-                    self.acure.set_align_mode(AlignMode::CenterAligned);
-                    self.acure.push(acure::Command::FillRectangle(
-                        i.widget.x(),
-                        i.widget.y(),
-                        i.widget.width() + border * 2,
-                        i.widget.height() + border * 2,
-                        color_to_acure_color(shadow.color),
-                    ));
-                    self.acure.push(acure::Command::FillRectangle(
-                        i.widget.x() + border,
-                        i.widget.y() + border,
-                        i.widget.width(),
-                        i.widget.height(),
-                        color_to_acure_color(i.widget.background_color()),
-                    ));
-                }
-                crate::widget::WidgetType::Circle => todo!(),
-                crate::widget::WidgetType::Text => {
-                    self.acure.push(acure::Command::WriteString(
-                        i.widget.x(),
-                        i.widget.y(),
-                        i.widget.width(),
-                        i.widget.height(),
-                        color_to_acure_color(i.widget.color()),
-                        i.widget.title().to_owned(),
-                    ));
-                }
+    pub fn draw(&self, color: crate::Color, widget: &Box<dyn Widget<M>>) {
+        match widget.widget_type() {
+            crate::widget::WidgetType::Rectangle => {
+                let shadow = widget.shadow();
+                let border = shadow.border;
+                self.acure.set_align_mode(AlignMode::CenterAligned);
+                self.acure.push(acure::Command::FillRectangle(
+                    widget.x(),
+                    widget.y(),
+                    widget.width() + border * 2,
+                    widget.height() + border * 2,
+                    color_to_acure_color(shadow.color),
+                ));
+                self.acure.push(acure::Command::FillRectangle(
+                    widget.x() + border,
+                    widget.y() + border,
+                    widget.width(),
+                    widget.height(),
+                    color_to_acure_color(widget.background_color()),
+                ));
+            }
+            crate::widget::WidgetType::Circle => todo!(),
+            crate::widget::WidgetType::Text => {
+                self.acure.push(acure::Command::WriteString(
+                    widget.x(),
+                    widget.y(),
+                    widget.width(),
+                    widget.height(),
+                    color_to_acure_color(widget.color()),
+                    widget.title().to_owned(),
+                ));
             }
         }
+    }
+
+    pub fn write(&self) {
         self.acure.write(&self.surface);
         self.acure.clear();
     }
