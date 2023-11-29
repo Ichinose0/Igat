@@ -35,7 +35,7 @@ where
             .push(acure::Command::Clear(color_to_acure_color(color)));
     }
 
-    pub fn draw(&self, widget: &Box<dyn Widget<M>>) {
+    pub fn draw(&self, widget: &Box<dyn Widget<M>>) -> Option<M> {
         match widget.widget_type() {
             crate::widget::WidgetType::Rectangle => {
                 let shadow = widget.shadow();
@@ -55,6 +55,7 @@ where
                     widget.height(),
                     color_to_acure_color(widget.background_color()),
                 ));
+                return widget.on_click();
             }
             crate::widget::WidgetType::Circle => todo!(),
             crate::widget::WidgetType::Text => {
@@ -68,6 +69,7 @@ where
                 ));
             }
         }
+        None
     }
 
     pub fn write(&self) {

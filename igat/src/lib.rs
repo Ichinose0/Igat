@@ -88,7 +88,6 @@ impl Executable {
     {
         let mut ctx = ApplicationContext::new(app);
         ctx.set_up();
-    
 
         let cde:Cde<M> = Cde::new(&self.window);
 
@@ -98,15 +97,24 @@ impl Executable {
                 WindowEvent::CloseRequested => elwt.exit(),
                 WindowEvent::RedrawRequested => {
                     let frame = ctx.route(ApplicationEvent::RedrawRequested);
+                    let title = &frame.title();
+                    self.window.set_title(title);
                     cde.bgr(frame.bgr());
                     match frame.ui() {
                         Some(component) => {
-                            cde.draw(&component.inner);
+                            match cde.draw(&component.inner) {
+                                Some(message) => {
+                                    ctx.dispatch_message(message);
+                                }
+
+                                None => {
+
+                                }
+                            }
                         },
                         None => {},
                     };
                     cde.write();
-                    self.window.set_title(&frame.title());
                     self.window.pre_present_notify();
                 }
                 _ => (),

@@ -49,11 +49,16 @@ where
         self.y = y;
         self
     }
+
+    pub fn on_click(mut self,on_click: M) -> Self {
+        self.on_click = Some(on_click);
+        self
+    }
 }
 
 impl<M> Widget<M> for NewButton<M> 
 where
-    M: Send + std::fmt::Debug
+    M: Send + Copy + std::fmt::Debug
 {
     fn width(&self) -> u32 {
         self.width
@@ -87,8 +92,8 @@ where
         &self.text
     }
 
-    fn on_click(&self) -> &Option<M> {
-        &self.on_click
+    fn on_click(&self) -> Option<M> {
+        self.on_click
     }
 
     fn message(&self,msg: ClientMessage) {

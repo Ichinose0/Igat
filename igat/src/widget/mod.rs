@@ -40,7 +40,7 @@ where
     fn widget_type(&self) -> WidgetType;
     fn title(&self) -> &str;
 
-    fn on_click(&self) -> &Option<M>;
+    fn on_click(&self) -> Option<M>;
 
     fn message(&self,msg: ClientMessage);
 }
@@ -53,7 +53,7 @@ pub struct Shadow {
 
 pub fn build_component<M,T>(widget: T) -> Component<M>
 where
-    M: Send + std::fmt::Debug,
+    M: Send + Copy + std::fmt::Debug,
     T: Widget<M> + 'static
 {
     Component {

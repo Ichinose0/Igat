@@ -1,7 +1,9 @@
 use igat::{frame::Frame, Application, ApplicationEvent, Executable, widget::{Component, build_component, NewButton}};
 
-#[derive(Debug)]
-pub enum Message {}
+#[derive(Clone,Copy,Debug)]
+pub enum Message {
+    ButtonClicked
+}
 
 pub struct Poweredit {
     frame: MyFrame,
@@ -19,7 +21,7 @@ impl Application<Message> for Poweredit {
     fn set_up(&mut self) {}
 
     fn message(&mut self,event: Message) {
-        
+        println!("{:?}",event);
     }
 }
 
@@ -41,7 +43,9 @@ impl Frame for MyFrame {
                                             .width(240)
                                             .height(80)
                                             .x(20)
-                                            .y(20);
+                                            .y(20)
+                                            .on_click(Message::ButtonClicked);
+
         Some(build_component(button))
     }
 
