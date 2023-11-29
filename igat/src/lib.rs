@@ -5,7 +5,7 @@ pub(crate) mod cde;
 pub mod frame;
 pub mod widget;
 
-use std::fmt::Debug;
+use std::{fmt::Debug, marker::PhantomData};
 
 use frame::Frame;
 
@@ -35,6 +35,40 @@ pub struct Executable {
     event_loop: EventLoop<()>,
 }
 
+pub struct ApplicationContext<A,M>
+where
+    A: Application<M>,
+    M: Send + std::fmt::Debug
+{
+    app: A,
+    phantom: PhantomData<M>
+}
+
+impl<A,M> ApplicationContext<A,M>
+where
+    A: Application<M>,
+    M: Send + std::fmt::Debug
+{
+    fn new(app: A) -> Self {
+        Self {
+            app,
+            phantom: PhantomData
+        }
+    }
+
+    fn set_up(&mut self) {
+        self.app.set_up();
+    }
+
+    fn route(&mut self,event: ApplicationEvent) -> &dyn Frame<Message = M> {
+        self.app.route(event)
+    }
+
+    pub fn dispatch_message(&mut self,message: M) {
+        self.app.message(message);
+    }
+}
+
 impl Executable {
     pub fn new() -> Self {
         let event_loop = EventLoop::new().unwrap();
@@ -47,23 +81,26 @@ impl Executable {
         Self { window, event_loop }
     }
 
-    pub fn run<T>(self, mut app: T)
+    pub fn run<T,M>(self, app: T)
     where
-        T: Application,
+        T: Application<M>,
+        M: Send + std::fmt::Debug
     {
-        app.set_up();
+        let mut ctx = ApplicationContext::new(app);
+        ctx.set_up();
+    
 
-        let cde = Cde::new(&self.window);
+        //let cde = Cde::new(&self.window);
 
         let _result = self.event_loop.run(move |event, elwt| match event {
             Event::WindowEvent { event, window_id } if window_id == self.window.id() => match event
             {
                 WindowEvent::CloseRequested => elwt.exit(),
                 WindowEvent::RedrawRequested => {
-                    let frame = app.route(ApplicationEvent::RedrawRequested);
+                    let frame = ctx.route(ApplicationEvent::RedrawRequested);
                     let element = frame.ui();
-                    cde.bgr(frame.bgr());
-                    cde.write();
+                    // cde.bgr(frame.bgr());
+                    // cde.write();
                     self.window.set_title(&frame.title());
                     self.window.pre_present_notify();
                 }
@@ -84,12 +121,19 @@ impl Default for Executable {
     }
 }
 
-pub trait Application: Sized {
+pub trait Application<M>: Sized 
+where
+    M: Send + std::fmt::Debug
+{
     type Message: Send + Debug;
 
     fn set_up(&mut self) {}
 
-    fn route(&self, event: ApplicationEvent) -> &dyn Frame<Message = Self::Message>;
+    fn message(&mut self,event: M) {
+
+    }
+
+    fn route(&self, event: ApplicationEvent) -> &dyn Frame<Message = M>;
 
     fn on_close(&self);
 }

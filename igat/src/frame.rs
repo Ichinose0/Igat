@@ -9,5 +9,5 @@ pub trait Frame {
 
     fn bgr(&self) -> Color;
     fn title(&self) -> String;
-    fn ui(&self) -> Component<Self::Message>;
+    fn ui(&self) -> Option<Component<Self::Message>>;
 }

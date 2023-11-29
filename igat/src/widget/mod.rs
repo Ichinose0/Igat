@@ -14,11 +14,14 @@ pub enum WidgetType {
     Text,
 }
 
-pub struct Component<M> {
+pub struct Component<M> 
+where
+    M: Send + std::fmt::Debug
+{
     pub(crate) inner: Box<dyn Widget<M>>
 }
 
-pub trait Widget<M> 
+pub trait Widget<M> : Send + std::fmt::Debug
 where
     M: Send + std::fmt::Debug
 {
@@ -48,12 +51,12 @@ pub struct Shadow {
 }
 
 
-pub fn build_component<T,M>(widget: T) -> Component<T>
+pub fn build_component<M,T>(widget: T) -> Component<M>
 where
     M: Send + std::fmt::Debug,
-    T: Widget<M>
+    T: Widget<M> + 'static
 {
     Component {
-        inner: widget
+        inner: Box::new(widget)
     }
 }

@@ -2,6 +2,7 @@ use crate::Color;
 
 use super::{Widget, WidgetType, ClientMessage};
 
+#[derive(Debug)]
 pub struct NewButton<M> 
 where
     M: Send + std::fmt::Debug

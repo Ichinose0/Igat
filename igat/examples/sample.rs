@@ -1,4 +1,4 @@
-use igat::{frame::Frame, Application, ApplicationEvent, Executable};
+use igat::{frame::Frame, Application, ApplicationEvent, Executable, widget::Component};
 
 #[derive(Debug)]
 pub enum Message {}
@@ -7,16 +7,20 @@ pub struct Poweredit {
     frame: MyFrame,
 }
 
-impl Application for Poweredit {
+impl Application<Message> for Poweredit {
     type Message = Message;
-
-    fn init(&mut self, loader: &igat::plugin::PluginLoader) {}
 
     fn route(&self, event: ApplicationEvent) -> &dyn Frame<Message = Self::Message> {
         &self.frame
     }
 
     fn on_close(&self) {}
+
+    fn set_up(&mut self) {}
+
+    fn message(&mut self,event: Message) {
+
+    }
 }
 
 pub struct MyFrame {}
@@ -32,13 +36,8 @@ impl Frame for MyFrame {
         "サンプルフレーム".to_owned()
     }
 
-    fn ui(&self) -> igat::widget::Target<Self::Message> {
-        let text = igat::widget::Button::new()
-            .width(120)
-            .height(60)
-            .text(String::from("ボタン"));
-
-        text.build()
+    fn ui(&self) -> Option<Component<Message>> {
+        None
     }
 
     fn resizable(&self) -> bool {
