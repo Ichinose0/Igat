@@ -90,7 +90,7 @@ impl Executable {
         ctx.set_up();
     
 
-        //let cde = Cde::new(&self.window);
+        let cde:Cde<M> = Cde::new(&self.window);
 
         let _result = self.event_loop.run(move |event, elwt| match event {
             Event::WindowEvent { event, window_id } if window_id == self.window.id() => match event
@@ -98,9 +98,14 @@ impl Executable {
                 WindowEvent::CloseRequested => elwt.exit(),
                 WindowEvent::RedrawRequested => {
                     let frame = ctx.route(ApplicationEvent::RedrawRequested);
-                    let element = frame.ui();
-                    // cde.bgr(frame.bgr());
-                    // cde.write();
+                    cde.bgr(frame.bgr());
+                    match frame.ui() {
+                        Some(component) => {
+                            cde.draw(&component.inner);
+                        },
+                        None => {},
+                    };
+                    cde.write();
                     self.window.set_title(&frame.title());
                     self.window.pre_present_notify();
                 }

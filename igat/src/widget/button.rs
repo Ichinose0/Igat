@@ -15,6 +15,42 @@ where
     on_click: Option<M>
 }
 
+impl<M> NewButton<M>
+where
+    M: Send + std::fmt::Debug
+{
+    pub fn new() -> Self {
+        Self {
+            width: 1,
+            height: 1,
+            x: 1,
+            y: 1,
+            text: String::new(),
+            on_click: None
+        }
+    }
+
+    pub fn width(mut self,width: u32) -> Self {
+        self.width = width;
+        self
+    }
+
+    pub fn height(mut self,height: u32) -> Self {
+        self.height = height;
+        self
+    }
+
+    pub fn x(mut self,x: u32) -> Self {
+        self.x = x;
+        self
+    }
+
+    pub fn y(mut self,y: u32) -> Self {
+        self.y = y;
+        self
+    }
+}
+
 impl<M> Widget<M> for NewButton<M> 
 where
     M: Send + std::fmt::Debug

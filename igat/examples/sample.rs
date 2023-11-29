@@ -1,4 +1,4 @@
-use igat::{frame::Frame, Application, ApplicationEvent, Executable, widget::Component};
+use igat::{frame::Frame, Application, ApplicationEvent, Executable, widget::{Component, build_component, NewButton}};
 
 #[derive(Debug)]
 pub enum Message {}
@@ -19,7 +19,7 @@ impl Application<Message> for Poweredit {
     fn set_up(&mut self) {}
 
     fn message(&mut self,event: Message) {
-
+        
     }
 }
 
@@ -37,7 +37,12 @@ impl Frame for MyFrame {
     }
 
     fn ui(&self) -> Option<Component<Message>> {
-        None
+        let button = NewButton::new()
+                                            .width(240)
+                                            .height(80)
+                                            .x(20)
+                                            .y(20);
+        Some(build_component(button))
     }
 
     fn resizable(&self) -> bool {

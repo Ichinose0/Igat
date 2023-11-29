@@ -35,7 +35,7 @@ where
             .push(acure::Command::Clear(color_to_acure_color(color)));
     }
 
-    pub fn draw(&self, color: crate::Color, widget: &Box<dyn Widget<M>>) {
+    pub fn draw(&self, widget: &Box<dyn Widget<M>>) {
         match widget.widget_type() {
             crate::widget::WidgetType::Rectangle => {
                 let shadow = widget.shadow();
