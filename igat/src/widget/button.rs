@@ -138,12 +138,13 @@ where
 }
 
 
-pub struct NewButton {
+pub struct NewButton<M> {
     width: u32,
     height: u32,
     x: u32,
     y: u32,
-    text: String
+    text: String,
+    on_click: Option<M>
 }
 
 impl Widget for NewButton {
@@ -177,5 +178,13 @@ impl Widget for NewButton {
 
     fn title(&self) -> &str {
         &self.text
+    }
+
+    fn on_click(&self) -> &Option<M> {
+        &self.on_click
+    }
+
+    fn message(&self,msg: ClientMessage) {
+
     }
 }

@@ -6,6 +6,10 @@ pub use text::*;
 
 use crate::Color;
 
+pub enum ClientMessage {
+    OnClick
+}
+
 pub enum WidgetType {
     Rectangle,
     Circle,
@@ -16,7 +20,7 @@ pub struct Component<T>
 where
     T: Widget
 {
-    inner: T
+    pub(crate) inner: T
 }
 
 pub struct Target<T> {
@@ -40,7 +44,10 @@ impl<T> Element<T> {
     }
 }
 
-pub trait Widget {
+pub trait Widget<M> 
+where
+    T: Send + std::fmt::Debug
+{
     fn width(&self) -> u32;
     fn height(&self) -> u32;
     fn x(&self) -> u32;
@@ -55,6 +62,14 @@ pub trait Widget {
     }
     fn widget_type(&self) -> WidgetType;
     fn title(&self) -> &str;
+
+    fn on_click(&self) -> &Option<M>;
+
+    fn message(&self,msg: ClientMessage);
+}
+
+pub trait Parent {
+    
 }
 
 pub struct Shadow {
@@ -65,7 +80,7 @@ pub struct Shadow {
 
 pub fn build_component<T>(widget: T) -> Component<T>
 where
-    T: Widget
+    T: Widget + Parent
 {
     Component {
         inner: widget
