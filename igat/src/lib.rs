@@ -4,9 +4,11 @@ extern crate log;
 pub(crate) mod cde;
 pub mod frame;
 pub mod widget;
+pub mod cursor;
 
 use std::{fmt::Debug, marker::PhantomData};
 
+use cursor::Cursor;
 use frame::Frame;
 
 use winit::{
@@ -99,6 +101,23 @@ impl Executable {
                     let frame = ctx.route(ApplicationEvent::RedrawRequested);
                     let title = &frame.title();
                     self.window.set_title(title);
+                    let cursor = Cursor::get();
+                    match cursor.window_x(&self.window) {
+                        Some(x) => {
+                            println!("{}",x);
+                        }
+                        None => {
+
+                        }
+                    }
+                    match cursor.window_y(&self.window) {
+                        Some(y) => {
+                            println!("{}",y);
+                        }
+                        None => {
+                            
+                        }
+                    }
                     cde.bgr(frame.bgr());
                     match frame.ui() {
                         Some(component) => {
