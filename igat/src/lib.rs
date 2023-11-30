@@ -62,7 +62,7 @@ where
         self.app.set_up();
     }
 
-    fn route(&mut self,event: ApplicationEvent) -> &dyn Frame<Message = M> {
+    fn route(&mut self,event: ApplicationEvent) -> &mut dyn Frame<Message = M> {
         self.app.route(event)
     }
 
@@ -98,29 +98,31 @@ impl Executable {
             {
                 WindowEvent::CloseRequested => elwt.exit(),
                 WindowEvent::RedrawRequested => {
-                    let frame = ctx.route(ApplicationEvent::RedrawRequested);
+                    let frame: &mut dyn Frame<Message = M> = ctx.route(ApplicationEvent::RedrawRequested);
                     let title = &frame.title();
                     self.window.set_title(title);
                     let cursor = Cursor::get();
-                    match cursor.window_x(&self.window) {
-                        Some(x) => {
-                            println!("{}",x);
-                        }
-                        None => {
-
-                        }
-                    }
-                    match cursor.window_y(&self.window) {
-                        Some(y) => {
-                            println!("{}",y);
-                        }
-                        None => {
-                            
-                        }
-                    }
+                    
                     cde.bgr(frame.bgr());
                     match frame.ui() {
-                        Some(component) => {
+                        Some(mut component) => {
+                            match cursor.window_x(&self.window) {
+                                Some(x) => {
+                                    match cursor.window_y(&self.window) {
+                                        // Determine if the cursor is at the widget position
+                                        Some(y) => {
+                                            if (x as u32) > component.inner.x() && (x as u32) < component.inner.x()+component.inner.width() {
+                                                if (y as u32) > component.inner.y() && (y as u32) < component.inner.y()+component.inner.height() {
+                                                    component.inner.message(widget::ClientMessage::OnHover)
+                                                }
+                                            }
+                                            println!("{}",y);
+                                        }
+                                        None => {}
+                                    }
+                                }
+                                None => {}
+                            }
                             match cde.draw(&component.inner) {
                                 Some(message) => {
                                     ctx.dispatch_message(message);
@@ -165,7 +167,7 @@ where
 
     }
 
-    fn route(&self, event: ApplicationEvent) -> &dyn Frame<Message = M>;
+    fn route(&mut self, event: ApplicationEvent) -> &mut dyn Frame<Message = M>;
 
     fn on_close(&self);
 }

@@ -4,8 +4,10 @@ pub use button::*;
 
 use crate::Color;
 
+#[derive(Debug)]
 pub enum ClientMessage {
-    OnClick
+    OnClick,
+    OnHover
 }
 
 pub enum WidgetType {
@@ -42,7 +44,7 @@ where
 
     fn on_click(&self) -> Option<M>;
 
-    fn message(&self,msg: ClientMessage);
+    fn message(&mut self,msg: ClientMessage);
 }
 
 pub struct Shadow {

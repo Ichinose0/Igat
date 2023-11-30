@@ -12,8 +12,8 @@ pub struct Poweredit {
 impl Application<Message> for Poweredit {
     type Message = Message;
 
-    fn route(&self, event: ApplicationEvent) -> &dyn Frame<Message = Self::Message> {
-        &self.frame
+    fn route(&mut self, event: ApplicationEvent) -> &mut dyn Frame<Message = Self::Message> {
+        &mut self.frame
     }
 
     fn on_close(&self) {}
@@ -25,7 +25,9 @@ impl Application<Message> for Poweredit {
     }
 }
 
-pub struct MyFrame {}
+pub struct MyFrame {
+
+}
 
 impl Frame for MyFrame {
     type Message = Message;
@@ -45,7 +47,6 @@ impl Frame for MyFrame {
                                             .x(20)
                                             .y(20)
                                             .on_click(Message::ButtonClicked);
-
         Some(build_component(button))
     }
 
@@ -56,6 +57,7 @@ impl Frame for MyFrame {
 
 fn main() {
     let exe = Executable::new();
-    let app = Poweredit { frame: MyFrame {} };
+    
+    let app = Poweredit { frame: MyFrame { } };
     exe.run(app);
 }

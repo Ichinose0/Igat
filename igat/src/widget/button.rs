@@ -11,6 +11,7 @@ where
     height: u32,
     x: u32,
     y: u32,
+    background_color: Color,
     text: String,
     on_click: Option<M>
 }
@@ -26,7 +27,8 @@ where
             x: 1,
             y: 1,
             text: String::new(),
-            on_click: None
+            on_click: None,
+            background_color: Color::White,
         }
     }
 
@@ -81,7 +83,7 @@ where
     }
 
     fn background_color(&self) -> Color {
-        Color::White
+        self.background_color
     }
 
     fn widget_type(&self) -> WidgetType {
@@ -96,7 +98,14 @@ where
         self.on_click
     }
 
-    fn message(&self,msg: ClientMessage) {
-
+    fn message(&mut self,msg: ClientMessage) {
+        println!("{:?}",self.background_color);
+        self.background_color = Color::White;
+        match msg {
+            ClientMessage::OnClick => todo!(),
+            ClientMessage::OnHover => {
+                self.background_color = Color::ARGB(255,0,0,200);
+            },
+        }
     }
 }
