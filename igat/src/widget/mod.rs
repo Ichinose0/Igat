@@ -8,7 +8,7 @@ use crate::Color;
 pub enum ClientMessage {
     OnClick,
     OnHover,
-    Unfocus
+    Unfocus,
 }
 
 pub enum WidgetType {
@@ -17,16 +17,16 @@ pub enum WidgetType {
     Text,
 }
 
-pub struct Component<M> 
+pub struct Component<M>
 where
-    M: Send + std::fmt::Debug
+    M: Send + std::fmt::Debug,
 {
-    pub(crate) inner: Box<dyn Widget<M>>
+    pub(crate) inner: Box<dyn Widget<M>>,
 }
 
-pub trait Widget<M> : Send + std::fmt::Debug
+pub trait Widget<M>: Send + std::fmt::Debug
 where
-    M: Send + std::fmt::Debug
+    M: Send + std::fmt::Debug,
 {
     fn width(&self) -> u32;
     fn height(&self) -> u32;
@@ -45,7 +45,7 @@ where
 
     fn on_click(&self) -> Option<M>;
 
-    fn message(&mut self,msg: ClientMessage);
+    fn message(&mut self, msg: ClientMessage);
 }
 
 pub struct Shadow {
@@ -53,13 +53,12 @@ pub struct Shadow {
     pub(crate) border: u32,
 }
 
-
-pub fn build_component<M,T>(widget: T) -> Component<M>
+pub fn build_component<M, T>(widget: T) -> Component<M>
 where
     M: Send + Copy + std::fmt::Debug,
-    T: Widget<M> + 'static
+    T: Widget<M> + 'static,
 {
     Component {
-        inner: Box::new(widget)
+        inner: Box::new(widget),
     }
 }

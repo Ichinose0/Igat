@@ -4,11 +4,9 @@ extern crate log;
 pub(crate) mod cde;
 pub mod frame;
 pub mod widget;
-pub mod cursor;
 
 use std::{fmt::Debug, marker::PhantomData};
 
-use cursor::Cursor;
 use frame::Frame;
 
 use widget::Component;
@@ -38,24 +36,24 @@ pub struct Executable {
     event_loop: EventLoop<()>,
 }
 
-pub struct ApplicationContext<A,M>
+pub struct ApplicationContext<A, M>
 where
     A: Application<M>,
-    M: Send + std::fmt::Debug
+    M: Send + std::fmt::Debug,
 {
     app: A,
-    phantom: PhantomData<M>
+    phantom: PhantomData<M>,
 }
 
-impl<A,M> ApplicationContext<A,M>
+impl<A, M> ApplicationContext<A, M>
 where
     A: Application<M>,
-    M: Send + std::fmt::Debug
+    M: Send + std::fmt::Debug,
 {
     fn new(app: A) -> Self {
         Self {
             app,
-            phantom: PhantomData
+            phantom: PhantomData,
         }
     }
 
@@ -63,11 +61,11 @@ where
         self.app.set_up();
     }
 
-    fn route(&mut self,event: ApplicationEvent) -> &mut dyn Frame<Message = M> {
+    fn route(&mut self, event: ApplicationEvent) -> &mut dyn Frame<Message = M> {
         self.app.route(event)
     }
 
-    pub fn dispatch_message(&mut self,message: M) {
+    pub fn dispatch_message(&mut self, message: M) {
         self.app.message(message);
     }
 }
@@ -84,15 +82,15 @@ impl Executable {
         Self { window, event_loop }
     }
 
-    pub fn run<T,M>(self, app: T)
+    pub fn run<T, M>(self, app: T)
     where
         T: Application<M>,
-        M: Send + std::fmt::Debug
+        M: Send + std::fmt::Debug,
     {
         let mut ctx = ApplicationContext::new(app);
         ctx.set_up();
 
-        let cde:Cde<M> = Cde::new(&self.window);
+        let cde: Cde<M> = Cde::new(&self.window);
         let theme = ctx.app.theme();
         let mut ui = ctx.app.ui();
 
@@ -101,64 +99,47 @@ impl Executable {
             {
                 WindowEvent::CloseRequested => elwt.exit(),
                 WindowEvent::RedrawRequested => {
-                    let frame: &mut dyn Frame<Message = M> = ctx.route(ApplicationEvent::RedrawRequested);
+                    let frame: &mut dyn Frame<Message = M> =
+                        ctx.route(ApplicationEvent::RedrawRequested);
                     let title = &frame.title();
                     self.window.set_title(title);
-                    let cursor = Cursor::get();
-                    
+
                     cde.bgr(theme.bgr);
                     match &mut ui {
                         Some(ref mut component) => {
-                            match cde.draw(&component.inner) {
-                                Some(message) => {
-                                    ctx.dispatch_message(message);
-                                }
-
-                                None => {
-                                    
-                                }
+                            if let Some(message) = cde.draw(&component.inner) {
+                                ctx.dispatch_message(message);
                             }
-                        },
-                        None => {},
+                        }
+                        None => {}
                     };
                     cde.write();
                     self.window.pre_present_notify();
                 }
 
-                WindowEvent::CursorMoved { device_id, position } => {
-                    match &mut ui {
-                        Some( component) => {
-                            let cursor = Cursor::get();
-                            match cursor.window_x(&self.window) {
-                                Some(x) => {
-                                    match cursor.window_y(&self.window) {
-                                        // Determine if the cursor is at the widget position
-                                        Some(y) => {
-                                            if (x as u32) > component.inner.x() && (x as u32) < component.inner.x()+component.inner.width() {
-                                                if (y as u32) > component.inner.y() && (y as u32) < component.inner.y()+component.inner.height() {
-                                                    component.inner.message(widget::ClientMessage::OnHover)
-                                                }
-                                            } else {
-                                                component.inner.message(widget::ClientMessage::Unfocus)
-                                            }
-                                        }
-                                        None => {
-                                        }
-                                    }
-                                }
-                                None => {
-                                    component.inner.message(widget::ClientMessage::Unfocus)
-                                }
+                WindowEvent::CursorMoved {
+                    device_id: _,
+                    position,
+                } => match &mut ui {
+                    Some(component) => {
+                        if (position.x as u32) > component.inner.x()
+                            && (position.x as u32) < component.inner.x() + component.inner.width()
+                        {
+                            if (position.y as u32) > component.inner.y()
+                                && (position.y as u32)
+                                    < component.inner.y() + component.inner.height()
+                            {
+                                component.inner.message(widget::ClientMessage::OnHover)
                             }
-                        },
-                        None => {
-
-                        },
+                        } else {
+                            component.inner.message(widget::ClientMessage::Unfocus)
+                        }
                     }
-                }
+                    None => {}
+                },
                 _ => (),
             },
-        
+
             Event::AboutToWait => {
                 self.window.request_redraw();
             }
@@ -174,9 +155,9 @@ impl Default for Executable {
     }
 }
 
-#[derive(Clone,Copy,Debug)]
+#[derive(Clone, Copy, Debug)]
 pub struct Theme {
-    bgr: Color
+    bgr: Color,
 }
 
 impl Theme {
@@ -184,7 +165,7 @@ impl Theme {
         Default::default()
     }
 
-    pub fn bgr(mut self,bgr: Color) -> Self {
+    pub fn bgr(mut self, bgr: Color) -> Self {
         self.bgr = bgr;
         self
     }
@@ -196,9 +177,9 @@ impl Default for Theme {
     }
 }
 
-pub trait Application<M>: Sized 
+pub trait Application<M>: Sized
 where
-    M: Send + std::fmt::Debug
+    M: Send + std::fmt::Debug,
 {
     type Message: Send + Debug;
 
@@ -206,13 +187,14 @@ where
 
     fn set_up(&mut self) {}
 
-    fn message(&mut self,event: M) {
-
-    }
+    fn message(&mut self, _event: M) {}
 
     fn ui(&mut self) -> Option<Component<M>>;
 
-    #[deprecated(since = "0.0.2", note = "UI construction using Frames will be discontinued. Please use the ui method instead")]
+    #[deprecated(
+        since = "0.0.2",
+        note = "UI construction using Frames will be discontinued. Please use the ui method instead"
+    )]
     fn route(&mut self, event: ApplicationEvent) -> &mut dyn Frame<Message = M>;
 
     fn on_close(&self);

@@ -1,8 +1,12 @@
-use igat::{frame::Frame, Application, ApplicationEvent, Executable, widget::{Component, build_component, Button}, Color, Theme};
+use igat::{
+    frame::Frame,
+    widget::{build_component, Button, Component},
+    Application, ApplicationEvent, Color, Executable, Theme,
+};
 
-#[derive(Clone,Copy,Debug)]
+#[derive(Clone, Copy, Debug)]
 pub enum Message {
-    ButtonClicked
+    ButtonClicked,
 }
 
 pub struct Poweredit {
@@ -21,17 +25,15 @@ impl Application<Message> for Poweredit {
 
     fn set_up(&mut self) {}
 
-    fn message(&mut self,event: Message) {
-
-    }
+    fn message(&mut self, event: Message) {}
 
     fn ui(&mut self) -> Option<Component<Message>> {
         let button = Button::new()
-                                            .width(240)
-                                            .height(80)
-                                            .x(20)
-                                            .y(20)
-                                            .on_click(Message::ButtonClicked);
+            .width(240)
+            .height(80)
+            .x(20)
+            .y(20)
+            .on_click(Message::ButtonClicked);
         Some(build_component(button))
     }
 
@@ -40,9 +42,7 @@ impl Application<Message> for Poweredit {
     }
 }
 
-pub struct MyFrame {
-
-}
+pub struct MyFrame {}
 
 impl Frame for MyFrame {
     type Message = Message;
@@ -57,11 +57,11 @@ impl Frame for MyFrame {
 
     fn ui(&self) -> Option<Component<Message>> {
         let button = Button::new()
-                                            .width(240)
-                                            .height(80)
-                                            .x(20)
-                                            .y(20)
-                                            .on_click(Message::ButtonClicked);
+            .width(240)
+            .height(80)
+            .x(20)
+            .y(20)
+            .on_click(Message::ButtonClicked);
         Some(build_component(button))
     }
 
@@ -72,7 +72,10 @@ impl Frame for MyFrame {
 
 fn main() {
     let exe = Executable::new();
-    
-    let app = Poweredit { theme: Theme::default(),frame: MyFrame { } };
+
+    let app = Poweredit {
+        theme: Theme::default(),
+        frame: MyFrame {},
+    };
     exe.run(app);
 }

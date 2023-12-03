@@ -3,7 +3,7 @@ use std::marker::PhantomData;
 use acure::{Acure, AlignMode};
 use raw_window_handle::HasWindowHandle;
 
-use crate::widget::{Component, Widget};
+use crate::widget::Widget;
 
 pub struct Cde<M>
 where
@@ -11,7 +11,7 @@ where
 {
     acure: Acure,
     surface: acure::d2d1::D2D1Surface,
-    phantom: PhantomData<M>
+    phantom: PhantomData<M>,
 }
 
 impl<M> Cde<M>

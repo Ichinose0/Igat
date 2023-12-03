@@ -1,11 +1,11 @@
 use crate::Color;
 
-use super::{Widget, WidgetType, ClientMessage};
+use super::{ClientMessage, Widget, WidgetType};
 
 #[derive(Debug)]
-pub struct Button<M> 
+pub struct Button<M>
 where
-    M: Send + std::fmt::Debug
+    M: Send + std::fmt::Debug,
 {
     width: u32,
     height: u32,
@@ -13,14 +13,48 @@ where
     y: u32,
     background_color: Color,
     text: String,
-    on_click: Option<M>
+    on_click: Option<M>,
 }
 
 impl<M> Button<M>
 where
-    M: Send + std::fmt::Debug
+    M: Send + std::fmt::Debug,
 {
     pub fn new() -> Self {
+        Default::default()
+    }
+
+    pub fn width(mut self, width: u32) -> Self {
+        self.width = width;
+        self
+    }
+
+    pub fn height(mut self, height: u32) -> Self {
+        self.height = height;
+        self
+    }
+
+    pub fn x(mut self, x: u32) -> Self {
+        self.x = x;
+        self
+    }
+
+    pub fn y(mut self, y: u32) -> Self {
+        self.y = y;
+        self
+    }
+
+    pub fn on_click(mut self, on_click: M) -> Self {
+        self.on_click = Some(on_click);
+        self
+    }
+}
+
+impl<M> Default for Button<M>
+where
+    M: Send + std::fmt::Debug,
+{
+    fn default() -> Self {
         Self {
             width: 1,
             height: 1,
@@ -31,36 +65,11 @@ where
             background_color: Color::White,
         }
     }
-
-    pub fn width(mut self,width: u32) -> Self {
-        self.width = width;
-        self
-    }
-
-    pub fn height(mut self,height: u32) -> Self {
-        self.height = height;
-        self
-    }
-
-    pub fn x(mut self,x: u32) -> Self {
-        self.x = x;
-        self
-    }
-
-    pub fn y(mut self,y: u32) -> Self {
-        self.y = y;
-        self
-    }
-
-    pub fn on_click(mut self,on_click: M) -> Self {
-        self.on_click = Some(on_click);
-        self
-    }
 }
 
-impl<M> Widget<M> for Button<M> 
+impl<M> Widget<M> for Button<M>
 where
-    M: Send + Copy + std::fmt::Debug
+    M: Send + Copy + std::fmt::Debug,
 {
     fn width(&self) -> u32 {
         self.width
@@ -98,15 +107,15 @@ where
         self.on_click
     }
 
-    fn message(&mut self,msg: ClientMessage) {
+    fn message(&mut self, msg: ClientMessage) {
         self.background_color = Color::White;
         match msg {
             ClientMessage::OnClick => todo!(),
             ClientMessage::OnHover => {
-                self.background_color = Color::ARGB(255,0,0,200);
-            },
+                self.background_color = Color::ARGB(255, 0, 0, 200);
+            }
             ClientMessage::Unfocus => {
-                self.background_color = Color::ARGB(255,255,255,255);
+                self.background_color = Color::ARGB(255, 255, 255, 255);
             }
         }
     }
