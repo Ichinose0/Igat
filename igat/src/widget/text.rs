@@ -3,7 +3,7 @@ use crate::Color;
 use super::{ClientMessage, Widget, WidgetType};
 
 #[derive(Debug)]
-pub struct Button<M>
+pub struct Text<M>
 where
     M: Send + std::fmt::Debug,
 {
@@ -16,7 +16,7 @@ where
     on_click: Option<M>,
 }
 
-impl<M> Button<M>
+impl<M> Text<M>
 where
     M: Send + std::fmt::Debug,
 {
@@ -50,7 +50,7 @@ where
     }
 }
 
-impl<M> Default for Button<M>
+impl<M> Default for Text<M>
 where
     M: Send + std::fmt::Debug,
 {
@@ -67,7 +67,7 @@ where
     }
 }
 
-impl<M> Widget<M> for Button<M>
+impl<M> Widget<M> for Text<M>
 where
     M: Send + Copy + std::fmt::Debug,
 {
@@ -96,7 +96,7 @@ where
     }
 
     fn widget_type(&self) -> WidgetType {
-        WidgetType::Rectangle
+        WidgetType::Text
     }
 
     fn title(&self) -> &str {
@@ -107,18 +107,7 @@ where
         self.on_click
     }
 
-    fn message(&mut self, msg: ClientMessage) {
-        self.background_color = Color::White;
-        match msg {
-            ClientMessage::OnClick => todo!(),
-            ClientMessage::OnHover => {
-                self.background_color = Color::ARGB(255, 0, 0, 200);
-            }
-            ClientMessage::Unfocus => {
-                self.background_color = Color::ARGB(255, 255, 255, 255);
-            }
-        }
-    }
+    fn message(&mut self, msg: ClientMessage) { }
 
     fn is_capture_event(&self) -> bool {
         false

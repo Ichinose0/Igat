@@ -1,6 +1,8 @@
 mod button;
+mod text;
 
 pub use button::*;
+pub use text::*;
 
 use crate::Color;
 
@@ -46,6 +48,8 @@ where
     fn on_click(&self) -> Option<M>;
 
     fn message(&mut self, msg: ClientMessage);
+
+    fn is_capture_event(&self) -> bool;
 }
 
 pub struct Shadow {

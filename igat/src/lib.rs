@@ -122,17 +122,20 @@ impl Executable {
                     position,
                 } => match &mut ui {
                     Some(component) => {
-                        if (position.x as u32) > component.inner.x()
-                            && (position.x as u32) < component.inner.x() + component.inner.width()
-                        {
-                            if (position.y as u32) > component.inner.y()
-                                && (position.y as u32)
-                                    < component.inner.y() + component.inner.height()
+                        if component.inner.is_capture_event() {
+                            if (position.x as u32) > component.inner.x()
+                                && (position.x as u32)
+                                    < component.inner.x() + component.inner.width()
                             {
-                                component.inner.message(widget::ClientMessage::OnHover)
+                                if (position.y as u32) > component.inner.y()
+                                    && (position.y as u32)
+                                        < component.inner.y() + component.inner.height()
+                                {
+                                    component.inner.message(widget::ClientMessage::OnHover)
+                                }
+                            } else {
+                                component.inner.message(widget::ClientMessage::Unfocus)
                             }
-                        } else {
-                            component.inner.message(widget::ClientMessage::Unfocus)
                         }
                     }
                     None => {}

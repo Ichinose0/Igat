@@ -1,6 +1,6 @@
 use igat::{
     frame::Frame,
-    widget::{build_component, Button, Component},
+    widget::{build_component, Button, Component, Text},
     Application, ApplicationEvent, Color, Executable, Theme,
 };
 
@@ -28,7 +28,7 @@ impl Application<Message> for Poweredit {
     fn message(&mut self, event: Message) {}
 
     fn ui(&mut self) -> Option<Component<Message>> {
-        let button = Button::new()
+        let button = Text::new()
             .width(240)
             .height(80)
             .x(20)
