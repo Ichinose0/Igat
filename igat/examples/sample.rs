@@ -23,6 +23,16 @@ impl Application<Message> for Poweredit {
     fn message(&mut self,event: Message) {
         println!("{:?}",event);
     }
+
+    fn ui(&mut self) -> Option<Component<Message>> {
+        let button = NewButton::new()
+                                            .width(240)
+                                            .height(80)
+                                            .x(20)
+                                            .y(20)
+                                            .on_click(Message::ButtonClicked);
+        Some(build_component(button))
+    }
 }
 
 pub struct MyFrame {

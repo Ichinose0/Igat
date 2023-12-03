@@ -7,7 +7,8 @@ use crate::Color;
 #[derive(Debug)]
 pub enum ClientMessage {
     OnClick,
-    OnHover
+    OnHover,
+    Unfocus
 }
 
 pub enum WidgetType {

@@ -105,6 +105,9 @@ where
             ClientMessage::OnHover => {
                 self.background_color = Color::ARGB(255,0,0,200);
             },
+            ClientMessage::Unfocus => {
+                self.background_color = Color::ARGB(255,255,255,255);
+            }
         }
     }
 }

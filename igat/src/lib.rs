@@ -11,6 +11,7 @@ use std::{fmt::Debug, marker::PhantomData};
 use cursor::Cursor;
 use frame::Frame;
 
+use widget::Component;
 use winit::{
     event::{Event, WindowEvent},
     event_loop::EventLoop,
@@ -92,6 +93,7 @@ impl Executable {
         ctx.set_up();
 
         let cde:Cde<M> = Cde::new(&self.window);
+        let mut ui = ctx.app.ui();
 
         let _result = self.event_loop.run(move |event, elwt| match event {
             Event::WindowEvent { event, window_id } if window_id == self.window.id() => match event
@@ -104,8 +106,28 @@ impl Executable {
                     let cursor = Cursor::get();
                     
                     cde.bgr(frame.bgr());
-                    match frame.ui() {
-                        Some(mut component) => {
+                    match &mut ui {
+                        Some(ref mut component) => {
+                            match cde.draw(&component.inner) {
+                                Some(message) => {
+                                    ctx.dispatch_message(message);
+                                }
+
+                                None => {
+                                    
+                                }
+                            }
+                        },
+                        None => {},
+                    };
+                    cde.write();
+                    self.window.pre_present_notify();
+                }
+
+                WindowEvent::CursorMoved { device_id, position } => {
+                    match &mut ui {
+                        Some( component) => {
+                            let cursor = Cursor::get();
                             match cursor.window_x(&self.window) {
                                 Some(x) => {
                                     match cursor.window_y(&self.window) {
@@ -115,31 +137,30 @@ impl Executable {
                                                 if (y as u32) > component.inner.y() && (y as u32) < component.inner.y()+component.inner.height() {
                                                     component.inner.message(widget::ClientMessage::OnHover)
                                                 }
+                                            } else {
+                                                component.inner.message(widget::ClientMessage::Unfocus)
                                             }
-                                            println!("{}",y);
                                         }
-                                        None => {}
+                                        None => {
+                                            println!("Unfocus");
+                                            
+                                        }
                                     }
                                 }
-                                None => {}
-                            }
-                            match cde.draw(&component.inner) {
-                                Some(message) => {
-                                    ctx.dispatch_message(message);
-                                }
-
                                 None => {
-
+                                    println!("Unfocus");
+                                    component.inner.message(widget::ClientMessage::Unfocus)
                                 }
                             }
                         },
-                        None => {},
-                    };
-                    cde.write();
-                    self.window.pre_present_notify();
+                        None => {
+
+                        },
+                    }
                 }
                 _ => (),
             },
+        
             Event::AboutToWait => {
                 self.window.request_redraw();
             }
@@ -167,6 +188,9 @@ where
 
     }
 
+    fn ui(&mut self) -> Option<Component<M>>;
+
+    #[deprecated(since = "0.0.2", note = "UI construction using Frames will be discontinued. Please use the ui method instead")]
     fn route(&mut self, event: ApplicationEvent) -> &mut dyn Frame<Message = M>;
 
     fn on_close(&self);
