@@ -93,6 +93,7 @@ impl Executable {
         ctx.set_up();
 
         let cde:Cde<M> = Cde::new(&self.window);
+        let theme = ctx.app.theme();
         let mut ui = ctx.app.ui();
 
         let _result = self.event_loop.run(move |event, elwt| match event {
@@ -105,7 +106,7 @@ impl Executable {
                     self.window.set_title(title);
                     let cursor = Cursor::get();
                     
-                    cde.bgr(frame.bgr());
+                    cde.bgr(theme.bgr);
                     match &mut ui {
                         Some(ref mut component) => {
                             match cde.draw(&component.inner) {
@@ -142,13 +143,10 @@ impl Executable {
                                             }
                                         }
                                         None => {
-                                            println!("Unfocus");
-                                            
                                         }
                                     }
                                 }
                                 None => {
-                                    println!("Unfocus");
                                     component.inner.message(widget::ClientMessage::Unfocus)
                                 }
                             }
@@ -176,11 +174,35 @@ impl Default for Executable {
     }
 }
 
+#[derive(Clone,Copy,Debug)]
+pub struct Theme {
+    bgr: Color
+}
+
+impl Theme {
+    pub fn new() -> Self {
+        Default::default()
+    }
+
+    pub fn bgr(mut self,bgr: Color) -> Self {
+        self.bgr = bgr;
+        self
+    }
+}
+
+impl Default for Theme {
+    fn default() -> Self {
+        Self { bgr: Color::White }
+    }
+}
+
 pub trait Application<M>: Sized 
 where
     M: Send + std::fmt::Debug
 {
     type Message: Send + Debug;
+
+    fn theme(&self) -> Theme;
 
     fn set_up(&mut self) {}
 

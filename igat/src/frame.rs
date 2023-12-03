@@ -2,6 +2,7 @@ use crate::Color;
 use crate::widget::Component;
 use std::fmt::Debug;
 
+#[deprecated(since = "0.0.2", note = "UI construction using Frames will be discontinued.")]
 pub trait Frame {
     type Message: Send + Debug;
 

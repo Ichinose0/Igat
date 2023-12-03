@@ -3,7 +3,7 @@ use crate::Color;
 use super::{Widget, WidgetType, ClientMessage};
 
 #[derive(Debug)]
-pub struct NewButton<M> 
+pub struct Button<M> 
 where
     M: Send + std::fmt::Debug
 {
@@ -16,7 +16,7 @@ where
     on_click: Option<M>
 }
 
-impl<M> NewButton<M>
+impl<M> Button<M>
 where
     M: Send + std::fmt::Debug
 {
@@ -58,7 +58,7 @@ where
     }
 }
 
-impl<M> Widget<M> for NewButton<M> 
+impl<M> Widget<M> for Button<M> 
 where
     M: Send + Copy + std::fmt::Debug
 {

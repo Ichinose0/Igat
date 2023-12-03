@@ -1,4 +1,4 @@
-use igat::{frame::Frame, Application, ApplicationEvent, Executable, widget::{Component, build_component, NewButton}};
+use igat::{frame::Frame, Application, ApplicationEvent, Executable, widget::{Component, build_component, Button}, Color, Theme};
 
 #[derive(Clone,Copy,Debug)]
 pub enum Message {
@@ -6,6 +6,7 @@ pub enum Message {
 }
 
 pub struct Poweredit {
+    theme: Theme,
     frame: MyFrame,
 }
 
@@ -21,17 +22,21 @@ impl Application<Message> for Poweredit {
     fn set_up(&mut self) {}
 
     fn message(&mut self,event: Message) {
-        println!("{:?}",event);
+
     }
 
     fn ui(&mut self) -> Option<Component<Message>> {
-        let button = NewButton::new()
+        let button = Button::new()
                                             .width(240)
                                             .height(80)
                                             .x(20)
                                             .y(20)
                                             .on_click(Message::ButtonClicked);
         Some(build_component(button))
+    }
+
+    fn theme(&self) -> igat::Theme {
+        self.theme
     }
 }
 
@@ -51,7 +56,7 @@ impl Frame for MyFrame {
     }
 
     fn ui(&self) -> Option<Component<Message>> {
-        let button = NewButton::new()
+        let button = Button::new()
                                             .width(240)
                                             .height(80)
                                             .x(20)
@@ -68,6 +73,6 @@ impl Frame for MyFrame {
 fn main() {
     let exe = Executable::new();
     
-    let app = Poweredit { frame: MyFrame { } };
+    let app = Poweredit { theme: Theme::default(),frame: MyFrame { } };
     exe.run(app);
 }
