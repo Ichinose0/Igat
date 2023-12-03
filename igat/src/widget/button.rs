@@ -99,7 +99,6 @@ where
     }
 
     fn message(&mut self,msg: ClientMessage) {
-        println!("{:?}",self.background_color);
         self.background_color = Color::White;
         match msg {
             ClientMessage::OnClick => todo!(),

@@ -7,7 +7,7 @@ edition = "2021"
 
 [dependencies]
 winit = "0.29.3"
-acure = { version = "0.1.0", git = "https://github.com/Ichinose0/acure", features = ["gdi"] }
+acure = { version = "0.0.1", git = "https://github.com/Ichinose0/acure", features = ["d2d1"] }
 raw-window-handle = "0.6.0"
 log = "0.4.20"
 

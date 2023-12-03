@@ -10,7 +10,7 @@ where
     M: Send + std::fmt::Debug,
 {
     acure: Acure,
-    surface: acure::gdi::GDISurface,
+    surface: acure::d2d1::D2D1Surface,
     phantom: PhantomData<M>
 }
 
@@ -23,7 +23,7 @@ where
         match handle.as_raw() {
             raw_window_handle::RawWindowHandle::Win32(handle) => Self {
                 acure: Acure::new(),
-                surface: acure::gdi::GDISurface::new(isize::from(handle.hwnd)),
+                surface: acure::d2d1::D2D1Surface::new(isize::from(handle.hwnd)),
                 phantom: PhantomData,
             },
             _ => panic!("Error"),
