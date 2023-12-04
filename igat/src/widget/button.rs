@@ -1,3 +1,5 @@
+use acure::Command;
+
 use crate::Color;
 
 use super::{ClientMessage, Widget, WidgetType};
@@ -101,6 +103,10 @@ where
 
     fn title(&self) -> &str {
         &self.text
+    }
+
+    fn view(&self) -> Vec<acure::Command> {
+        vec![Command::FillRectangle(self.x,self.y,self.width,self.height,self.background_color.into())]
     }
 
     fn on_click(&self) -> Option<M> {

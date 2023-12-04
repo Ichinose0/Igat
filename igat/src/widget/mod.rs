@@ -45,6 +45,8 @@ where
     fn widget_type(&self) -> WidgetType;
     fn title(&self) -> &str;
 
+    fn view(&self) -> Vec<acure::Command>;
+
     fn on_click(&self) -> Option<M>;
 
     fn message(&mut self, msg: ClientMessage);

@@ -35,41 +35,11 @@ where
             .push(acure::Command::Clear(color_to_acure_color(color)));
     }
 
-    pub fn draw(&self, widget: &Box<dyn Widget<M>>) -> Option<M> {
-        match widget.widget_type() {
-            crate::widget::WidgetType::Rectangle => {
-                let shadow = widget.shadow();
-                let border = shadow.border;
-                self.acure.set_align_mode(AlignMode::CenterAligned);
-                self.acure.push(acure::Command::FillRectangle(
-                    widget.x(),
-                    widget.y(),
-                    widget.width() + border * 2,
-                    widget.height() + border * 2,
-                    color_to_acure_color(shadow.color),
-                ));
-                self.acure.push(acure::Command::FillRectangle(
-                    widget.x() + border,
-                    widget.y() + border,
-                    widget.width(),
-                    widget.height(),
-                    color_to_acure_color(widget.background_color()),
-                ));
-                return widget.on_click();
-            }
-            crate::widget::WidgetType::Circle => todo!(),
-            crate::widget::WidgetType::Text => {
-                self.acure.push(acure::Command::WriteString(
-                    widget.x(),
-                    widget.y(),
-                    widget.width(),
-                    widget.height(),
-                    color_to_acure_color(widget.color()),
-                    widget.title().to_owned(),
-                ));
-            }
+    pub fn draw(&self, widget: &Box<dyn Widget<M>>) {
+        for c in widget.view() {
+            println!("{:?}",c);
+            self.acure.push(c);
         }
-        None
     }
 
     pub fn write(&self) {

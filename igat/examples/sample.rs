@@ -1,5 +1,4 @@
 use igat::{
-    frame::Frame,
     widget::{build_component, Button, Component, Text},
     Application, ApplicationEvent, Color, Executable, Theme,
 };
@@ -26,8 +25,9 @@ impl Application<Message> for Poweredit {
         let button = Text::new()
             .width(240)
             .height(80)
-            .x(20)
-            .y(20)
+            .text("Hello".to_string())
+            .x(10)
+            .y(10)
             .on_click(Message::ButtonClicked);
         Some(build_component(button))
     }

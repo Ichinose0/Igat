@@ -1,3 +1,5 @@
+use acure::Command;
+
 use crate::Color;
 
 use super::{ClientMessage, Widget, WidgetType};
@@ -41,6 +43,11 @@ where
 
     pub fn y(mut self, y: u32) -> Self {
         self.y = y;
+        self
+    }
+
+    pub fn text(mut self,text: String) -> Self {
+        self.text = text;
         self
     }
 
@@ -111,5 +118,9 @@ where
 
     fn is_capture_event(&self) -> bool {
         false
+    }
+
+    fn view(&self) -> Vec<acure::Command> {
+        vec![Command::WriteString(self.x,self.y,self.width,self.height,self.background_color.into(),self.text.clone())]
     }
 }

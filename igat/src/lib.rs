@@ -6,8 +6,6 @@ pub mod widget;
 
 use std::{fmt::Debug, marker::PhantomData};
 
-use frame::Frame;
-
 use widget::Component;
 use winit::{
     event::{Event, WindowEvent},
@@ -23,6 +21,18 @@ pub enum Color {
     Black,
     White,
     ARGB(u8, u8, u8, u8),
+}
+
+impl Into<acure::Color> for Color {
+    fn into(self) -> acure::Color {
+        match self {
+            Color::Black => acure::Color::ARGB(0,0,0,0),
+            Color::White => acure::Color::ARGB(255,0,0,0),
+            Color::ARGB(a, r, g, b) => {
+                acure::Color::ARGB(a,r,g,b)
+            },
+        }
+    }
 }
 
 pub enum ApplicationEvent {
@@ -58,10 +68,6 @@ where
 
     fn set_up(&mut self) {
         self.app.set_up();
-    }
-
-    fn route(&mut self, event: ApplicationEvent) -> &mut dyn Frame<Message = M> {
-        self.app.route(event)
     }
 
     pub fn dispatch_message(&mut self, message: M) {
@@ -101,9 +107,7 @@ impl Executable {
                     cde.bgr(theme.bgr);
                     match &mut ui {
                         Some(ref mut component) => {
-                            if let Some(message) = cde.draw(&component.inner) {
-                                ctx.dispatch_message(message);
-                            }
+                            cde.draw(&component.inner);
                         }
                         None => {}
                     };
