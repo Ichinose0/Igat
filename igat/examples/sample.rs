@@ -19,13 +19,17 @@ impl Application<Message> for Poweredit {
 
     fn set_up(&mut self) {}
 
-    fn message(&mut self, event: Message) {}
+    fn message(&mut self, event: Message) {
+        match event {
+            Message::ButtonClicked => println!("Clicked"),
+        }
+    }
 
     fn ui(&mut self) -> Option<Component<Message>> {
         let button = Button::new()
-            .width(240)
-            .height(80)
-            .text("Hello".to_string())
+            .width(70)
+            .height(30)
+            .text("Count up".to_string())
             .x(10)
             .y(10)
             .on_click(Message::ButtonClicked);

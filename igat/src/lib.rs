@@ -7,6 +7,7 @@ pub mod widget;
 use std::{fmt::Debug, marker::PhantomData};
 
 use widget::Component;
+use winapi::um::winuser::{GetAsyncKeyState, VK_LBUTTON};
 use winit::{
     event::{Event, WindowEvent},
     event_loop::EventLoop,
@@ -97,55 +98,76 @@ impl Executable {
         let theme = ctx.app.theme();
         let mut ui = ctx.app.ui();
 
-        let _result = self.event_loop.run(move |event, elwt| match event {
-            Event::WindowEvent { event, window_id } if window_id == self.window.id() => match event
-            {
-                WindowEvent::CloseRequested => elwt.exit(),
-                WindowEvent::RedrawRequested => {
-                    cde.bgr(theme.bgr);
-                    match &mut ui {
-                        Some(ref mut component) => {
-                            cde.draw(&component.inner);
+        let _result = self.event_loop.run(move |event, elwt| {
+            cde.bgr(theme.bgr);
+            match event {
+                Event::WindowEvent { event, window_id } if window_id == self.window.id() => {
+                    match event {
+                        WindowEvent::CloseRequested => elwt.exit(),
+                        WindowEvent::RedrawRequested => {
+                            
+                            match &mut ui {
+                                Some(ref mut component) => {
+                                    cde.draw(&component.inner);
+                                }
+                                None => {}
+                            };
+
+                            cde.write();
+
+                            self.window.pre_present_notify();
                         }
-                        None => {}
-                    };
-                    cde.write();
-                    self.window.pre_present_notify();
+
+                        WindowEvent::CursorMoved {
+                            device_id: _,
+                            position,
+                        } => match &mut ui {
+                            Some(component) => {
+                                if component.inner.is_capture_event() {
+                                    if (position.x as u32) > component.inner.x()
+                                        && (position.x as u32)
+                                            < component.inner.x() + component.inner.width()
+                                    {
+                                        if (position.y as u32) > component.inner.y()
+                                            && (position.y as u32)
+                                                < component.inner.y() + component.inner.height()
+                                        {
+                                            component
+                                                    .inner
+                                                    .message(widget::ClientMessage::OnHover);
+                                            if unsafe { GetAsyncKeyState(VK_LBUTTON) != 0 } {
+                                                println!("On click");
+                                                component
+                                                    .inner
+                                                    .message(widget::ClientMessage::OnClick);
+                                                match component.inner.on_click() {
+                                                    Some(e) => {
+                                                        ctx.app.message(e);
+                                                    },
+                                                    None => todo!(),
+                                                }
+                                                cde.draw(&component.inner);
+                                            }
+                                        }
+                                    } else {
+                                        println!("unfocus");
+                                        component.inner.message(widget::ClientMessage::Unfocus)
+                                    }
+                                }
+                            }
+                            None => {}
+                        },
+
+                        _ => {}
+                    }
                 }
 
-                WindowEvent::CursorMoved {
-                    device_id: _,
-                    position,
-                } => match &mut ui {
-                    Some(component) => {
-                        println!("Has component");
-                        if component.inner.is_capture_event() {
-                            if (position.x as u32) > component.inner.x()
-                                && (position.x as u32)
-                                    < component.inner.x() + component.inner.width()
-                            {
-                                if (position.y as u32) > component.inner.y()
-                                    && (position.y as u32)
-                                        < component.inner.y() + component.inner.height()
-                                {
-                                    println!("Onhover");
-                                    component.inner.message(widget::ClientMessage::OnHover)
-                                }
-                            } else {
-                                component.inner.message(widget::ClientMessage::Unfocus)
-                            }
-                        }
-                    }
-                    None => {}
-                },
-                _ => (),
-            },
+                Event::AboutToWait => {
+                    self.window.request_redraw();
+                }
 
-            Event::AboutToWait => {
-                self.window.request_redraw();
+                _ => {}
             }
-
-            _ => (),
         });
     }
 }

@@ -73,7 +73,7 @@ where
             on_click: None,
             color: Color::Black,
             background_color: Color::White,
-            shadow_color: Color::ARGB(255,128,128,128)
+            shadow_color: Color::ARGB(255, 128, 128, 128),
         }
     }
 }
@@ -148,11 +148,16 @@ where
     fn message(&mut self, msg: ClientMessage) {
         self.background_color = Color::White;
         match msg {
-            ClientMessage::OnClick => todo!(),
+            ClientMessage::OnClick => {
+                self.background_color = Color::ARGB(255, 50, 51, 204);
+                self.shadow_color = Color::ARGB(255, 0, 102, 204);
+            }
             ClientMessage::OnHover => {
-                self.shadow_color = Color::ARGB(255, 0, 0, 200);
+                self.background_color = Color::ARGB(255, 240, 255, 255);
+                self.shadow_color = Color::ARGB(255, 0, 102, 204);
             }
             ClientMessage::Unfocus => {
+                self.background_color = Color::ARGB(255, 255, 255, 255);
                 self.shadow_color = Color::ARGB(255, 128, 128, 128);
             }
         }
