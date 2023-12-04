@@ -149,12 +149,12 @@ where
         self.background_color = Color::White;
         match msg {
             ClientMessage::OnClick => {
-                self.background_color = Color::ARGB(255, 50, 51, 204);
-                self.shadow_color = Color::ARGB(255, 0, 102, 204);
+                self.background_color = Color::ARGB(255, 200, 200, 200);
+                self.shadow_color = Color::ARGB(255,0, 70, 204);
             }
             ClientMessage::OnHover => {
-                self.background_color = Color::ARGB(255, 240, 255, 255);
-                self.shadow_color = Color::ARGB(255, 0, 102, 204);
+                self.background_color = Color::ARGB(255,255, 255, 255);
+                self.shadow_color = Color::ARGB(255,0, 170, 204);
             }
             ClientMessage::Unfocus => {
                 self.background_color = Color::ARGB(255, 255, 255, 255);

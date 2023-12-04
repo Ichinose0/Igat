@@ -4,7 +4,7 @@ use acure::{Acure, AlignMode};
 use raw_window_handle::HasWindowHandle;
 use winit::window::Window;
 
-use crate::{widget::Widget, menu::Menubar};
+use crate::{menu::Menubar, widget::Widget};
 
 pub struct Cde<M>
 where

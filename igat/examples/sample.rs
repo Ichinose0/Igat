@@ -21,14 +21,10 @@ impl Application<Message> for Poweredit {
 
     fn set_up(&mut self) {}
 
-    fn message(&mut self, event: Message) {
-        match event {
-            Message::ButtonClicked => println!("Clicked"),
-        }
-    }
+    fn message(&mut self, event: Message) {}
 
     fn menu(&self) -> Option<&igat::menu::Menubar> {
-        Some(&self.menu)
+        None
     }
 
     fn ui(&mut self) -> Option<Component<Message>> {
@@ -37,7 +33,7 @@ impl Application<Message> for Poweredit {
             .height(30)
             .text("Count up".to_string())
             .x(10)
-            .y(50)
+            .y(10)
             .on_click(Message::ButtonClicked);
         Some(build_component(button))
     }

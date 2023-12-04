@@ -2,11 +2,13 @@
 extern crate log;
 
 pub(crate) mod cde;
+mod cursor;
 pub mod menu;
 pub mod widget;
 
 use std::{fmt::Debug, marker::PhantomData};
 
+use cursor::Cursor;
 use menu::Menubar;
 use widget::Component;
 use winapi::um::winuser::{GetAsyncKeyState, VK_LBUTTON};
@@ -82,7 +84,7 @@ impl Executable {
 
         let window = WindowBuilder::new()
             .with_title("A fantastic window!")
-            .with_inner_size(winit::dpi::LogicalSize::new(128.0, 128.0))
+            .with_inner_size(winit::dpi::LogicalSize::new(800.0, 600.0))
             .build(&event_loop)
             .unwrap();
         Self { window, event_loop }
@@ -104,12 +106,64 @@ impl Executable {
             cde.bgr(theme.bgr);
             match ctx.app.menu() {
                 Some(menu) => {
-                    cde.draw_menu(&self.window,menu);
+                    cde.draw_menu(&self.window, menu);
                 }
                 None => {}
             }
             match event {
                 Event::WindowEvent { event, window_id } if window_id == self.window.id() => {
+                    let cursor = Cursor::get();
+                    match &mut ui {
+                        Some(component) => {
+                            if component.inner.is_capture_event() {
+                                match cursor.window_x(&self.window) {
+                                    Some(x) => {
+                                        let x = x-component.inner.x() as i32;
+                                        if (x as u32) > component.inner.x()
+                                            && (x as u32)
+                                                < component.inner.x() + component.inner.width()
+                                        {
+                                            match cursor.window_y(&self.window) {
+                                                Some(y) => {
+                                                    let y = y-component.inner.y() as i32;
+                                                    if (y as u32) > component.inner.y()
+                                                        && (y as u32)
+                                                            < component.inner.y()
+                                                                + component.inner.height()
+                                                    {
+                                                        component.inner.message(
+                                                            widget::ClientMessage::OnHover,
+                                                        );
+                                                        if unsafe {
+                                                            GetAsyncKeyState(VK_LBUTTON) != 0
+                                                        } {
+                                                            component.inner.message(
+                                                                widget::ClientMessage::OnClick,
+                                                            );
+                                                            match component.inner.on_click() {
+                                                                Some(e) => {
+                                                                    ctx.app.message(e);
+                                                                }
+                                                                None => todo!(),
+                                                            }
+                                                            cde.draw(&component.inner);
+                                                        }
+                                                    }
+                                                }
+
+                                                None => {}
+                                            }
+                                        } else {
+                                            component.inner.message(widget::ClientMessage::Unfocus)
+                                        }
+                                    }
+                                    None => {}
+                                }
+                            }
+                        }
+                        None => todo!(),
+                    }
+
                     match event {
                         WindowEvent::CloseRequested => elwt.exit(),
                         WindowEvent::RedrawRequested => {
@@ -124,44 +178,6 @@ impl Executable {
 
                             self.window.pre_present_notify();
                         }
-
-                        WindowEvent::CursorMoved {
-                            device_id: _,
-                            position,
-                        } => match &mut ui {
-                            Some(component) => {
-                                if component.inner.is_capture_event() {
-                                    if (position.x as u32) > component.inner.x()
-                                        && (position.x as u32)
-                                            < component.inner.x() + component.inner.width()
-                                    {
-                                        if (position.y as u32) > component.inner.y()
-                                            && (position.y as u32)
-                                                < component.inner.y() + component.inner.height()
-                                        {
-                                            component.inner.message(widget::ClientMessage::OnHover);
-                                            if unsafe { GetAsyncKeyState(VK_LBUTTON) != 0 } {
-                                                println!("On click");
-                                                component
-                                                    .inner
-                                                    .message(widget::ClientMessage::OnClick);
-                                                match component.inner.on_click() {
-                                                    Some(e) => {
-                                                        ctx.app.message(e);
-                                                    }
-                                                    None => todo!(),
-                                                }
-                                                cde.draw(&component.inner);
-                                            }
-                                        }
-                                    } else {
-                                        println!("unfocus");
-                                        component.inner.message(widget::ClientMessage::Unfocus)
-                                    }
-                                }
-                            }
-                            None => {}
-                        },
 
                         _ => {}
                     }
@@ -201,7 +217,9 @@ impl Theme {
 
 impl Default for Theme {
     fn default() -> Self {
-        Self { bgr: Color::ARGB(255,240,240,240) }
+        Self {
+            bgr: Color::ARGB(255, 240, 240, 240),
+        }
     }
 }
 
