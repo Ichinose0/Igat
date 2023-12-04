@@ -2,7 +2,6 @@
 extern crate log;
 
 pub(crate) mod cde;
-pub mod frame;
 pub mod widget;
 
 use std::{fmt::Debug, marker::PhantomData};
@@ -99,11 +98,6 @@ impl Executable {
             {
                 WindowEvent::CloseRequested => elwt.exit(),
                 WindowEvent::RedrawRequested => {
-                    let frame: &mut dyn Frame<Message = M> =
-                        ctx.route(ApplicationEvent::RedrawRequested);
-                    let title = &frame.title();
-                    self.window.set_title(title);
-
                     cde.bgr(theme.bgr);
                     match &mut ui {
                         Some(ref mut component) => {
@@ -193,12 +187,6 @@ where
     fn message(&mut self, _event: M) {}
 
     fn ui(&mut self) -> Option<Component<M>>;
-
-    #[deprecated(
-        since = "0.0.2",
-        note = "UI construction using Frames will be discontinued. Please use the ui method instead"
-    )]
-    fn route(&mut self, event: ApplicationEvent) -> &mut dyn Frame<Message = M>;
 
     fn on_close(&self);
 }
