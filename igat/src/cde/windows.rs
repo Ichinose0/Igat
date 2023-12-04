@@ -37,7 +37,6 @@ where
 
     pub fn draw(&self, widget: &Box<dyn Widget<M>>) {
         for c in widget.view() {
-            println!("{:?}",c);
             self.acure.push(c);
         }
     }

@@ -26,11 +26,9 @@ pub enum Color {
 impl Into<acure::Color> for Color {
     fn into(self) -> acure::Color {
         match self {
-            Color::Black => acure::Color::ARGB(0,0,0,0),
-            Color::White => acure::Color::ARGB(255,0,0,0),
-            Color::ARGB(a, r, g, b) => {
-                acure::Color::ARGB(a,r,g,b)
-            },
+            Color::Black => acure::Color::ARGB(255, 0, 0, 0),
+            Color::White => acure::Color::ARGB(255, 255, 255, 255),
+            Color::ARGB(a, r, g, b) => acure::Color::ARGB(a, r, g, b),
         }
     }
 }
@@ -120,6 +118,7 @@ impl Executable {
                     position,
                 } => match &mut ui {
                     Some(component) => {
+                        println!("Has component");
                         if component.inner.is_capture_event() {
                             if (position.x as u32) > component.inner.x()
                                 && (position.x as u32)
@@ -129,6 +128,7 @@ impl Executable {
                                     && (position.y as u32)
                                         < component.inner.y() + component.inner.height()
                                 {
+                                    println!("Onhover");
                                     component.inner.message(widget::ClientMessage::OnHover)
                                 }
                             } else {

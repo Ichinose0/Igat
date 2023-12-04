@@ -46,7 +46,7 @@ where
         self
     }
 
-    pub fn text(mut self,text: String) -> Self {
+    pub fn text(mut self, text: String) -> Self {
         self.text = text;
         self
     }
@@ -114,13 +114,20 @@ where
         self.on_click
     }
 
-    fn message(&mut self, msg: ClientMessage) { }
+    fn message(&mut self, msg: ClientMessage) {}
 
     fn is_capture_event(&self) -> bool {
         false
     }
 
     fn view(&self) -> Vec<acure::Command> {
-        vec![Command::WriteString(self.x,self.y,self.width,self.height,self.background_color.into(),self.text.clone())]
+        vec![Command::WriteString(
+            self.x,
+            self.y,
+            self.width,
+            self.height,
+            self.background_color.into(),
+            self.text.clone(),
+        )]
     }
 }

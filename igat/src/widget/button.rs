@@ -13,7 +13,9 @@ where
     height: u32,
     x: u32,
     y: u32,
+    color: Color,
     background_color: Color,
+    shadow_color: Color,
     text: String,
     on_click: Option<M>,
 }
@@ -46,6 +48,11 @@ where
         self
     }
 
+    pub fn text(mut self, text: String) -> Self {
+        self.text = text;
+        self
+    }
+
     pub fn on_click(mut self, on_click: M) -> Self {
         self.on_click = Some(on_click);
         self
@@ -64,7 +71,9 @@ where
             y: 1,
             text: String::new(),
             on_click: None,
+            color: Color::Black,
             background_color: Color::White,
+            shadow_color: Color::ARGB(255,128,128,128)
         }
     }
 }
@@ -106,7 +115,30 @@ where
     }
 
     fn view(&self) -> Vec<acure::Command> {
-        vec![Command::FillRectangle(self.x,self.y,self.width,self.height,self.background_color.into())]
+        vec![
+            Command::FillRectangle(
+                self.x,
+                self.y,
+                self.width,
+                self.height,
+                self.shadow_color.into(),
+            ),
+            Command::FillRectangle(
+                self.x + 1,
+                self.y + 1,
+                self.width - 2,
+                self.height - 2,
+                self.background_color.into(),
+            ),
+            Command::WriteString(
+                self.x,
+                self.y,
+                self.width,
+                self.height,
+                self.color.into(),
+                self.text.clone(),
+            ),
+        ]
     }
 
     fn on_click(&self) -> Option<M> {
@@ -118,15 +150,15 @@ where
         match msg {
             ClientMessage::OnClick => todo!(),
             ClientMessage::OnHover => {
-                self.background_color = Color::ARGB(255, 0, 0, 200);
+                self.shadow_color = Color::ARGB(255, 0, 0, 200);
             }
             ClientMessage::Unfocus => {
-                self.background_color = Color::ARGB(255, 255, 255, 255);
+                self.shadow_color = Color::ARGB(255, 128, 128, 128);
             }
         }
     }
 
     fn is_capture_event(&self) -> bool {
-        false
+        true
     }
 }

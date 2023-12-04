@@ -22,7 +22,7 @@ impl Application<Message> for Poweredit {
     fn message(&mut self, event: Message) {}
 
     fn ui(&mut self) -> Option<Component<Message>> {
-        let button = Text::new()
+        let button = Button::new()
             .width(240)
             .height(80)
             .text("Hello".to_string())
