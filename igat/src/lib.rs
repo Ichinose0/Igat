@@ -2,10 +2,12 @@
 extern crate log;
 
 pub(crate) mod cde;
+pub mod menu;
 pub mod widget;
 
 use std::{fmt::Debug, marker::PhantomData};
 
+use menu::Menubar;
 use widget::Component;
 use winapi::um::winuser::{GetAsyncKeyState, VK_LBUTTON};
 use winit::{
@@ -100,12 +102,17 @@ impl Executable {
 
         let _result = self.event_loop.run(move |event, elwt| {
             cde.bgr(theme.bgr);
+            match ctx.app.menu() {
+                Some(menu) => {
+                    cde.draw_menu(&self.window,menu);
+                }
+                None => {}
+            }
             match event {
                 Event::WindowEvent { event, window_id } if window_id == self.window.id() => {
                     match event {
                         WindowEvent::CloseRequested => elwt.exit(),
                         WindowEvent::RedrawRequested => {
-                            
                             match &mut ui {
                                 Some(ref mut component) => {
                                     cde.draw(&component.inner);
@@ -132,9 +139,7 @@ impl Executable {
                                             && (position.y as u32)
                                                 < component.inner.y() + component.inner.height()
                                         {
-                                            component
-                                                    .inner
-                                                    .message(widget::ClientMessage::OnHover);
+                                            component.inner.message(widget::ClientMessage::OnHover);
                                             if unsafe { GetAsyncKeyState(VK_LBUTTON) != 0 } {
                                                 println!("On click");
                                                 component
@@ -143,7 +148,7 @@ impl Executable {
                                                 match component.inner.on_click() {
                                                     Some(e) => {
                                                         ctx.app.message(e);
-                                                    },
+                                                    }
                                                     None => todo!(),
                                                 }
                                                 cde.draw(&component.inner);
@@ -196,7 +201,7 @@ impl Theme {
 
 impl Default for Theme {
     fn default() -> Self {
-        Self { bgr: Color::White }
+        Self { bgr: Color::ARGB(255,240,240,240) }
     }
 }
 
@@ -211,6 +216,10 @@ where
     fn set_up(&mut self) {}
 
     fn message(&mut self, _event: M) {}
+
+    fn menu(&self) -> Option<&Menubar> {
+        None
+    }
 
     fn ui(&mut self) -> Option<Component<M>>;
 

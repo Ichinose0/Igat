@@ -2,8 +2,9 @@ use std::marker::PhantomData;
 
 use acure::{Acure, AlignMode};
 use raw_window_handle::HasWindowHandle;
+use winit::window::Window;
 
-use crate::widget::Widget;
+use crate::{widget::Widget, menu::Menubar};
 
 pub struct Cde<M>
 where
@@ -33,6 +34,12 @@ where
     pub fn bgr(&self, color: crate::Color) {
         self.acure
             .push(acure::Command::Clear(color_to_acure_color(color)));
+    }
+
+    pub fn draw_menu(&self, window: &Window, menu: &Menubar) {
+        for i in menu.view(window) {
+            self.acure.push(i)
+        }
     }
 
     pub fn draw(&self, widget: &Box<dyn Widget<M>>) {

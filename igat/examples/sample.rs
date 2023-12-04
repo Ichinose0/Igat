@@ -1,4 +1,5 @@
 use igat::{
+    menu::Menubar,
     widget::{build_component, Button, Component, Text},
     Application, ApplicationEvent, Color, Executable, Theme,
 };
@@ -10,6 +11,7 @@ pub enum Message {
 
 pub struct Poweredit {
     theme: Theme,
+    menu: Menubar,
 }
 
 impl Application<Message> for Poweredit {
@@ -25,13 +27,17 @@ impl Application<Message> for Poweredit {
         }
     }
 
+    fn menu(&self) -> Option<&igat::menu::Menubar> {
+        Some(&self.menu)
+    }
+
     fn ui(&mut self) -> Option<Component<Message>> {
         let button = Button::new()
             .width(70)
             .height(30)
             .text("Count up".to_string())
             .x(10)
-            .y(10)
+            .y(50)
             .on_click(Message::ButtonClicked);
         Some(build_component(button))
     }
@@ -46,6 +52,7 @@ fn main() {
 
     let app = Poweredit {
         theme: Theme::default(),
+        menu: Menubar::new(),
     };
     exe.run(app);
 }
