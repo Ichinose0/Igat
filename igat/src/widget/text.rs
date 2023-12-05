@@ -2,66 +2,7 @@ use acure::Command;
 
 use crate::Color;
 
-use super::{ClientMessage, Widget, WidgetType};
-
-pub trait IText<M>:Widget<M>
-where
-    M: Send + Copy + std::fmt::Debug,
-{
-    fn width(&self) -> u32 {
-        self.width
-    }
-
-    fn height(&self) -> u32 {
-        self.height
-    }
-
-    fn x(&self) -> u32 {
-        self.x
-    }
-
-    fn y(&self) -> u32 {
-        self.y
-    }
-
-    fn color(&self) -> Color {
-        Color::Black
-    }
-
-    fn background_color(&self) -> Color {
-        self.background_color
-    }
-
-    fn widget_type(&self) -> WidgetType {
-        WidgetType::Text
-    }
-
-    fn title(&self) -> &str {
-        &self.text
-    }
-
-    fn on_click(&self) -> Option<M> {
-        self.on_click
-    }
-
-    fn message(&mut self, msg: ClientMessage) {}
-
-    fn is_capture_event(&self) -> bool {
-        false
-    }
-
-    fn view(&self) -> Vec<acure::Command> {
-        vec![Command::WriteString(
-            self.x,
-            self.y,
-            self.width,
-            self.height,
-            self.background_color.into(),
-            self.text.clone(),
-        )]
-    }
-}
-
+use super::{ClientMessage, Widget};
 
 #[derive(Debug)]
 pub struct Text<M>
@@ -133,9 +74,44 @@ where
     }
 }
 
-impl<M> IText<M> for Text<M>
+impl<M> Widget<M> for Text<M>
 where
     M: Send + Copy + std::fmt::Debug,
 {
-    
+    fn width(&self) -> u32 {
+        self.width
+    }
+
+    fn height(&self) -> u32 {
+        self.height
+    }
+
+    fn x(&self) -> u32 {
+        self.x
+    }
+
+    fn y(&self) -> u32 {
+        self.y
+    }
+
+    fn on_click(&self) -> Option<M> {
+        self.on_click
+    }
+
+    fn message(&mut self, msg: ClientMessage) {}
+
+    fn is_capture_event(&self) -> bool {
+        false
+    }
+
+    fn view(&self) -> Vec<acure::Command> {
+        vec![Command::WriteString(
+            self.x,
+            self.y,
+            self.width,
+            self.height,
+            self.background_color.into(),
+            self.text.clone(),
+        )]
+    }
 }

@@ -45,7 +45,7 @@ pub enum ApplicationEvent {
 }
 
 pub enum ApplicationResponse {
-    ReloadUi
+    ReloadUi,
 }
 
 pub struct Executable {
@@ -79,7 +79,7 @@ where
     }
 
     pub fn dispatch_message(&mut self, message: M) {
-        self.app.message(message);
+        self.app.message(ApplicationEvent::WidgetEvent,Some(message));
     }
 }
 
@@ -251,7 +251,11 @@ where
 
     fn set_up(&mut self) {}
 
-    fn message(&mut self, event: ApplicationEvent,_message: Option<M>) -> Option<ApplicationResponse> {
+    fn message(
+        &mut self,
+        event: ApplicationEvent,
+        _message: Option<M>,
+    ) -> Option<ApplicationResponse> {
         None
     }
 

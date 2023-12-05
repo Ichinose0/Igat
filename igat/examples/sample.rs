@@ -3,6 +3,7 @@ use igat::{
     widget::{build_component, Button, Component, Text},
     Application, ApplicationEvent, Color, Executable, Theme,
 };
+use igat::ApplicationResponse;
 
 #[derive(Clone, Copy, Debug)]
 pub enum Message {
@@ -20,8 +21,12 @@ impl Application<Message> for Poweredit {
     fn on_close(&self) {}
 
     fn set_up(&mut self) {}
-    
-    fn message(&mut self, event: ApplicationEvent,_message: Option<M>) -> Option<ApplicationResponse> {
+
+    fn message(
+        &mut self,
+        event: ApplicationEvent,
+        _message: Option<Message>,
+    ) -> Option<ApplicationResponse> {
         None
     }
 
