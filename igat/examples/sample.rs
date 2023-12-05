@@ -31,7 +31,7 @@ impl Application<Message> for Poweredit {
         let button = Button::new()
             .width(70)
             .height(30)
-            .text("Count up".to_string())
+            .text("Button".to_string())
             .x(10)
             .y(10)
             .on_click(Message::ButtonClicked);

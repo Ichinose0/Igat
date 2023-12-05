@@ -1,11 +1,15 @@
 <div id="top"></div>
 
-# Acure - Expressive GUI library
+# Igat - Expressive GUI library
 
 <p style="display: inline">
   <img src="https://img.shields.io/badge/-Rust-000000.svg?logo=rust&style=for-the-badge">
   <img src="https://img.shields.io/badge/-githubactions-FFFFFF.svg?logo=github-actions&style=for-the-badge">
 </p>
+
+## Example
+### Button
+![result](img/button_sample.gif)
 
 ## About Igat
 

@@ -118,14 +118,14 @@ impl Executable {
                             if component.inner.is_capture_event() {
                                 match cursor.window_x(&self.window) {
                                     Some(x) => {
-                                        let x = x-component.inner.x() as i32;
+                                        let x = x - component.inner.x() as i32;
                                         if (x as u32) > component.inner.x()
                                             && (x as u32)
                                                 < component.inner.x() + component.inner.width()
                                         {
                                             match cursor.window_y(&self.window) {
                                                 Some(y) => {
-                                                    let y = y-component.inner.y() as i32;
+                                                    let y = y - component.inner.y() as i32;
                                                     if (y as u32) > component.inner.y()
                                                         && (y as u32)
                                                             < component.inner.y()

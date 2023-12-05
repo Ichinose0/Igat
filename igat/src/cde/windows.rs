@@ -22,11 +22,15 @@ where
     pub fn new(handle: &impl HasWindowHandle) -> Self {
         let handle = handle.window_handle().unwrap();
         match handle.as_raw() {
-            raw_window_handle::RawWindowHandle::Win32(handle) => Self {
-                acure: Acure::new(),
-                surface: acure::d2d1::D2D1Surface::new(isize::from(handle.hwnd)),
-                phantom: PhantomData,
-            },
+            raw_window_handle::RawWindowHandle::Win32(handle) => {
+                let acure = Acure::new();
+                acure.set_border_radius(4.2);
+                Self {
+                    acure,
+                    surface: acure::d2d1::D2D1Surface::new(isize::from(handle.hwnd)),
+                    phantom: PhantomData,
+                }
+            }
             _ => panic!("Error"),
         }
     }
