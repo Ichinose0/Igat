@@ -13,12 +13,6 @@ pub enum ClientMessage {
     Unfocus,
 }
 
-pub enum WidgetType {
-    Rectangle,
-    Circle,
-    Text,
-}
-
 pub struct Component<M>
 where
     M: Send + std::fmt::Debug,
