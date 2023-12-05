@@ -4,81 +4,7 @@ use crate::Color;
 
 use super::{ClientMessage, Widget, WidgetType};
 
-#[derive(Debug)]
-pub struct Button<M>
-where
-    M: Send + std::fmt::Debug,
-{
-    width: u32,
-    height: u32,
-    x: u32,
-    y: u32,
-    color: Color,
-    background_color: Color,
-    shadow_color: Color,
-    text: String,
-    on_click: Option<M>,
-}
-
-impl<M> Button<M>
-where
-    M: Send + std::fmt::Debug,
-{
-    pub fn new() -> Self {
-        Default::default()
-    }
-
-    pub fn width(mut self, width: u32) -> Self {
-        self.width = width;
-        self
-    }
-
-    pub fn height(mut self, height: u32) -> Self {
-        self.height = height;
-        self
-    }
-
-    pub fn x(mut self, x: u32) -> Self {
-        self.x = x;
-        self
-    }
-
-    pub fn y(mut self, y: u32) -> Self {
-        self.y = y;
-        self
-    }
-
-    pub fn text(mut self, text: String) -> Self {
-        self.text = text;
-        self
-    }
-
-    pub fn on_click(mut self, on_click: M) -> Self {
-        self.on_click = Some(on_click);
-        self
-    }
-}
-
-impl<M> Default for Button<M>
-where
-    M: Send + std::fmt::Debug,
-{
-    fn default() -> Self {
-        Self {
-            width: 1,
-            height: 1,
-            x: 1,
-            y: 1,
-            text: String::new(),
-            on_click: None,
-            color: Color::Black,
-            background_color: Color::White,
-            shadow_color: Color::ARGB(255, 128, 128, 128),
-        }
-    }
-}
-
-impl<M> Widget<M> for Button<M>
+pub trait IButton<M>: Widget<M>
 where
     M: Send + Copy + std::fmt::Debug,
 {
@@ -166,4 +92,86 @@ where
     fn is_capture_event(&self) -> bool {
         true
     }
+}
+
+
+#[derive(Debug)]
+pub struct Button<M>
+where
+    M: Send + std::fmt::Debug,
+{
+    width: u32,
+    height: u32,
+    x: u32,
+    y: u32,
+    color: Color,
+    background_color: Color,
+    shadow_color: Color,
+    text: String,
+    on_click: Option<M>,
+}
+
+impl<M> Button<M>
+where
+    M: Send + std::fmt::Debug,
+{
+    pub fn new() -> Self {
+        Default::default()
+    }
+
+    pub fn width(mut self, width: u32) -> Self {
+        self.width = width;
+        self
+    }
+
+    pub fn height(mut self, height: u32) -> Self {
+        self.height = height;
+        self
+    }
+
+    pub fn x(mut self, x: u32) -> Self {
+        self.x = x;
+        self
+    }
+
+    pub fn y(mut self, y: u32) -> Self {
+        self.y = y;
+        self
+    }
+
+    pub fn text(mut self, text: String) -> Self {
+        self.text = text;
+        self
+    }
+
+    pub fn on_click(mut self, on_click: M) -> Self {
+        self.on_click = Some(on_click);
+        self
+    }
+}
+
+impl<M> Default for Button<M>
+where
+    M: Send + std::fmt::Debug,
+{
+    fn default() -> Self {
+        Self {
+            width: 1,
+            height: 1,
+            x: 1,
+            y: 1,
+            text: String::new(),
+            on_click: None,
+            color: Color::Black,
+            background_color: Color::White,
+            shadow_color: Color::ARGB(255, 128, 128, 128),
+        }
+    }
+}
+
+impl<M> IButton<M> for Button<M>
+where
+    M: Send + Copy + std::fmt::Debug,
+{
+
 }

@@ -40,7 +40,12 @@ impl Into<acure::Color> for Color {
 
 pub enum ApplicationEvent {
     RedrawRequested,
+    WidgetEvent,
     KeyboardInput(char),
+}
+
+pub enum ApplicationResponse {
+    ReloadUi
 }
 
 pub struct Executable {
@@ -142,7 +147,13 @@ impl Executable {
                                                             );
                                                             match component.inner.on_click() {
                                                                 Some(e) => {
-                                                                    ctx.app.message(e);
+                                                                    match ctx.app.message(ApplicationEvent::WidgetEvent,Some(e)) {
+                                                                        Some(e) => {
+
+                                                                        }
+
+                                                                        None => {}
+                                                                    }
                                                                 }
                                                                 None => todo!(),
                                                             }
@@ -167,6 +178,13 @@ impl Executable {
                     match event {
                         WindowEvent::CloseRequested => elwt.exit(),
                         WindowEvent::RedrawRequested => {
+                            match ctx.app.message(ApplicationEvent::RedrawRequested,None) {
+                                Some(e) => {
+
+                                }
+
+                                None => {}
+                            }
                             match &mut ui {
                                 Some(ref mut component) => {
                                     cde.draw(&component.inner);
@@ -233,7 +251,9 @@ where
 
     fn set_up(&mut self) {}
 
-    fn message(&mut self, _event: M) {}
+    fn message(&mut self, event: ApplicationEvent,_message: Option<M>) -> Option<ApplicationResponse> {
+        None
+    }
 
     fn menu(&self) -> Option<&Menubar> {
         None
