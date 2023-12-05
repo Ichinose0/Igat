@@ -20,8 +20,10 @@ impl Application<Message> for Poweredit {
     fn on_close(&self) {}
 
     fn set_up(&mut self) {}
-
-    fn message(&mut self, event: Message) {}
+    
+    fn message(&mut self, event: ApplicationEvent,_message: Option<M>) -> Option<ApplicationResponse> {
+        None
+    }
 
     fn menu(&self) -> Option<&igat::menu::Menubar> {
         None
