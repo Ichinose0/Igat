@@ -1,5 +1,6 @@
 use igat::{
     menu::Menubar,
+    menu::Menu,
     widget::{build_component, Button, Component, Text},
     Application, ApplicationEvent, Color, Executable, Theme, Frame,
 };
@@ -52,9 +53,12 @@ impl Application<Message> for Poweredit {
 fn main() {
     let exe = Executable::new();
 
+    let mut menubar = Menubar::new();
+    menubar.add(Menu::new("File".to_string()));
+    menubar.add(Menu::new("Edit".to_string()));
     let app = Poweredit {
         theme: Theme::default(),
-        menu: Menubar::new(),
+        menu: menubar,
     };
     exe.run(app);
 }

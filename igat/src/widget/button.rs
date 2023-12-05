@@ -37,7 +37,7 @@ where
             height: 80,
             menu_height: rect.top,
             x: 0,
-            y: rect.top,
+            y: 0,
             text: String::new(),
             on_click: None,
             color: Color::Black,
@@ -95,7 +95,7 @@ where
     }
 
     fn y(&self) -> u32 {
-        self.y
+        self.y+self.menu_height
     }
 
     fn view(&self) -> Vec<acure::Command> {
