@@ -15,15 +15,29 @@ impl Menubar {
         }
     }
 
+    pub fn height(&self) -> u32 {
+        19
+    }
+
     pub(crate) fn view(&self, window: &Window) -> Vec<acure::Command> {
         let size = window.inner_size();
-        vec![acure::Command::FillRectangle(
+        vec![
+            acure::Command::FillRectangle(
+                0,
+                0,
+                size.width,
+                19,
+                0.0,
+                Color::ARGB(255,128,128,128).into(),
+            ),
+            acure::Command::FillRectangle(
             0,
             0,
             size.width,
             18,
+            0.0,
             self.background_color.into(),
-        )]
+        ),]
     }
 }
 

@@ -10,7 +10,7 @@ use std::{fmt::Debug, marker::PhantomData};
 
 use cursor::Cursor;
 use menu::Menubar;
-use widget::Component;
+use widget::{Component, RenderConfig};
 use winapi::um::winuser::{GetAsyncKeyState, VK_LBUTTON};
 use winit::{
     event::{Event, WindowEvent},
@@ -20,6 +20,14 @@ use winit::{
 };
 
 use cde::Cde;
+
+#[derive(Clone,Copy,Debug)]
+pub struct Rect {
+    left: u32,
+    top: u32,
+    right: u32,
+    bottom: u32,
+}
 
 #[derive(Clone, Copy, Debug)]
 pub enum Color {
@@ -53,6 +61,23 @@ pub struct Executable {
     event_loop: EventLoop<()>,
 }
 
+pub struct Frame {
+    window: Window,
+    menu_height: u32,
+}
+
+impl Frame {
+    pub fn get_rect(&self) -> Rect {
+        let size = self.window.inner_size();
+        Rect {
+            left: 0,
+            top: self.menu_height,
+            right: size.width,
+            bottom: size.height+self.menu_height,
+        }
+    }
+}
+
 pub struct ApplicationContext<A, M>
 where
     A: Application<M>,
@@ -78,8 +103,8 @@ where
         self.app.set_up();
     }
 
-    pub fn dispatch_message(&mut self, message: M) {
-        self.app.message(ApplicationEvent::WidgetEvent,Some(message));
+    pub fn dispatch_message(&mut self, message: M,frame: &Frame) {
+        self.app.message(ApplicationEvent::WidgetEvent,Some(message),frame);
     }
 }
 
@@ -92,6 +117,7 @@ impl Executable {
             .with_inner_size(winit::dpi::LogicalSize::new(800.0, 600.0))
             .build(&event_loop)
             .unwrap();
+
         Self { window, event_loop }
     }
 
@@ -105,30 +131,42 @@ impl Executable {
 
         let cde: Cde<M> = Cde::new(&self.window);
         let theme = ctx.app.theme();
-        let mut ui = ctx.app.ui();
+        
+
+        let mut config = RenderConfig {
+            thickness: 0,
+            border_radius: 0.0,
+        };
+
+        let height = match ctx.app.menu() {
+            Some(m) => m.height(),
+            None => 0,
+        };
+
+        let frame = Frame {
+            window: self.window,
+            menu_height: height
+        };
+
+        let mut ui = ctx.app.ui(&frame);
 
         let _result = self.event_loop.run(move |event, elwt| {
             cde.bgr(theme.bgr);
-            match ctx.app.menu() {
-                Some(menu) => {
-                    cde.draw_menu(&self.window, menu);
-                }
-                None => {}
-            }
+            
             match event {
-                Event::WindowEvent { event, window_id } if window_id == self.window.id() => {
+                Event::WindowEvent { event, window_id } if window_id == frame.window.id() => {
                     let cursor = Cursor::get();
                     match &mut ui {
                         Some(component) => {
                             if component.inner.is_capture_event() {
-                                match cursor.window_x(&self.window) {
+                                match cursor.window_x(&frame.window) {
                                     Some(x) => {
                                         let x = x - component.inner.x() as i32;
                                         if (x as u32) > component.inner.x()
                                             && (x as u32)
                                                 < component.inner.x() + component.inner.width()
                                         {
-                                            match cursor.window_y(&self.window) {
+                                            match cursor.window_y(&frame.window) {
                                                 Some(y) => {
                                                     let y = y - component.inner.y() as i32;
                                                     if (y as u32) > component.inner.y()
@@ -147,7 +185,7 @@ impl Executable {
                                                             );
                                                             match component.inner.on_click() {
                                                                 Some(e) => {
-                                                                    match ctx.app.message(ApplicationEvent::WidgetEvent,Some(e)) {
+                                                                    match ctx.app.message(ApplicationEvent::WidgetEvent,Some(e),&frame) {
                                                                         Some(e) => {
 
                                                                         }
@@ -178,7 +216,7 @@ impl Executable {
                     match event {
                         WindowEvent::CloseRequested => elwt.exit(),
                         WindowEvent::RedrawRequested => {
-                            match ctx.app.message(ApplicationEvent::RedrawRequested,None) {
+                            match ctx.app.message(ApplicationEvent::RedrawRequested,None,&frame) {
                                 Some(e) => {
 
                                 }
@@ -191,10 +229,16 @@ impl Executable {
                                 }
                                 None => {}
                             };
+                            match ctx.app.menu() {
+                                Some(menu) => {
+                                    cde.draw_menu(&frame.window, menu);
+                                }
+                                None => {}
+                            }
 
                             cde.write();
 
-                            self.window.pre_present_notify();
+                            frame.window.pre_present_notify();
                         }
 
                         _ => {}
@@ -202,7 +246,7 @@ impl Executable {
                 }
 
                 Event::AboutToWait => {
-                    self.window.request_redraw();
+                    frame.window.request_redraw();
                 }
 
                 _ => {}
@@ -255,6 +299,7 @@ where
         &mut self,
         event: ApplicationEvent,
         _message: Option<M>,
+        frame: &Frame
     ) -> Option<ApplicationResponse> {
         None
     }
@@ -263,7 +308,7 @@ where
         None
     }
 
-    fn ui(&mut self) -> Option<Component<M>>;
+    fn ui(&mut self,frame: &Frame) -> Option<Component<M>>;
 
     fn on_close(&self);
 }

@@ -1,8 +1,13 @@
 use acure::Command;
 
-use crate::Color;
+use crate::{Color, Frame};
 
 use super::{ClientMessage, Widget};
+
+pub struct RenderConfig {
+    pub thickness: u32,
+    pub border_radius: f64
+}
 
 #[derive(Debug)]
 pub struct Button<M>
@@ -11,6 +16,7 @@ where
 {
     width: u32,
     height: u32,
+    menu_height: u32,
     x: u32,
     y: u32,
     color: Color,
@@ -24,8 +30,20 @@ impl<M> Button<M>
 where
     M: Send + std::fmt::Debug,
 {
-    pub fn new() -> Self {
-        Default::default()
+    pub fn new(frame: &Frame) -> Self {
+        let rect = frame.get_rect();
+        Self {
+            width: 30,
+            height: 80,
+            menu_height: rect.top,
+            x: 0,
+            y: rect.top,
+            text: String::new(),
+            on_click: None,
+            color: Color::Black,
+            background_color: Color::White,
+            shadow_color: Color::ARGB(255, 128, 128, 128),
+        }
     }
 
     pub fn width(mut self, width: u32) -> Self {
@@ -59,24 +77,6 @@ where
     }
 }
 
-impl<M> Default for Button<M>
-where
-    M: Send + std::fmt::Debug,
-{
-    fn default() -> Self {
-        Self {
-            width: 1,
-            height: 1,
-            x: 1,
-            y: 1,
-            text: String::new(),
-            on_click: None,
-            color: Color::Black,
-            background_color: Color::White,
-            shadow_color: Color::ARGB(255, 128, 128, 128),
-        }
-    }
-}
 
 impl<M> Widget<M> for Button<M>
 where
@@ -99,24 +99,27 @@ where
     }
 
     fn view(&self) -> Vec<acure::Command> {
+        let y = self.y + self.menu_height;
         vec![
             Command::FillRectangle(
                 self.x,
-                self.y,
+                y,
                 self.width,
                 self.height,
+                4.2,
                 self.shadow_color.into(),
             ),
             Command::FillRectangle(
                 self.x + 1,
-                self.y + 1,
+                y + 1,
                 self.width - 2,
                 self.height - 2,
+                4.2,
                 self.background_color.into(),
             ),
             Command::WriteString(
                 self.x,
-                self.y,
+                y,
                 self.width,
                 self.height,
                 self.color.into(),

@@ -1,7 +1,7 @@
 use igat::{
     menu::Menubar,
     widget::{build_component, Button, Component, Text},
-    Application, ApplicationEvent, Color, Executable, Theme,
+    Application, ApplicationEvent, Color, Executable, Theme, Frame,
 };
 use igat::ApplicationResponse;
 
@@ -26,21 +26,20 @@ impl Application<Message> for Poweredit {
         &mut self,
         event: ApplicationEvent,
         _message: Option<Message>,
+        frame: &Frame
     ) -> Option<ApplicationResponse> {
         None
     }
 
     fn menu(&self) -> Option<&igat::menu::Menubar> {
-        None
+        Some(&self.menu)
     }
 
-    fn ui(&mut self) -> Option<Component<Message>> {
-        let button = Button::new()
+    fn ui(&mut self,frame: &Frame) -> Option<Component<Message>> {
+        let button = Button::new(frame)
             .width(70)
             .height(30)
             .text("Button".to_string())
-            .x(10)
-            .y(10)
             .on_click(Message::ButtonClicked);
         Some(build_component(button))
     }
