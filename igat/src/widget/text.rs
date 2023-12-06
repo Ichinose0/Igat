@@ -94,6 +94,15 @@ where
         self.y
     }
 
+    fn area(&self) -> Vec<Rect> {
+        vec![Rect {
+            left: self.x,
+            top: self.y+self.menu_height,
+            right: self.x+self.width,
+            bottom: self.y+self.menu_height+self.height, 
+        }]
+    }
+
     fn on_click(&self) -> Option<M> {
         self.on_click
     }

@@ -1,6 +1,6 @@
 use acure::Command;
 
-use crate::{Color, Frame};
+use crate::{Color, Frame,Rect};
 
 use super::{ClientMessage, Widget};
 
@@ -96,6 +96,15 @@ where
 
     fn y(&self) -> u32 {
         self.y+self.menu_height
+    }
+
+    fn area(&self) -> Vec<Rect> {
+        vec![Rect {
+            left: self.x,
+            top: self.y+self.menu_height,
+            right: self.x+self.width,
+            bottom: self.y+self.menu_height+self.height, 
+        }]
     }
 
     fn view(&self) -> Vec<acure::Command> {
