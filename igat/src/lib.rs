@@ -21,6 +21,8 @@ use winit::{
 
 use cde::Cde;
 
+pub type CursorIcon = winit::window::CursorIcon;
+
 #[derive(Clone,Copy,Debug)]
 pub struct Rect {
     left: u32,
@@ -67,6 +69,34 @@ pub struct Frame {
 }
 
 impl Frame {
+    pub fn set_title(&self,title: &str) {
+        self.window.set_title(title);
+    }
+
+    pub fn set_resizable(&self,resizable: bool) {
+        self.window.set_resizable(resizable);
+    }
+
+    pub fn set_minimized(&self,minimized: bool) {
+        self.window.set_minimized(minimized);
+    }
+
+    pub fn set_maximized(&self, maximized: bool) {
+        self.window.set_maximized(maximized);
+    } 
+
+    pub fn set_decorations(&self, decorations: bool) {
+        self.window.set_decorations(decorations);
+    }
+
+    pub fn set_cursor_visible(&self, visible: bool) {
+        self.window.set_cursor_visible(visible);
+    }
+
+    pub fn set_cursor_icon(&self, cursor: CursorIcon) {
+        self.window.set_cursor_icon(cursor);
+    }
+
     pub fn get_rect(&self) -> Rect {
         let size = self.window.inner_size();
         Rect {
