@@ -31,6 +31,24 @@ pub struct Rect {
     bottom: u32,
 }
 
+impl Rect {
+    pub fn x(&self) -> u32 {
+        self.left
+    }
+
+    pub fn y(&self) -> u32 {
+        self.top
+    }
+    
+    pub fn width(&self) -> u32 {
+        self.right-self.left
+    }
+
+    pub fn height(&self) -> u32 {
+        self.bottom-self.top
+    }
+}
+
 #[derive(Clone, Copy, Debug)]
 pub enum Color {
     Black,
@@ -143,7 +161,7 @@ impl Executable {
         let event_loop = EventLoop::new().unwrap();
 
         let window = WindowBuilder::new()
-            .with_title("A fantastic window!")
+            .with_title("None")
             .with_inner_size(winit::dpi::LogicalSize::new(800.0, 600.0))
             .build(&event_loop)
             .unwrap();
@@ -224,8 +242,8 @@ impl Executable {
                                                                                 cde.draw(&component.inner);
                                                                             }
                                                                         }
-                                                                    }
-                                            }
+                                                                    
+                                            
                                         } else {
                                             component.inner.message(widget::ClientMessage::Unfocus);
                                         }
@@ -318,9 +336,11 @@ where
 {
     type Message: Send + Debug;
 
-    fn theme(&self) -> Theme;
+    fn theme(&self) -> Theme {
+        Theme::default()
+    }
 
-    fn set_up(&mut self) {}
+    fn set_up(&mut self,frame: &Frame) {}
 
     fn message(
         &mut self,
@@ -337,5 +357,6 @@ where
 
     fn ui(&mut self,frame: &Frame) -> Option<Component<M>>;
 
+    #[deprecated(since = "0.0.4",note = "This method is not planned to be used")]
     fn on_close(&self);
 }

@@ -11,12 +11,11 @@ pub enum Message {
     ButtonClicked,
 }
 
-pub struct Poweredit {
-    theme: Theme,
+pub struct SampleApp {
     menu: Menubar,
 }
 
-impl Application<Message> for Poweredit {
+impl Application<Message> for SampleApp {
     type Message = Message;
 
     fn on_close(&self) {}
@@ -44,10 +43,6 @@ impl Application<Message> for Poweredit {
             .on_click(Message::ButtonClicked);
         Some(build_component(button))
     }
-
-    fn theme(&self) -> igat::Theme {
-        self.theme
-    }
 }
 
 fn main() {
@@ -56,8 +51,7 @@ fn main() {
     let mut menubar = Menubar::new();
     menubar.add(Menu::new("File".to_string()));
     menubar.add(Menu::new("Edit".to_string()));
-    let app = Poweredit {
-        theme: Theme::default(),
+    let app = SampleApp {
         menu: menubar,
     };
     exe.run(app);
