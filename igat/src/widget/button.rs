@@ -1,6 +1,6 @@
 use acure::Command;
 
-use crate::{Color, Frame,Rect};
+use crate::{Color, Frame, Rect};
 
 use super::{ClientMessage, Widget};
 
@@ -72,17 +72,16 @@ where
     }
 }
 
-
 impl<M> Widget<M> for Button<M>
 where
     M: Send + Copy + std::fmt::Debug,
-{          
+{
     fn area(&self) -> Vec<Rect> {
         vec![Rect {
             left: self.x,
-            top: self.y+self.menu_height,
-            right: self.x+self.width,
-            bottom: self.y+self.menu_height+self.height, 
+            top: self.y + self.menu_height,
+            right: self.x + self.width,
+            bottom: self.y + self.menu_height + self.height,
         }]
     }
 

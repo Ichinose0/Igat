@@ -1,6 +1,6 @@
 use acure::Command;
 
-use crate::Color;
+use crate::{Color, Frame, Rect};
 
 use super::{ClientMessage, Widget};
 
@@ -14,6 +14,7 @@ where
     menu_height: u32,
     x: u32,
     y: u32,
+    color: Color,
     background_color: Color,
     text: String,
     on_click: Option<M>,
@@ -35,7 +36,6 @@ where
             on_click: None,
             color: Color::Black,
             background_color: Color::White,
-            shadow_color: Color::ARGB(255, 128, 128, 128),
         }
     }
 
@@ -77,9 +77,9 @@ where
     fn area(&self) -> Vec<Rect> {
         vec![Rect {
             left: self.x,
-            top: self.y+self.menu_height,
-            right: self.x+self.width,
-            bottom: self.y+self.menu_height+self.height, 
+            top: self.y + self.menu_height,
+            right: self.x + self.width,
+            bottom: self.y + self.menu_height + self.height,
         }]
     }
 
@@ -87,7 +87,7 @@ where
         self.on_click
     }
 
-    fn message(&mut self, msg: ClientMessage) {}
+    fn message(&mut self, _msg: ClientMessage) {}
 
     fn is_capture_event(&self) -> bool {
         false

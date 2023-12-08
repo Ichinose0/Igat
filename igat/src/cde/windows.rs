@@ -1,6 +1,6 @@
 use std::marker::PhantomData;
 
-use acure::{Acure, AlignMode};
+use acure::Acure;
 use raw_window_handle::HasWindowHandle;
 use winit::window::Window;
 

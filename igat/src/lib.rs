@@ -23,7 +23,7 @@ use cde::Cde;
 
 pub type CursorIcon = winit::window::CursorIcon;
 
-#[derive(Clone,Copy,Debug)]
+#[derive(Clone, Copy, Debug)]
 pub struct Rect {
     left: u32,
     top: u32,
@@ -39,13 +39,13 @@ impl Rect {
     pub fn y(&self) -> u32 {
         self.top
     }
-    
+
     pub fn width(&self) -> u32 {
-        self.right-self.left
+        self.right - self.left
     }
 
     pub fn height(&self) -> u32 {
-        self.bottom-self.top
+        self.bottom - self.top
     }
 }
 
@@ -87,21 +87,21 @@ pub struct Frame {
 }
 
 impl Frame {
-    pub fn set_title(&self,title: &str) {
+    pub fn set_title(&self, title: &str) {
         self.window.set_title(title);
     }
 
-    pub fn set_resizable(&self,resizable: bool) {
+    pub fn set_resizable(&self, resizable: bool) {
         self.window.set_resizable(resizable);
     }
 
-    pub fn set_minimized(&self,minimized: bool) {
+    pub fn set_minimized(&self, minimized: bool) {
         self.window.set_minimized(minimized);
     }
 
     pub fn set_maximized(&self, maximized: bool) {
         self.window.set_maximized(maximized);
-    } 
+    }
 
     pub fn set_decorations(&self, decorations: bool) {
         self.window.set_decorations(decorations);
@@ -121,7 +121,7 @@ impl Frame {
             left: 0,
             top: self.menu_height,
             right: size.width,
-            bottom: size.height+self.menu_height,
+            bottom: size.height + self.menu_height,
         }
     }
 }
@@ -147,12 +147,9 @@ where
         }
     }
 
-    fn set_up(&mut self) {
-        self.app.set_up();
-    }
-
-    pub fn dispatch_message(&mut self, message: M,frame: &Frame) {
-        self.app.message(ApplicationEvent::WidgetEvent,Some(message),frame);
+    pub fn dispatch_message(&mut self, message: M, frame: &Frame) {
+        self.app
+            .message(ApplicationEvent::WidgetEvent, Some(message), frame);
     }
 }
 
@@ -175,13 +172,11 @@ impl Executable {
         M: Send + std::fmt::Debug,
     {
         let mut ctx = ApplicationContext::new(app);
-        ctx.set_up();
 
         let cde: Cde<M> = Cde::new(&self.window);
         let theme = ctx.app.theme();
-        
 
-        let mut config = RenderConfig {
+        let config = RenderConfig {
             thickness: 0,
             border_radius: 0.0,
         };
@@ -193,14 +188,16 @@ impl Executable {
 
         let frame = Frame {
             window: self.window,
-            menu_height: height
+            menu_height: height,
         };
+
+        ctx.app.set_up(&frame);
 
         let mut ui = ctx.app.ui(&frame);
 
         let _result = self.event_loop.run(move |event, elwt| {
             cde.bgr(theme.bgr);
-            
+
             match event {
                 Event::WindowEvent { event, window_id } if window_id == frame.window.id() => {
                     let cursor = Cursor::get(&frame.window);
@@ -210,45 +207,40 @@ impl Executable {
                                 let x = cursor.x();
                                 let y = cursor.y();
                                 if x > 0 && y > 0 {
-                                    let area = component.area();
-                                    for a in area {
+                                    let area = component.inner.area();
+                                    for area in area {
                                         let cx = (area.left) as i32;
                                         let cy = (area.top) as i32;
-                                        let width = (area.left-area.right) as i32;
-                                        let height = (area.bottom-area.top) as i32;
-                                        if x >= cx && x <= cx+width {
-                                            if y >= cy && y <= cy+height {
-                                                component.inner.message(
-                                                                                widget::ClientMessage::OnHover,
-                                                                            );
-                                                                            if unsafe {
-                                                                                GetAsyncKeyState(VK_LBUTTON) != 0
-                                                                            } {
-                                                                                component.inner.message(
-                                                                                    widget::ClientMessage::OnClick,
-                                                                                );
-                                                                                match component.inner.on_click() {
-                                                                                    Some(e) => {
-                                                                                        match ctx.app.message(ApplicationEvent::WidgetEvent,Some(e),&frame) {
-                                                                                            Some(e) => {
-                    
-                                                                                            }
-                    
-                                                                                            None => {}
-                                                                                        }
-                                                                                    }
-                                                                                    None => todo!(),
-                                                                                }
-                                                                                cde.draw(&component.inner);
-                                                                            }
-                                                                        }
-                                                                    
-                                            
+                                        let width = (area.right - area.left) as i32;
+                                        let height = (area.bottom - area.top) as i32;
+                                        if x >= cx && x <= cx + width {
+                                            if y >= cy && y <= cy + height {
+                                                component
+                                                    .inner
+                                                    .message(widget::ClientMessage::OnHover);
+                                                if unsafe { GetAsyncKeyState(VK_LBUTTON) != 0 } {
+                                                    component
+                                                        .inner
+                                                        .message(widget::ClientMessage::OnClick);
+                                                    match component.inner.on_click() {
+                                                        Some(e) => {
+                                                            if let Some(e) = ctx.app.message(
+                                                                ApplicationEvent::WidgetEvent,
+                                                                Some(e),
+                                                                &frame,
+                                                            ) {
+                                                            }
+                                                        }
+                                                        None => todo!(),
+                                                    }
+                                                    cde.draw(&component.inner);
+                                                }
+                                            }
                                         } else {
                                             component.inner.message(widget::ClientMessage::Unfocus);
                                         }
                                     }
-                                } 
+                                }
                                 // Cursor is out of window range
                                 else {
                                     component.inner.message(widget::ClientMessage::Unfocus);
@@ -261,12 +253,10 @@ impl Executable {
                     match event {
                         WindowEvent::CloseRequested => elwt.exit(),
                         WindowEvent::RedrawRequested => {
-                            match ctx.app.message(ApplicationEvent::RedrawRequested,None,&frame) {
-                                Some(e) => {
-
-                                }
-
-                                None => {}
+                            if let Some(e) =
+                                ctx.app
+                                    .message(ApplicationEvent::RedrawRequested, None, &frame)
+                            {
                             }
                             match &mut ui {
                                 Some(ref mut component) => {
@@ -274,11 +264,8 @@ impl Executable {
                                 }
                                 None => {}
                             };
-                            match ctx.app.menu() {
-                                Some(menu) => {
-                                    cde.draw_menu(&frame.window, menu);
-                                }
-                                None => {}
+                            if let Some(menu) = ctx.app.menu() {
+                                cde.draw_menu(&frame.window, menu);
                             }
 
                             cde.write();
@@ -340,13 +327,13 @@ where
         Theme::default()
     }
 
-    fn set_up(&mut self,frame: &Frame) {}
+    fn set_up(&mut self, _frame: &Frame) {}
 
     fn message(
         &mut self,
-        event: ApplicationEvent,
+        _event: ApplicationEvent,
         _message: Option<M>,
-        frame: &Frame
+        _frame: &Frame,
     ) -> Option<ApplicationResponse> {
         None
     }
@@ -355,8 +342,8 @@ where
         None
     }
 
-    fn ui(&mut self,frame: &Frame) -> Option<Component<M>>;
+    fn ui(&mut self, frame: &Frame) -> Option<Component<M>>;
 
-    #[deprecated(since = "0.0.4",note = "This method is not planned to be used")]
+    #[deprecated(since = "0.0.4", note = "This method is not planned to be used")]
     fn on_close(&self);
 }

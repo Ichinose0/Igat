@@ -4,8 +4,12 @@ mod text;
 pub use button::*;
 pub use text::*;
 
-use crate::Color;
 use crate::Rect;
+
+pub struct RenderConfig {
+    pub thickness: u32,
+    pub border_radius: f64,
+}
 
 #[derive(Debug)]
 pub enum ClientMessage {

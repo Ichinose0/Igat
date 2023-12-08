@@ -1,8 +1,6 @@
 use raw_window_handle::HasWindowHandle;
-use winapi::shared::windef::{HWND, POINT, RECT};
-use winapi::um::winuser::{
-    GetClientRect, GetCursorPos, GetSystemMetrics, ScreenToClient, GetWindowRect, SM_CXSIZEFRAME, SM_CYCAPTION,
-};
+use winapi::shared::windef::{HWND, POINT};
+use winapi::um::winuser::{GetCursorPos, ScreenToClient};
 
 pub struct Cursor {
     point: POINT,
@@ -15,7 +13,7 @@ impl Cursor {
                 let mut point = POINT { x: 0, y: 0 };
                 unsafe {
                     GetCursorPos(&mut point);
-                    ScreenToClient(isize::from(handle.hwnd) as HWND,&mut point);
+                    ScreenToClient(isize::from(handle.hwnd) as HWND, &mut point);
                 }
                 Self { point }
             }
