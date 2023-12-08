@@ -22,7 +22,7 @@ impl Application<AppMessage> for Counter {
     fn on_close(&self) {}
 
     fn set_up(&mut self, frame: &Frame) {
-        frame.set_resizable(false);
+        //frame.set_resizable(false);
     }
 
     fn message(
