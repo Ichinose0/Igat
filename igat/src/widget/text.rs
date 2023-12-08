@@ -11,6 +11,7 @@ where
 {
     width: u32,
     height: u32,
+    menu_height: u32,
     x: u32,
     y: u32,
     background_color: Color,
@@ -22,10 +23,22 @@ impl<M> Text<M>
 where
     M: Send + std::fmt::Debug,
 {
-    pub fn new() -> Self {
-        Default::default()
+    pub fn new(frame: &Frame) -> Self {
+        let rect = frame.get_rect();
+        Self {
+            width: 30,
+            height: 80,
+            menu_height: rect.top,
+            x: 0,
+            y: 0,
+            text: String::new(),
+            on_click: None,
+            color: Color::Black,
+            background_color: Color::White,
+            shadow_color: Color::ARGB(255, 128, 128, 128),
+        }
     }
-
+    
     pub fn width(mut self, width: u32) -> Self {
         self.width = width;
         self
@@ -54,23 +67,6 @@ where
     pub fn on_click(mut self, on_click: M) -> Self {
         self.on_click = Some(on_click);
         self
-    }
-}
-
-impl<M> Default for Text<M>
-where
-    M: Send + std::fmt::Debug,
-{
-    fn default() -> Self {
-        Self {
-            width: 1,
-            height: 1,
-            x: 1,
-            y: 1,
-            text: String::new(),
-            on_click: None,
-            background_color: Color::White,
-        }
     }
 }
 
