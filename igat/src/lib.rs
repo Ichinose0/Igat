@@ -194,55 +194,40 @@ impl Executable {
                                 if x > 0 && y > 0 {
                                     let area = component.area();
                                     for a in area {
-                                        
-                                        // match cursor.window_x(&frame.window) {
-                                        //     Some(x) => {
-                                        //         let x = x - component.inner.x() as i32;
-                                        //         if (x as u32) > component.inner.x()
-                                        //             && (x as u32)
-                                        //                 < component.inner.x() + component.inner.width()
-                                        //         {
-                                        //             match cursor.window_y(&frame.window) {
-                                        //                 Some(y) => {
-                                        //                     let y = y - component.inner.y() as i32;
-                                        //                     if (y as u32) > component.inner.y()
-                                        //                         && (y as u32)
-                                        //                             < component.inner.y()
-                                        //                                 + component.inner.height()
-                                        //                     {
-                                        //                         component.inner.message(
-                                        //                             widget::ClientMessage::OnHover,
-                                        //                         );
-                                        //                         if unsafe {
-                                        //                             GetAsyncKeyState(VK_LBUTTON) != 0
-                                        //                         } {
-                                        //                             component.inner.message(
-                                        //                                 widget::ClientMessage::OnClick,
-                                        //                             );
-                                        //                             match component.inner.on_click() {
-                                        //                                 Some(e) => {
-                                        //                                     match ctx.app.message(ApplicationEvent::WidgetEvent,Some(e),&frame) {
-                                        //                                         Some(e) => {
-        
-                                        //                                         }
-        
-                                        //                                         None => {}
-                                        //                                     }
-                                        //                                 }
-                                        //                                 None => todo!(),
-                                        //                             }
-                                        //                             cde.draw(&component.inner);
-                                        //                         }
-                                        //                     }
-                                        //                 }
-        
-                                        //                 None => {}
-                                        //             }
-                                        //         } else {
-                                        //             component.inner.message(widget::ClientMessage::Unfocus)
-                                        //         }
-                                        //     }
-                                        //     None => {}
+                                        let cx = (area.left) as i32;
+                                        let cy = (area.top) as i32;
+                                        let width = (area.left-area.right) as i32;
+                                        let height = (area.bottom-area.top) as i32;
+                                        if x >= cx && x <= cx+width {
+                                            if y >= cy && y <= cy+height {
+                                                component.inner.message(
+                                                                                widget::ClientMessage::OnHover,
+                                                                            );
+                                                                            if unsafe {
+                                                                                GetAsyncKeyState(VK_LBUTTON) != 0
+                                                                            } {
+                                                                                component.inner.message(
+                                                                                    widget::ClientMessage::OnClick,
+                                                                                );
+                                                                                match component.inner.on_click() {
+                                                                                    Some(e) => {
+                                                                                        match ctx.app.message(ApplicationEvent::WidgetEvent,Some(e),&frame) {
+                                                                                            Some(e) => {
+                    
+                                                                                            }
+                    
+                                                                                            None => {}
+                                                                                        }
+                                                                                    }
+                                                                                    None => todo!(),
+                                                                                }
+                                                                                cde.draw(&component.inner);
+                                                                            }
+                                                                        }
+                                                                    }
+                                            }
+                                        } else {
+                                            component.inner.message(widget::ClientMessage::Unfocus);
                                         }
                                     }
                                 } 
