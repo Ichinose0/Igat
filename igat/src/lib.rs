@@ -193,11 +193,12 @@ impl Executable {
 
         ctx.app.set_up(&frame);
 
-        
+        let mut clicked = false;
 
         let _result = self.event_loop.run(move |event, elwt| {
             cde.bgr(theme.bgr);
             let mut ui = ctx.app.ui(&frame);
+
             match event {
                 Event::WindowEvent { event, window_id } if window_id == frame.window.id() => {
                     let cursor = Cursor::get(&frame.window);
@@ -222,19 +223,20 @@ impl Executable {
                                                     component
                                                         .inner
                                                         .message(widget::ClientMessage::OnClick);
-                                                    match component.inner.on_click() {
-                                                        Some(e) => {
-                                                            if let Some(e) = ctx.app.message(
-                                                                ApplicationEvent::WidgetEvent,
-                                                                Some(e),
-                                                                &frame,
-                                                            ) {
+
+                                                    if clicked == false {
+                                                        match component.inner.on_click() {
+                                                            Some(e) => {
+                                                                ctx.app.message(
+                                                                    ApplicationEvent::WidgetEvent,
+                                                                    Some(e),
+                                                                    &frame,
+                                                                );
+                                                                clicked = true;
                                                             }
+                                                            None => {}
                                                         }
-                                                
-                                                        None => todo!(),
                                                     }
-                                                    std::thread::sleep(Duration::from_millis(130));
                                                     cde.draw(&component.inner);
                                                 }
                                             }
@@ -255,7 +257,6 @@ impl Executable {
                     match event {
                         WindowEvent::CloseRequested => elwt.exit(),
                         WindowEvent::RedrawRequested => {
-                            
                             if let Some(e) =
                                 ctx.app
                                     .message(ApplicationEvent::RedrawRequested, None, &frame)
@@ -272,6 +273,8 @@ impl Executable {
                             }
 
                             cde.write();
+                            std::thread::sleep(Duration::from_millis(130));
+                            clicked = false;
 
                             frame.window.pre_present_notify();
                         }

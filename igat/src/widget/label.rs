@@ -89,9 +89,9 @@ where
 
     fn message(&mut self, msg: ClientMessage) {
         match msg {
-            ClientMessage::OnClick => {},
-            ClientMessage::OnHover => {},
-            ClientMessage::Unfocus => {},
+            ClientMessage::OnClick => {}
+            ClientMessage::OnHover => {}
+            ClientMessage::Unfocus => {}
         }
     }
 
