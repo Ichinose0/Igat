@@ -38,7 +38,7 @@ where
             shadow_color: Color::ARGB(255, 128, 128, 128),
         }
     }
-    
+
     pub fn width(mut self, width: u32) -> Self {
         self.width = width;
         self
@@ -74,22 +74,6 @@ impl<M> Widget<M> for Text<M>
 where
     M: Send + Copy + std::fmt::Debug,
 {
-    fn width(&self) -> u32 {
-        self.width
-    }
-
-    fn height(&self) -> u32 {
-        self.height
-    }
-
-    fn x(&self) -> u32 {
-        self.x
-    }
-
-    fn y(&self) -> u32 {
-        self.y
-    }
-
     fn area(&self) -> Vec<Rect> {
         vec![Rect {
             left: self.x,

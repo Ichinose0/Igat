@@ -5,7 +5,7 @@ use crate::{Color, Frame,Rect};
 use super::{ClientMessage, Widget};
 
 #[derive(Debug)]
-pub struct Button<M>
+pub struct TextArea<M>
 where
     M: Send + std::fmt::Debug,
 {
@@ -18,10 +18,11 @@ where
     background_color: Color,
     shadow_color: Color,
     text: String,
+    is_editable: bool,
     on_click: Option<M>,
 }
 
-impl<M> Button<M>
+impl<M> TextArea<M>
 where
     M: Send + std::fmt::Debug,
 {
@@ -33,6 +34,7 @@ where
             menu_height: rect.top,
             x: 0,
             y: 0,
+            is_editable: false,
             text: String::new(),
             on_click: None,
             color: Color::Black,
@@ -73,10 +75,10 @@ where
 }
 
 
-impl<M> Widget<M> for Button<M>
+impl<M> Widget<M> for TextArea<M>
 where
     M: Send + Copy + std::fmt::Debug,
-{          
+{
     fn area(&self) -> Vec<Rect> {
         vec![Rect {
             left: self.x,
@@ -94,7 +96,7 @@ where
                 y,
                 self.width,
                 self.height,
-                4.2,
+                1.2,
                 self.shadow_color.into(),
             ),
             Command::FillRectangle(
@@ -102,7 +104,7 @@ where
                 y + 1,
                 self.width - 2,
                 self.height - 2,
-                4.2,
+                1.2,
                 self.background_color.into(),
             ),
             Command::WriteString(
