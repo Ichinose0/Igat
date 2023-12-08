@@ -6,7 +6,7 @@ mod cursor;
 pub mod menu;
 pub mod widget;
 
-use std::{fmt::Debug, marker::PhantomData};
+use std::{fmt::Debug, marker::PhantomData, time::Duration};
 
 use cursor::Cursor;
 use menu::Menubar;
@@ -193,11 +193,11 @@ impl Executable {
 
         ctx.app.set_up(&frame);
 
-        let mut ui = ctx.app.ui(&frame);
+        
 
         let _result = self.event_loop.run(move |event, elwt| {
             cde.bgr(theme.bgr);
-
+            let mut ui = ctx.app.ui(&frame);
             match event {
                 Event::WindowEvent { event, window_id } if window_id == frame.window.id() => {
                     let cursor = Cursor::get(&frame.window);
@@ -231,8 +231,10 @@ impl Executable {
                                                             ) {
                                                             }
                                                         }
+                                                
                                                         None => todo!(),
                                                     }
+                                                    std::thread::sleep(Duration::from_millis(130));
                                                     cde.draw(&component.inner);
                                                 }
                                             }
@@ -253,6 +255,7 @@ impl Executable {
                     match event {
                         WindowEvent::CloseRequested => elwt.exit(),
                         WindowEvent::RedrawRequested => {
+                            
                             if let Some(e) =
                                 ctx.app
                                     .message(ApplicationEvent::RedrawRequested, None, &frame)

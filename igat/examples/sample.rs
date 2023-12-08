@@ -13,6 +13,7 @@ pub enum Message {
 
 pub struct SampleApp {
     menu: Menubar,
+    num: u32
 }
 
 impl Application<Message> for SampleApp {
@@ -25,9 +26,18 @@ impl Application<Message> for SampleApp {
     fn message(
         &mut self,
         event: ApplicationEvent,
-        _message: Option<Message>,
+        message: Option<Message>,
         frame: &Frame,
     ) -> Option<ApplicationResponse> {
+        match event {
+            ApplicationEvent::RedrawRequested => {},
+            ApplicationEvent::WidgetEvent => {
+                match message.unwrap() {
+                    Message::ButtonClicked => {self.num+=1},
+                }
+            },
+            ApplicationEvent::KeyboardInput(_) => {},
+        }
         None
     }
 
@@ -39,7 +49,7 @@ impl Application<Message> for SampleApp {
         let button = Button::new(frame)
             .width(70)
             .height(30)
-            .text("Button".to_string())
+            .text(self.num.to_string())
             .on_click(Message::ButtonClicked);
         Some(build_component(button))
     }
@@ -51,6 +61,6 @@ fn main() {
     let mut menubar = Menubar::new();
     menubar.add(Menu::new("File".to_string()));
     menubar.add(Menu::new("Edit".to_string()));
-    let app = SampleApp { menu: menubar };
+    let app = SampleApp { menu: menubar,num:0 };
     exe.run(app);
 }
