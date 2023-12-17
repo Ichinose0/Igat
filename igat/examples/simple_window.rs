@@ -17,9 +17,6 @@ pub struct SimpleApp {
 }
 
 impl Application<Message> for SimpleApp {
-    type Message = Message;
-
-    fn on_close(&self) {}
 
     fn set_up(&mut self,frame: &Frame) {}
 

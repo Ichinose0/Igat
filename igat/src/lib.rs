@@ -1,8 +1,18 @@
+//! # Igat - Expressive GUI library
+//!
+//! <p style="display: inline">
+//! <img src="https://img.shields.io/badge/-Rust-000000.svg?logo=rust&style=for-the-badge">
+//! <img src="https://img.shields.io/badge/-githubactions-FFFFFF.svg?logo=github-actions&style=for-the-badge">
+//! </p>
+
+
 #[macro_use]
 extern crate log;
 
+#[doc(hidden)]
 pub(crate) mod cde;
-mod cursor;
+#[doc(hidden)]
+pub(crate) mod cursor;
 pub mod menu;
 pub mod widget;
 
@@ -23,6 +33,14 @@ use cde::Cde;
 
 pub type CursorIcon = winit::window::CursorIcon;
 
+/// Represents an area on the screen
+/// 
+/// This structure represents an area (rectangle) by the coordinates of the upper left and lower right corners
+/// # Members
+/// * `left` - X coordinate of upper left corner
+/// * `top` - Y coordinate of upper left corner
+/// * `right` - X coordinate of lower right corner
+/// * `bottom` - Y coordinate of lower right corner
 #[derive(Clone, Copy, Debug)]
 pub struct Rect {
     left: u32,
@@ -32,27 +50,35 @@ pub struct Rect {
 }
 
 impl Rect {
+    /// Obtains the X coordinate
     pub fn x(&self) -> u32 {
         self.left
     }
 
+    /// Obtains the Y coordinate
     pub fn y(&self) -> u32 {
         self.top
     }
 
+    /// Get width
     pub fn width(&self) -> u32 {
         self.right - self.left
     }
 
+    /// Get height
     pub fn height(&self) -> u32 {
         self.bottom - self.top
     }
 }
 
+/// Represents a color
+/// 
+/// Initialization with ARGB allows you to create your own colors
 #[derive(Clone, Copy, Debug)]
 pub enum Color {
     Black,
     White,
+    /// Initialization with ARGB allows you to create your own colors
     ARGB(u8, u8, u8, u8),
 }
 
@@ -81,6 +107,9 @@ pub struct Executable {
     event_loop: EventLoop<()>,
 }
 
+/// Represents an application window handle
+/// 
+/// This structure can be used to change window properties
 pub struct Frame {
     window: Window,
     menu_height: u32,
@@ -327,8 +356,6 @@ pub trait Application<M>: Sized
 where
     M: Send + std::fmt::Debug,
 {
-    type Message: Send + Debug;
-
     fn theme(&self) -> Theme {
         Theme::default()
     }
@@ -344,12 +371,12 @@ where
         None
     }
 
+    /// Specify the application menu.
+    /// By default, None is returned and no menu is added.
     fn menu(&self) -> Option<&Menubar> {
         None
     }
 
+    /// Passes the UI to be displayed in the application.
     fn ui(&mut self, frame: &Frame) -> Option<Component<M>>;
-
-    #[deprecated(since = "0.0.4", note = "This method is not planned to be used")]
-    fn on_close(&self);
 }
