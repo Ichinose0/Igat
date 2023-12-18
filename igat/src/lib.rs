@@ -5,7 +5,6 @@
 //! <img src="https://img.shields.io/badge/-githubactions-FFFFFF.svg?logo=github-actions&style=for-the-badge">
 //! </p>
 
-
 #[macro_use]
 extern crate log;
 
@@ -29,12 +28,12 @@ use winit::{
     window::WindowBuilder,
 };
 
-use cde::Cde;
+use cde::{Cde, RenderManager};
 
 pub type CursorIcon = winit::window::CursorIcon;
 
 /// Represents an area on the screen
-/// 
+///
 /// This structure represents an area (rectangle) by the coordinates of the upper left and lower right corners
 /// # Members
 /// * `left` - X coordinate of upper left corner
@@ -72,7 +71,7 @@ impl Rect {
 }
 
 /// Represents a color
-/// 
+///
 /// Initialization with ARGB allows you to create your own colors
 #[derive(Clone, Copy, Debug)]
 pub enum Color {
@@ -108,7 +107,7 @@ pub struct Executable {
 }
 
 /// Represents an application window handle
-/// 
+///
 /// This structure can be used to change window properties
 pub struct Frame {
     window: Window,
@@ -202,8 +201,9 @@ impl Executable {
     {
         let mut ctx = ApplicationContext::new(app);
 
-        let cde: Cde<M> = Cde::new(&self.window);
         let theme = ctx.app.theme();
+        
+        
 
         let config = RenderConfig {
             thickness: 0,
@@ -220,17 +220,18 @@ impl Executable {
             menu_height: height,
         };
 
-        ctx.app.set_up(&frame);
+        let render_manager:RenderManager<M> = RenderManager::new(frame,theme);
+
+        ctx.app.set_up(render_manager.frame());
 
         let mut clicked = false;
 
         let _result = self.event_loop.run(move |event, elwt| {
-            cde.bgr(theme.bgr);
-            let mut ui = ctx.app.ui(&frame);
+            let mut ui = ctx.app.ui(render_manager.frame());
 
             match event {
-                Event::WindowEvent { event, window_id } if window_id == frame.window.id() => {
-                    let cursor = Cursor::get(&frame.window);
+                Event::WindowEvent { event, window_id } if window_id == render_manager.frame().window.id() => {
+                    let cursor = Cursor::get(&render_manager.frame().window);
                     match &mut ui {
                         Some(component) => {
                             if component.inner.is_capture_event() {
@@ -259,23 +260,24 @@ impl Executable {
                                                                 ctx.app.message(
                                                                     ApplicationEvent::WidgetEvent,
                                                                     Some(e),
-                                                                    &frame,
+                                                                    render_manager.frame(),
                                                                 );
                                                                 clicked = true;
                                                             }
                                                             None => {}
                                                         }
                                                     }
-                                                    cde.draw(&component.inner);
+                                                    //cde.draw(&component.inner);
                                                 }
                                             }
                                         } else {
-                                            component.inner.message(widget::ClientMessage::Unfocus);
+                                            //state.event = WidgetEvent::StateChanged { state: widget::WidgetState::None };
                                         }
                                     }
                                 }
                                 // Cursor is out of window range
                                 else {
+                                    //(*state).event = WidgetEvent::None;
                                     component.inner.message(widget::ClientMessage::Unfocus);
                                 }
                             }
@@ -288,24 +290,25 @@ impl Executable {
                         WindowEvent::RedrawRequested => {
                             if let Some(e) =
                                 ctx.app
-                                    .message(ApplicationEvent::RedrawRequested, None, &frame)
+                                    .message(ApplicationEvent::RedrawRequested, None, &render_manager.frame())
                             {
                             }
                             match &mut ui {
                                 Some(ref mut component) => {
-                                    cde.draw(&component.inner);
+                                    //cde.draw(&component.inner);
                                 }
                                 None => {}
                             };
                             if let Some(menu) = ctx.app.menu() {
-                                cde.draw_menu(&frame.window, menu);
+                                //cde.draw_menu(&frame.window, menu);
                             }
 
-                            cde.write();
+                            //cde.write();
+                            render_manager.write();
                             std::thread::sleep(Duration::from_millis(130));
                             clicked = false;
 
-                            frame.window.pre_present_notify();
+                            render_manager.frame().window.pre_present_notify();
                         }
 
                         _ => {}
@@ -313,7 +316,7 @@ impl Executable {
                 }
 
                 Event::AboutToWait => {
-                    frame.window.request_redraw();
+                    render_manager.frame().window.request_redraw();
                 }
 
                 _ => {}

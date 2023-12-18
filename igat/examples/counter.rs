@@ -17,9 +17,6 @@ pub struct Counter {
 }
 
 impl Application<AppMessage> for Counter {
-    type Message = AppMessage;
-
-    fn on_close(&self) {}
 
     fn set_up(&mut self, frame: &Frame) {
         //frame.set_resizable(false);

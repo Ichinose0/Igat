@@ -1,6 +1,6 @@
 use std::marker::PhantomData;
 
-use acure::Acure;
+use acure::{Acure, Command};
 use raw_window_handle::HasWindowHandle;
 use winit::window::Window;
 
@@ -45,8 +45,8 @@ where
         }
     }
 
-    pub fn draw(&self, widget: &Box<dyn Widget<M>>) {
-        for c in widget.view() {
+    pub fn draw(&self, commands: Vec<Command>) {
+        for c in commands {
             self.acure.push(c);
         }
     }
