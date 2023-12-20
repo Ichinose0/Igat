@@ -14,7 +14,6 @@ pub enum AppMessage {
 
 pub struct Counter {
     count: i32,
-    menu: Menubar
 }
 
 impl Application<AppMessage> for Counter {
@@ -41,7 +40,7 @@ impl Application<AppMessage> for Counter {
     }
 
     fn menu(&self) -> Option<&igat::menu::Menubar> {
-        Some(&self.menu)
+        None
     }
 
     fn ui(&mut self, frame: &Frame) -> Option<Component<AppMessage>> {
@@ -57,6 +56,6 @@ impl Application<AppMessage> for Counter {
 fn main() {
     let exe = Executable::new();
 
-    let app = Counter { count: 0, menu: Menubar::default() };
+    let app = Counter { count: 0 };
     exe.run(app);
 }

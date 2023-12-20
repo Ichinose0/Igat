@@ -228,6 +228,7 @@ impl Executable {
         render_manager.set_background_color();
 
         let mut clicked = false;
+        let mut resizing = false;
 
         let _result = self.event_loop.run(move |event, elwt| {
             let mut ui = ctx.app.ui(render_manager.frame());
@@ -291,6 +292,7 @@ impl Executable {
 
                     match event {
                         WindowEvent::Resized(size) => {
+                            resizing = true;
                             render_manager.resize(size.width,size.height);
                         }
                         WindowEvent::CloseRequested => elwt.exit(),
@@ -314,6 +316,12 @@ impl Executable {
 
                             
                             render_manager.write();
+
+                            if !resizing {
+                                std::thread::sleep(Duration::from_millis(130));
+                            }
+
+                            resizing = false;
                             clicked = false;
 
                             render_manager.frame().window.pre_present_notify();
