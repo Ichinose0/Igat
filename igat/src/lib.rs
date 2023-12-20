@@ -220,14 +220,19 @@ impl Executable {
             menu_height: height,
         };
 
-        let render_manager:RenderManager<M> = RenderManager::new(frame,theme);
+        let mut render_manager:RenderManager<M> = RenderManager::new(frame,theme);
 
         ctx.app.set_up(render_manager.frame());
+
+
+        render_manager.set_background_color();
 
         let mut clicked = false;
 
         let _result = self.event_loop.run(move |event, elwt| {
             let mut ui = ctx.app.ui(render_manager.frame());
+
+            
 
             match event {
                 Event::WindowEvent { event, window_id } if window_id == render_manager.frame().window.id() => {
@@ -267,7 +272,6 @@ impl Executable {
                                                             None => {}
                                                         }
                                                     }
-                                                    //cde.draw(&component.inner);
                                                 }
                                             }
                                         } else {
@@ -286,8 +290,12 @@ impl Executable {
                     }
 
                     match event {
+                        WindowEvent::Resized(size) => {
+                            render_manager.resize(size.width,size.height);
+                        }
                         WindowEvent::CloseRequested => elwt.exit(),
                         WindowEvent::RedrawRequested => {
+                            render_manager.begin();
                             if let Some(e) =
                                 ctx.app
                                     .message(ApplicationEvent::RedrawRequested, None, &render_manager.frame())
@@ -295,17 +303,17 @@ impl Executable {
                             }
                             match &mut ui {
                                 Some(ref mut component) => {
-                                    //cde.draw(&component.inner);
+                                    render_manager.register(&component.inner.view());
                                 }
                                 None => {}
                             };
                             if let Some(menu) = ctx.app.menu() {
+                                render_manager.register(&menu.view(&render_manager.frame.window));
                                 //cde.draw_menu(&frame.window, menu);
                             }
 
-                            //cde.write();
+                            
                             render_manager.write();
-                            std::thread::sleep(Duration::from_millis(130));
                             clicked = false;
 
                             render_manager.frame().window.pre_present_notify();
