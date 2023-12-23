@@ -58,7 +58,7 @@ impl Application<AppMessage> for Counter {
             .y(100)
             .text("Down".to_owned())
             .on_click(AppMessage::CountDown);
-        let count = Button::new(frame)
+        let count = Text::new(frame)
             .width(190)
             .height(40)
             .x(180)

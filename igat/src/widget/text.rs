@@ -99,7 +99,7 @@ where
             self.y,
             self.width,
             self.height,
-            self.background_color.into(),
+            self.color.into(),
             self.text.clone(),
         )]
     }
