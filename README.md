@@ -8,8 +8,8 @@
 </p>
 
 ## Example
-### Button
-![result](img/button_sample.gif)
+### Counter
+![result](img/counter.gif)
 
 ## About Igat
 
