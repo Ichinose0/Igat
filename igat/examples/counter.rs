@@ -1,3 +1,4 @@
+use igat::widget::Panel;
 use igat::ApplicationResponse;
 use igat::{
     menu::Menu,
@@ -17,7 +18,6 @@ pub struct Counter {
 }
 
 impl Application<AppMessage> for Counter {
-
     fn set_up(&mut self, frame: &Frame) {
         //frame.set_resizable(false);
     }
@@ -44,12 +44,29 @@ impl Application<AppMessage> for Counter {
     }
 
     fn ui(&mut self, frame: &Frame) -> Option<Component<AppMessage>> {
-        let button = Button::new(frame)
-            .width(800)
-            .height(600)
-            .text(self.count.to_string())
+        let countup = Button::new(frame)
+            .width(240)
+            .height(80)
+            .x(10)
+            .y(100)
+            .text("Up".to_owned())
             .on_click(AppMessage::CountUp);
-        Some(build_component(button))
+        let countdown = Button::new(frame)
+            .width(240)
+            .height(80)
+            .x(280)
+            .y(100)
+            .text("Down".to_owned())
+            .on_click(AppMessage::CountDown);
+        let count = Button::new(frame)
+            .width(190)
+            .height(40)
+            .x(180)
+            .y(20)
+            .text(self.count.to_string())
+            .on_click(AppMessage::CountDown);
+        let panel = Panel::new().child(countup).child(countdown).child(count);
+        Some(panel.into())
     }
 }
 

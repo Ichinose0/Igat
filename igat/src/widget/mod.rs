@@ -1,9 +1,11 @@
 mod button;
 mod label;
+mod panel;
 mod text;
 
 pub use button::*;
 pub use label::*;
+pub use panel::*;
 pub use text::*;
 
 use crate::Rect;
@@ -24,7 +26,7 @@ pub struct Component<M>
 where
     M: Send + std::fmt::Debug,
 {
-    pub(crate) inner: Box<dyn Widget<M>>,
+    pub(crate) inner: Vec<Box<dyn Widget<M>>>,
 }
 
 pub trait Widget<M>: Send + std::fmt::Debug
@@ -48,6 +50,6 @@ where
     T: Widget<M> + 'static,
 {
     Component {
-        inner: Box::new(widget),
+        inner: vec![Box::new(widget)],
     }
 }

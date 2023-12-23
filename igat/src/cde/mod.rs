@@ -3,7 +3,7 @@ pub mod windows;
 use acure::Command;
 use raw_window_handle::HasWindowHandle;
 
-use crate::{Theme, menu::Menubar, Frame, Color};
+use crate::{menu::Menubar, Color, Frame, Theme};
 
 #[cfg(target_os = "windows")]
 pub use self::windows::*;
@@ -14,23 +14,23 @@ where
 {
     cde: Cde<M>,
     pub(crate) frame: Frame,
-    theme: Theme
+    theme: Theme,
 }
 
-impl<M> RenderManager<M> 
+impl<M> RenderManager<M>
 where
-    M: Send + std::fmt::Debug
+    M: Send + std::fmt::Debug,
 {
-    pub fn new(frame: Frame,theme: Theme) -> Self {
+    pub fn new(frame: Frame, theme: Theme) -> Self {
         Self {
             cde: Cde::new(&frame),
             frame,
-            theme
+            theme,
         }
     }
 
-    pub fn resize(&mut self,width: u32,height: u32) {
-        self.cde.resize(width,height);
+    pub fn resize(&mut self, width: u32, height: u32) {
+        self.cde.resize(width, height);
     }
 
     pub fn frame(&self) -> &Frame {
@@ -41,8 +41,7 @@ where
         self.cde.bgr(self.theme.bgr);
     }
 
-
-    pub fn register(&mut self,cmds: &[Command]) {
+    pub fn register(&mut self, cmds: &[Command]) {
         self.cde.register(cmds.to_vec());
     }
 

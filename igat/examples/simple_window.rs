@@ -1,10 +1,10 @@
-use igat::{
-    menu::Menubar,
-    menu::Menu,
-    widget::{build_component, Button, Component, Text},
-    Application, ApplicationEvent, Color, Executable, Theme, Frame,
-};
 use igat::ApplicationResponse;
+use igat::{
+    menu::Menu,
+    menu::Menubar,
+    widget::{build_component, Button, Component, Text},
+    Application, ApplicationEvent, Color, Executable, Frame, Theme,
+};
 
 #[derive(Clone, Copy, Debug)]
 pub enum Message {
@@ -17,14 +17,13 @@ pub struct SimpleApp {
 }
 
 impl Application<Message> for SimpleApp {
-
-    fn set_up(&mut self,frame: &Frame) {}
+    fn set_up(&mut self, frame: &Frame) {}
 
     fn message(
         &mut self,
         event: ApplicationEvent,
         _message: Option<Message>,
-        frame: &Frame
+        frame: &Frame,
     ) -> Option<ApplicationResponse> {
         None
     }
@@ -33,7 +32,7 @@ impl Application<Message> for SimpleApp {
         Some(&self.menu)
     }
 
-    fn ui(&mut self,frame: &Frame) -> Option<Component<Message>> {
+    fn ui(&mut self, frame: &Frame) -> Option<Component<Message>> {
         let button = Button::new(frame)
             .width(70)
             .height(30)

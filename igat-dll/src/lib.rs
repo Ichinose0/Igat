@@ -1,6 +1,6 @@
 #![no_main]
 
-use std::ptr::{null,null_mut};
+use std::ptr::{null, null_mut};
 
 pub type MESSEAGEPROCPTR = fn();
 pub type UIPROCPTR = fn();
@@ -17,34 +17,23 @@ pub struct Rect {
 }
 
 #[repr(C)]
-pub enum Menubar {
-
-}
+pub enum Menubar {}
 
 #[repr(C)]
-pub enum Menu {
-    
-}
+pub enum Menu {}
 
 #[repr(C)]
-pub enum Theme {
-
-}
+pub enum Theme {}
 
 #[repr(C)]
-pub enum Frame {
-
-}
+pub enum Frame {}
 
 #[repr(C)]
-pub enum Application {
-
-}
+pub enum Application {}
 
 pub struct DefaultApplication {
-    ui: UIPROCPTR
+    ui: UIPROCPTR,
 }
-
 
 #[no_mangle]
 pub extern "C" fn CreateApplication() -> *mut Application {

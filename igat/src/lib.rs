@@ -202,8 +202,6 @@ impl Executable {
         let mut ctx = ApplicationContext::new(app);
 
         let theme = ctx.app.theme();
-        
-        
 
         let config = RenderConfig {
             thickness: 0,
@@ -220,10 +218,9 @@ impl Executable {
             menu_height: height,
         };
 
-        let mut render_manager:RenderManager<M> = RenderManager::new(frame,theme);
+        let mut render_manager: RenderManager<M> = RenderManager::new(frame, theme);
 
         ctx.app.set_up(render_manager.frame());
-
 
         render_manager.set_background_color();
 
@@ -232,58 +229,54 @@ impl Executable {
 
         let _result = self.event_loop.run(move |event, elwt| {
             let mut ui = ctx.app.ui(render_manager.frame());
-
-            
-
             match event {
                 Event::WindowEvent { event, window_id } if window_id == render_manager.frame().window.id() => {
                     let cursor = Cursor::get(&render_manager.frame().window);
                     match &mut ui {
                         Some(component) => {
-                            if component.inner.is_capture_event() {
-                                let x = cursor.x();
-                                let y = cursor.y();
-                                if x > 0 && y > 0 {
-                                    let area = component.inner.area();
-                                    for area in area {
-                                        let cx = (area.left) as i32;
-                                        let cy = (area.top) as i32;
-                                        let width = (area.right - area.left) as i32;
-                                        let height = (area.bottom - area.top) as i32;
-                                        if x >= cx && x <= cx + width {
-                                            if y >= cy && y <= cy + height {
-                                                component
-                                                    .inner
-                                                    .message(widget::ClientMessage::OnHover);
-                                                if unsafe { GetAsyncKeyState(VK_LBUTTON) != 0 } {
-                                                    component
-                                                        .inner
-                                                        .message(widget::ClientMessage::OnClick);
-
-                                                    if clicked == false {
-                                                        match component.inner.on_click() {
-                                                            Some(e) => {
-                                                                ctx.app.message(
-                                                                    ApplicationEvent::WidgetEvent,
-                                                                    Some(e),
-                                                                    render_manager.frame(),
-                                                                );
-                                                                clicked = true;
+                            for comp in &mut component.inner {
+                                if comp.is_capture_event() {
+                                    let x = cursor.x();
+                                    let y = cursor.y();
+                                    if x > 0 && y > 0 {
+                                        let area = comp.area();
+                                        for area in area {
+                                            let cx = (area.left) as i32;
+                                            let cy = (area.top) as i32;
+                                            let width = (area.right - area.left) as i32;
+                                            let height = (area.bottom - area.top) as i32;
+                                            if x >= cx && x <= cx + width {
+                                                if y >= cy && y <= cy + height {
+                                                    comp
+                                                        .message(widget::ClientMessage::OnHover);
+                                                    if unsafe { GetAsyncKeyState(VK_LBUTTON) != 0 } {
+                                                        comp
+                                                            .message(widget::ClientMessage::OnClick);
+                                                        if clicked == false {
+                                                            match comp.on_click() {
+                                                                Some(e) => {
+                                                                    ctx.app.message(
+                                                                        ApplicationEvent::WidgetEvent,
+                                                                        Some(e),
+                                                                        render_manager.frame(),
+                                                                    );
+                                                                    clicked = true;
+                                                                }
+                                                                None => {}
                                                             }
-                                                            None => {}
                                                         }
                                                     }
                                                 }
+                                            } else {
+                                                //state.event = WidgetEvent::StateChanged { state: widget::WidgetState::None };
                                             }
-                                        } else {
-                                            //state.event = WidgetEvent::StateChanged { state: widget::WidgetState::None };
                                         }
                                     }
-                                }
-                                // Cursor is out of window range
-                                else {
-                                    //(*state).event = WidgetEvent::None;
-                                    component.inner.message(widget::ClientMessage::Unfocus);
+                                    // Cursor is out of window range
+                                    else {
+                                        //(*state).event = WidgetEvent::None;
+                                        comp.message(widget::ClientMessage::Unfocus);
+                                    }
                                 }
                             }
                         }
@@ -305,7 +298,9 @@ impl Executable {
                             }
                             match &mut ui {
                                 Some(ref mut component) => {
-                                    render_manager.register(&component.inner.view());
+                                    for comp in &component.inner {
+                                        render_manager.register(&comp.view());
+                                    }
                                 }
                                 None => {}
                             };
@@ -313,8 +308,6 @@ impl Executable {
                                 render_manager.register(&menu.view(&render_manager.frame.window));
                                 //cde.draw_menu(&frame.window, menu);
                             }
-
-                            
                             render_manager.write();
 
                             if !resizing {

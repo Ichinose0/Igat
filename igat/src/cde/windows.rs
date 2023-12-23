@@ -27,7 +27,7 @@ where
                 let acure = Acure::new();
                 Self {
                     acure,
-                    surface: acure::d2d1::D2D1Surface::new(isize::from(handle.hwnd),size.width,size.height),
+                    surface: acure::d2d1::D2D1Surface::new(isize::from(handle.hwnd)),
                     phantom: PhantomData,
                 }
             }
@@ -35,8 +35,8 @@ where
         }
     }
 
-    pub fn resize(&mut self,width: u32,height: u32) {
-        self.surface.resize(width, height);
+    pub fn resize(&mut self, width: u32, height: u32) {
+        self.surface.resize();
     }
 
     pub fn begin(&mut self) {
@@ -47,7 +47,7 @@ where
         self.acure.set_background_color(color.into());
     }
 
-    pub fn register(&mut self,cmds: Vec<Command>) {
+    pub fn register(&mut self, cmds: Vec<Command>) {
         for c in cmds {
             self.acure.push(c);
         }
