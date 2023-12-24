@@ -44,6 +44,7 @@ where
     fn is_capture_event(&self) -> bool;
 }
 
+#[deprecated(since = "0.0.4", note = "Make sure to use the Panel widget")]
 pub fn build_component<M, T>(widget: T) -> Component<M>
 where
     M: Send + Copy + std::fmt::Debug,
