@@ -17,18 +17,14 @@ pub mod widget;
 
 use std::{fmt::Debug, marker::PhantomData, time::Duration};
 
+use cde::RenderManager;
 use cursor::Cursor;
 use menu::Menubar;
-use widget::{Component, RenderConfig};
+use widget::{Component, RenderConfig, ContentPanel};
 use winapi::um::winuser::{GetAsyncKeyState, VK_LBUTTON};
-use winit::{
-    event::{Event, WindowEvent},
-    event_loop::EventLoop,
-    window::Window,
-    window::WindowBuilder,
-};
 
-use cde::{Cde, RenderManager};
+//use cde::{Cde, RenderManager};
+use winit::{event_loop::EventLoop, window::WindowBuilder, event::WindowEvent};
 
 pub type CursorIcon = winit::window::CursorIcon;
 
@@ -102,243 +98,242 @@ pub enum ApplicationResponse {
 }
 
 pub struct Executable {
-    window: Window,
     event_loop: EventLoop<()>,
 }
 
 /// Represents an application window handle
 ///
 /// This structure can be used to change window properties
-pub struct Frame {
-    window: Window,
-    menu_height: u32,
-}
+// pub struct Frame {
+//     window: Window,
+//     menu_height: u32,
+// }
 
-impl Frame {
-    pub fn set_title(&self, title: &str) {
-        self.window.set_title(title);
-    }
+// impl Frame {
+//     pub fn set_title(&self, title: &str) {
+//         self.window.set_title(title);
+//     }
 
-    pub fn set_resizable(&self, resizable: bool) {
-        self.window.set_resizable(resizable);
-    }
+//     pub fn set_resizable(&self, resizable: bool) {
+//         self.window.set_resizable(resizable);
+//     }
 
-    pub fn set_minimized(&self, minimized: bool) {
-        self.window.set_minimized(minimized);
-    }
+//     pub fn set_minimized(&self, minimized: bool) {
+//         self.window.set_minimized(minimized);
+//     }
 
-    pub fn set_maximized(&self, maximized: bool) {
-        self.window.set_maximized(maximized);
-    }
+//     pub fn set_maximized(&self, maximized: bool) {
+//         self.window.set_maximized(maximized);
+//     }
 
-    pub fn set_decorations(&self, decorations: bool) {
-        self.window.set_decorations(decorations);
-    }
+//     pub fn set_decorations(&self, decorations: bool) {
+//         self.window.set_decorations(decorations);
+//     }
 
-    pub fn set_cursor_visible(&self, visible: bool) {
-        self.window.set_cursor_visible(visible);
-    }
+//     pub fn set_cursor_visible(&self, visible: bool) {
+//         self.window.set_cursor_visible(visible);
+//     }
 
-    pub fn set_cursor_icon(&self, cursor: CursorIcon) {
-        self.window.set_cursor_icon(cursor);
-    }
+//     pub fn set_cursor_icon(&self, cursor: CursorIcon) {
+//         self.window.set_cursor_icon(cursor);
+//     }
 
-    pub fn get_rect(&self) -> Rect {
-        let size = self.window.inner_size();
-        Rect {
-            left: 0,
-            top: self.menu_height,
-            right: size.width,
-            bottom: size.height + self.menu_height,
-        }
-    }
-}
+//     pub fn get_rect(&self) -> Rect {
+//         let size = self.window.inner_size();
+//         Rect {
+//             left: 0,
+//             top: self.menu_height,
+//             right: size.width,
+//             bottom: size.height + self.menu_height,
+//         }
+//     }
+// }
 
-pub struct ApplicationContext<A, M>
-where
-    A: Application<M>,
-    M: Send + std::fmt::Debug,
-{
-    app: A,
-    phantom: PhantomData<M>,
-}
+// pub struct ApplicationContext<A, M>
+// where
+//     A: Application<M>,
+//     M: Send + std::fmt::Debug,
+// {
+//     app: A,
+//     phantom: PhantomData<M>,
+// }
 
-impl<A, M> ApplicationContext<A, M>
-where
-    A: Application<M>,
-    M: Send + std::fmt::Debug,
-{
-    fn new(app: A) -> Self {
-        Self {
-            app,
-            phantom: PhantomData,
-        }
-    }
+// impl<A, M> ApplicationContext<A, M>
+// where
+//     A: Application<M>,
+//     M: Send + std::fmt::Debug,
+// {
+//     fn new(app: A) -> Self {
+//         Self {
+//             app,
+//             phantom: PhantomData,
+//         }
+//     }
 
-    pub fn dispatch_message(&mut self, message: M, frame: &Frame) {
-        self.app
-            .message(ApplicationEvent::WidgetEvent, Some(message), frame);
-    }
-}
+//     pub fn dispatch_message(&mut self, message: M, frame: &Frame) {
+//         self.app
+//             .message(ApplicationEvent::WidgetEvent, Some(message), frame);
+//     }
+// }
 
-impl Executable {
-    pub fn new() -> Self {
-        let event_loop = EventLoop::new().unwrap();
+// impl Executable {
+//     pub fn new() -> Self {
+//         let event_loop = EventLoop::new().unwrap();
 
-        let window = WindowBuilder::new()
-            .with_title("None")
-            .with_inner_size(winit::dpi::LogicalSize::new(800.0, 600.0))
-            .build(&event_loop)
-            .unwrap();
+//         let window = WindowBuilder::new()
+//             .with_title("None")
+//             .with_inner_size(winit::dpi::LogicalSize::new(800.0, 600.0))
+//             .build(&event_loop)
+//             .unwrap();
 
-        Self { window, event_loop }
-    }
+//         Self { window, event_loop }
+//     }
 
-    pub fn run<T, M>(self, app: T)
-    where
-        T: Application<M>,
-        M: Send + std::fmt::Debug,
-    {
-        let mut ctx = ApplicationContext::new(app);
+//     pub fn run<T, M>(self, app: T)
+//     where
+//         T: Application<M>,
+//         M: Send + std::fmt::Debug,
+//     {
+//         let mut ctx = ApplicationContext::new(app);
 
-        let theme = ctx.app.theme();
+//         let theme = ctx.app.theme();
 
-        let config = RenderConfig {
-            thickness: 0,
-            border_radius: 0.0,
-        };
+//         let config = RenderConfig {
+//             thickness: 0,
+//             border_radius: 0.0,
+//         };
 
-        let height = match ctx.app.menu() {
-            Some(m) => m.height(),
-            None => 0,
-        };
+//         let height = match ctx.app.menu() {
+//             Some(m) => m.height(),
+//             None => 0,
+//         };
 
-        let frame = Frame {
-            window: self.window,
-            menu_height: height,
-        };
+//         let frame = Frame {
+//             window: self.window,
+//             menu_height: height,
+//         };
 
-        let mut render_manager: RenderManager<M> = RenderManager::new(frame, theme);
+//         let mut render_manager: RenderManager<M> = RenderManager::new(frame, theme);
 
-        ctx.app.set_up(render_manager.frame());
+//         ctx.app.set_up(render_manager.frame());
 
-        render_manager.set_background_color();
+//         render_manager.set_background_color();
 
-        let mut clicked = false;
-        let mut resizing = false;
+//         let mut clicked = false;
+//         let mut resizing = false;
 
-        let _result = self.event_loop.run(move |event, elwt| {
-            let mut ui = ctx.app.ui(render_manager.frame());
-            match event {
-                Event::WindowEvent { event, window_id } if window_id == render_manager.frame().window.id() => {
-                    let cursor = Cursor::get(&render_manager.frame().window);
-                    match &mut ui {
-                        Some(component) => {
-                            for comp in &mut component.inner {
-                                if comp.is_capture_event() {
-                                    let x = cursor.x();
-                                    let y = cursor.y();
-                                    if x > 0 && y > 0 {
-                                        let area = comp.area();
-                                        for area in area {
-                                            let cx = (area.left) as i32;
-                                            let cy = (area.top) as i32;
-                                            let width = (area.right - area.left) as i32;
-                                            let height = (area.bottom - area.top) as i32;
-                                            if x >= cx && x <= cx + width {
-                                                if y >= cy && y <= cy + height {
-                                                    comp
-                                                        .message(widget::ClientMessage::OnHover);
-                                                    if unsafe { GetAsyncKeyState(VK_LBUTTON) != 0 } {
-                                                        comp
-                                                            .message(widget::ClientMessage::OnClick);
-                                                        if clicked == false {
-                                                            match comp.on_click() {
-                                                                Some(e) => {
-                                                                    ctx.app.message(
-                                                                        ApplicationEvent::WidgetEvent,
-                                                                        Some(e),
-                                                                        render_manager.frame(),
-                                                                    );
-                                                                    clicked = true;
-                                                                }
-                                                                None => {}
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                            } else {
-                                                //state.event = WidgetEvent::StateChanged { state: widget::WidgetState::None };
-                                            }
-                                        }
-                                    }
-                                    // Cursor is out of window range
-                                    else {
-                                        //(*state).event = WidgetEvent::None;
-                                        comp.message(widget::ClientMessage::Unfocus);
-                                    }
-                                }
-                            }
-                        }
-                        None => todo!(),
-                    }
+//         let _result = self.event_loop.run(move |event, elwt| {
+//             let mut ui = ctx.app.ui(render_manager.frame());
+//             match event {
+//                 Event::WindowEvent { event, window_id } if window_id == render_manager.frame().window.id() => {
+//                     let cursor = Cursor::get(&render_manager.frame().window);
+//                     match &mut ui {
+//                         Some(component) => {
+//                             for comp in &mut component.inner {
+//                                 if comp.is_capture_event() {
+//                                     let x = cursor.x();
+//                                     let y = cursor.y();
+//                                     if x > 0 && y > 0 {
+//                                         let area = comp.area();
+//                                         for area in area {
+//                                             let cx = (area.left) as i32;
+//                                             let cy = (area.top) as i32;
+//                                             let width = (area.right - area.left) as i32;
+//                                             let height = (area.bottom - area.top) as i32;
+//                                             if x >= cx && x <= cx + width {
+//                                                 if y >= cy && y <= cy + height {
+//                                                     comp
+//                                                         .message(widget::ClientMessage::OnHover);
+//                                                     if unsafe { GetAsyncKeyState(VK_LBUTTON) != 0 } {
+//                                                         comp
+//                                                             .message(widget::ClientMessage::OnClick);
+//                                                         if clicked == false {
+//                                                             match comp.on_click() {
+//                                                                 Some(e) => {
+//                                                                     ctx.app.message(
+//                                                                         ApplicationEvent::WidgetEvent,
+//                                                                         Some(e),
+//                                                                         render_manager.frame(),
+//                                                                     );
+//                                                                     clicked = true;
+//                                                                 }
+//                                                                 None => {}
+//                                                             }
+//                                                         }
+//                                                     }
+//                                                 }
+//                                             } else {
+//                                                 //state.event = WidgetEvent::StateChanged { state: widget::WidgetState::None };
+//                                             }
+//                                         }
+//                                     }
+//                                     // Cursor is out of window range
+//                                     else {
+//                                         //(*state).event = WidgetEvent::None;
+//                                         comp.message(widget::ClientMessage::Unfocus);
+//                                     }
+//                                 }
+//                             }
+//                         }
+//                         None => todo!(),
+//                     }
 
-                    match event {
-                        WindowEvent::Resized(size) => {
-                            resizing = true;
-                            render_manager.resize(size.width,size.height);
-                        }
-                        WindowEvent::CloseRequested => elwt.exit(),
-                        WindowEvent::RedrawRequested => {
-                            render_manager.begin();
-                            if let Some(e) =
-                                ctx.app
-                                    .message(ApplicationEvent::RedrawRequested, None, &render_manager.frame())
-                            {
-                            }
-                            match &mut ui {
-                                Some(ref mut component) => {
-                                    for comp in &component.inner {
-                                        render_manager.register(&comp.view());
-                                    }
-                                }
-                                None => {}
-                            };
-                            if let Some(menu) = ctx.app.menu() {
-                                render_manager.register(&menu.view(&render_manager.frame.window));
-                                //cde.draw_menu(&frame.window, menu);
-                            }
-                            render_manager.write();
+//                     match event {
+//                         WindowEvent::Resized(size) => {
+//                             resizing = true;
+//                             render_manager.resize(size.width,size.height);
+//                         }
+//                         WindowEvent::CloseRequested => elwt.exit(),
+//                         WindowEvent::RedrawRequested => {
+//                             render_manager.begin();
+//                             if let Some(e) =
+//                                 ctx.app
+//                                     .message(ApplicationEvent::RedrawRequested, None, &render_manager.frame())
+//                             {
+//                             }
+//                             match &mut ui {
+//                                 Some(ref mut component) => {
+//                                     for comp in &component.inner {
+//                                         render_manager.register(&comp.view());
+//                                     }
+//                                 }
+//                                 None => {}
+//                             };
+//                             if let Some(menu) = ctx.app.menu() {
+//                                 render_manager.register(&menu.view(&render_manager.frame.window));
+//                                 //cde.draw_menu(&frame.window, menu);
+//                             }
+//                             render_manager.write();
 
-                            if !resizing {
-                                std::thread::sleep(Duration::from_millis(130));
-                            }
+//                             if !resizing {
+//                                 std::thread::sleep(Duration::from_millis(130));
+//                             }
 
-                            resizing = false;
-                            clicked = false;
+//                             resizing = false;
+//                             clicked = false;
 
-                            render_manager.frame().window.pre_present_notify();
-                        }
+//                             render_manager.frame().window.pre_present_notify();
+//                         }
 
-                        _ => {}
-                    }
-                }
+//                         _ => {}
+//                     }
+//                 }
 
-                Event::AboutToWait => {
-                    render_manager.frame().window.request_redraw();
-                }
+//                 Event::AboutToWait => {
+//                     render_manager.frame().window.request_redraw();
+//                 }
 
-                _ => {}
-            }
-        });
-    }
-}
+//                 _ => {}
+//             }
+//         });
+//     }
+// }
 
-impl Default for Executable {
-    fn default() -> Self {
-        Self::new()
-    }
-}
+// impl Default for Executable {
+//     fn default() -> Self {
+//         Self::new()
+//     }
+// }
 
 #[derive(Clone, Copy, Debug)]
 pub struct Theme {
@@ -364,31 +359,167 @@ impl Default for Theme {
     }
 }
 
-pub trait Application<M>: Sized
+pub struct Event<M> 
 where
-    M: Send + std::fmt::Debug,
+    M: Send + std::fmt::Debug
 {
-    fn theme(&self) -> Theme {
-        Theme::default()
-    }
-
-    fn set_up(&mut self, _frame: &Frame) {}
-
-    fn message(
-        &mut self,
-        _event: ApplicationEvent,
-        _message: Option<M>,
-        _frame: &Frame,
-    ) -> Option<ApplicationResponse> {
-        None
-    }
-
-    /// Specify the application menu.
-    /// By default, None is returned and no menu is added.
-    fn menu(&self) -> Option<&Menubar> {
-        None
-    }
-
-    /// Passes the UI to be displayed in the application.
-    fn ui(&mut self, frame: &Frame) -> Option<Component<M>>;
+    resized: M,
 }
+
+impl<M> Event<M> 
+where
+    M: Send + std::fmt::Debug
+{
+    pub fn new(resized: M) -> Self {
+        Self {
+            resized
+        }
+    }
+}
+
+pub struct Window<M> 
+where
+    M: Send + std::fmt::Debug
+{
+    pub(crate) inner: winit::window::Window,
+    event_loop: Option<EventLoop<()>>,
+    event: Event<M>,
+    panel: ContentPanel<M>
+}
+
+impl<M> Window<M> 
+where
+    M: Send + std::fmt::Debug
+{
+    pub fn new(event: Event<M>) -> Self {
+        let event_loop = EventLoop::new().unwrap();
+
+        let inner = WindowBuilder::new()
+            .with_title("None")
+            .with_inner_size(winit::dpi::LogicalSize::new(800.0, 600.0))
+            .build(&event_loop)
+            .unwrap();
+
+        Self {
+            inner,
+            event_loop: Some(event_loop),
+            event,
+            panel: ContentPanel{ widgets: vec![] }
+        }
+    }
+}
+
+pub struct IApplicationBuilder<M> 
+where
+    M: Send + std::fmt::Debug 
+{
+    window: Option<Window<M>>,
+}
+
+impl<M> IApplicationBuilder<M> 
+where
+    M: Send + std::fmt::Debug 
+{
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    pub fn with(mut self, window: crate::Window<M>) -> Self {
+        self.window = Some(window);
+        self
+    }
+
+    pub fn build(self) -> IApplication<M> {
+        let window = self.window.unwrap();
+        let render_manager = RenderManager::new(&window,Theme::default());
+        IApplication {
+            window,
+            render_manager,
+        }
+    }
+}
+
+impl<M> Default  for IApplicationBuilder<M> 
+where
+    M: Send + std::fmt::Debug
+{
+    fn default() -> Self {
+        Self {
+            window: None,
+        }
+    }
+}
+
+pub struct IApplication<M> 
+where
+    M: Send + std::fmt::Debug
+{
+    window: Window<M>,
+    render_manager: RenderManager<M>
+}
+
+impl<M> IApplication<M> 
+where
+    M: Send + std::fmt::Debug
+{
+    pub fn run(mut self) {
+        let event_loop = self.window.event_loop.unwrap();
+
+        self.render_manager.set_background_color();
+        
+        event_loop.run(move |event, elwt| {
+            
+            match event {
+                winit::event::Event::WindowEvent { window_id, event } => {
+                    match event {
+                        WindowEvent::RedrawRequested => {
+                            self.render_manager.begin();
+                            self.render_manager.write();
+                            self.window.inner.pre_present_notify();
+                        }
+
+                        WindowEvent::Resized(_) => {
+                            self.render_manager.resize(0, 0);
+                        }
+                            
+                            _ => {}
+                    }
+                }
+                
+
+                _ => {}
+            }
+        });
+    }
+}
+
+
+
+// pub trait Application<M>: Sized
+// where
+//     M: Send + std::fmt::Debug,
+// {
+//     fn theme(&self) -> Theme {
+//         Theme::default()
+//     }
+
+//     fn set_up(&mut self, _frame: &Frame) {}
+
+//     fn message(
+//         &mut self,
+//         _event: ApplicationEvent,
+//         _message: Option<M>,
+//         _frame: &Frame,
+//     ) -> Option<ApplicationResponse> {
+//         None
+//     }
+
+//     /// Specify the application menu.
+//     /// By default, None is returned and no menu is added.
+//     fn menu(&self) -> Option<&Menubar> {
+//         None
+//     }
+
+//     /// Passes the UI to be displayed in the application.
+//     fn ui(&mut self, frame: &Frame) -> Option<Component<M>>;
+// }

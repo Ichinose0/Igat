@@ -3,7 +3,7 @@ pub mod windows;
 use acure::Command;
 use raw_window_handle::HasWindowHandle;
 
-use crate::{menu::Menubar, Color, Frame, Theme};
+use crate::{menu::Menubar, Color, Theme, Window};
 
 #[cfg(target_os = "windows")]
 pub use self::windows::*;
@@ -13,7 +13,6 @@ where
     M: Send + std::fmt::Debug,
 {
     cde: Cde<M>,
-    pub(crate) frame: Frame,
     theme: Theme,
 }
 
@@ -21,20 +20,15 @@ impl<M> RenderManager<M>
 where
     M: Send + std::fmt::Debug,
 {
-    pub fn new(frame: Frame, theme: Theme) -> Self {
+    pub fn new(window: &Window<M>, theme: Theme) -> Self {
         Self {
-            cde: Cde::new(&frame),
-            frame,
+            cde: Cde::new(window),
             theme,
         }
     }
 
     pub fn resize(&mut self, width: u32, height: u32) {
         self.cde.resize(width, height);
-    }
-
-    pub fn frame(&self) -> &Frame {
-        &self.frame
     }
 
     pub fn set_background_color(&mut self) {

@@ -1,6 +1,6 @@
 use acure::Command;
 
-use crate::{Color, Frame, Rect};
+use crate::{Color, Rect};
 
 use super::{ClientMessage, Component, Widget};
 

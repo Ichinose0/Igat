@@ -54,3 +54,11 @@ where
         inner: vec![Box::new(widget)],
     }
 }
+
+
+pub struct ContentPanel<M> 
+where
+    M: Send + std::fmt::Debug
+{
+    pub(crate) widgets: Vec<Box<dyn Widget<M>>>
+}

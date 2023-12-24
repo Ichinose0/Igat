@@ -2,9 +2,8 @@ use std::marker::PhantomData;
 
 use acure::{Acure, Command};
 use raw_window_handle::HasWindowHandle;
-use winit::window::Window;
 
-use crate::{menu::Menubar, widget::Widget, Frame};
+use crate::{menu::Menubar, widget::Widget, Window};
 
 pub struct Cde<M>
 where
@@ -19,9 +18,9 @@ impl<M> Cde<M>
 where
     M: Send + std::fmt::Debug,
 {
-    pub fn new(handle: &Frame) -> Self {
-        let size = handle.window.inner_size();
-        let handle = handle.window.window_handle().unwrap();
+    pub fn new(handle: &Window<M>) -> Self {
+        let size = handle.inner.inner_size();
+        let handle = handle.inner.window_handle().unwrap();
         match handle.as_raw() {
             raw_window_handle::RawWindowHandle::Win32(handle) => {
                 let acure = Acure::new();
@@ -53,8 +52,8 @@ where
         }
     }
 
-    pub fn draw_menu(&mut self, window: &Window, menu: &Menubar) {
-        for i in menu.view(window) {
+    pub fn draw_menu(&mut self, window: &Window<M>, menu: &Menubar) {
+        for i in menu.view(&window.inner) {
             self.acure.push(i);
         }
     }

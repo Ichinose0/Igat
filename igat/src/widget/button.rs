@@ -1,6 +1,6 @@
 use acure::Command;
 
-use crate::{Color, Frame, Rect};
+use crate::{Color, Rect};
 
 use super::{ClientMessage, Widget};
 
@@ -25,12 +25,11 @@ impl<M> Button<M>
 where
     M: Send + std::fmt::Debug,
 {
-    pub fn new(frame: &Frame) -> Self {
-        let rect = frame.get_rect();
+    pub fn new() -> Self {
         Self {
             width: 30,
             height: 80,
-            menu_height: rect.top,
+            menu_height: 0,
             x: 0,
             y: 0,
             text: String::new(),
