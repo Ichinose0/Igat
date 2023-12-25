@@ -1,14 +1,14 @@
 mod button;
-mod label;
+// mod label;
 mod panel;
-mod text;
+// mod text;
 
 pub use button::*;
-pub use label::*;
+// pub use label::*;
 pub use panel::*;
-pub use text::*;
+// pub use text::*;
 
-use crate::Rect;
+use crate::{Rect, Theme};
 
 pub struct RenderConfig {
     pub thickness: u32,
@@ -22,44 +22,26 @@ pub enum ClientMessage {
     Unfocus,
 }
 
-pub struct Component<M>
-where
-    M: Send + std::fmt::Debug,
+pub struct Component
 {
-    pub(crate) inner: Vec<Box<dyn Widget<M>>>,
+    pub(crate) inner: Vec<Box<dyn Widget>>,
 }
 
-pub trait Widget<M>: Send + std::fmt::Debug
-where
-    M: Send + std::fmt::Debug,
-{
+pub trait Layout {
     fn area(&self) -> Vec<Rect>;
 
-    fn view(&self) -> Vec<acure::Command>;
-
-    fn on_click(&self) -> Option<M>;
-
-    fn message(&mut self, msg: ClientMessage);
+    fn theme(&mut self, theme: Theme);
 
     fn is_capture_event(&self) -> bool;
 }
 
-#[deprecated(since = "0.0.4", note = "Make sure to use the Panel widget")]
-pub fn build_component<M, T>(widget: T) -> Component<M>
-where
-    M: Send + Copy + std::fmt::Debug,
-    T: Widget<M> + 'static,
-{
-    Component {
-        inner: vec![Box::new(widget)],
-    }
+pub trait Widget: Layout {
+    fn view(&self) -> Vec<acure::Command>;
+
+    fn message(&mut self, msg: ClientMessage);
 }
 
-pub struct ContentPanel<M>
-where
-    M: Send + std::fmt::Debug,
+pub struct ContentPanel
 {
-    pub(crate) widgets: Vec<Box<dyn Widget<M>>>,
+    pub(crate) widgets: Vec<Box<dyn Widget>>,
 }
-
-impl<M> ContentPanel<M> where M: Send + Copy + std::fmt::Debug {}

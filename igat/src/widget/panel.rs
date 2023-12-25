@@ -4,17 +4,13 @@ use crate::{Color, Rect};
 
 use super::{ClientMessage, Component, Widget};
 
-#[derive(Debug)]
-pub struct Panel<M>
-where
-    M: Send + std::fmt::Debug,
+
+pub struct Panel
 {
-    inner: Vec<Box<dyn Widget<M>>>,
+    inner: Vec<Box<dyn Widget>>,
 }
 
-impl<M> Panel<M>
-where
-    M: Send + std::fmt::Debug,
+impl Panel
 {
     pub fn new() -> Self {
         Self { inner: vec![] }
@@ -22,18 +18,16 @@ where
 
     pub fn child<T>(mut self, widget: T) -> Self
     where
-        T: Widget<M> + 'static,
+        T: Widget + 'static,
     {
         self.inner.push(Box::new(widget));
         self
     }
 }
 
-impl<M> Into<Component<M>> for Panel<M>
-where
-    M: Send + std::fmt::Debug,
+impl Into<Component> for Panel
 {
-    fn into(self) -> Component<M> {
+    fn into(self) -> Component {
         Component { inner: self.inner }
     }
 }

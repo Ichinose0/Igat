@@ -69,7 +69,7 @@ where
     }
 }
 
-impl<M> Widget<M> for Text<M>
+impl<M> Widget for Text<M>
 where
     M: Send + Copy + std::fmt::Debug,
 {

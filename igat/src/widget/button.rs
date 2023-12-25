@@ -1,13 +1,15 @@
+use std::cell::RefCell;
+
 use acure::Command;
 
 use crate::{Color, Rect};
 
-use super::{ClientMessage, Widget};
+use super::{ClientMessage, Layout, Widget};
 
 #[derive(Debug)]
-pub struct Button<M>
+pub struct Button<E>
 where
-    M: Send + std::fmt::Debug,
+    E: Fn(ClientMessage)
 {
     width: u32,
     height: u32,
@@ -18,12 +20,12 @@ where
     background_color: Color,
     shadow_color: Color,
     text: String,
-    on_click: Option<M>,
+    on_message: RefCell<Option<E>>
 }
 
-impl<M> Button<M>
+impl<E> Button<E>
 where
-    M: Send + std::fmt::Debug,
+    E: Fn(ClientMessage)
 {
     pub fn new() -> Self {
         Self {
@@ -33,7 +35,7 @@ where
             x: 0,
             y: 0,
             text: String::new(),
-            on_click: None,
+            on_message: RefCell::new(None),
             color: Color::Black,
             background_color: Color::White,
             shadow_color: Color::ARGB(255, 128, 128, 128),
@@ -65,15 +67,15 @@ where
         self
     }
 
-    pub fn on_click(mut self, on_click: M) -> Self {
-        self.on_click = Some(on_click);
+    pub fn on_message(mut self, on_message: E) -> Self {
+        self.on_message = RefCell::new(Some(on_message));
         self
     }
 }
 
-impl<M> Widget<M> for Button<M>
+impl<E> Layout for Button<E>
 where
-    M: Send + Copy + std::fmt::Debug,
+    E: Fn(ClientMessage)
 {
     fn area(&self) -> Vec<Rect> {
         vec![Rect {
@@ -84,6 +86,17 @@ where
         }]
     }
 
+    fn is_capture_event(&self) -> bool {
+        true
+    }
+
+    fn theme(&mut self, theme: crate::Theme) {}
+}
+
+impl<E> Widget for Button<E>
+where
+    E: Fn(ClientMessage)
+{
     fn view(&self) -> Vec<acure::Command> {
         let y = self.y + self.menu_height;
         vec![
@@ -114,16 +127,14 @@ where
         ]
     }
 
-    fn on_click(&self) -> Option<M> {
-        self.on_click
-    }
-
     fn message(&mut self, msg: ClientMessage) {
         self.background_color = Color::White;
         match msg {
             ClientMessage::OnClick => {
                 self.background_color = Color::ARGB(255, 200, 200, 200);
                 self.shadow_color = Color::ARGB(255, 0, 70, 204);
+                let mut e = self.on_message.borrow_mut();
+                e.as_mut().unwrap()(msg);
             }
             ClientMessage::OnHover => {
                 self.background_color = Color::ARGB(255, 255, 255, 255);
@@ -134,9 +145,5 @@ where
                 self.shadow_color = Color::ARGB(255, 128, 128, 128);
             }
         }
-    }
-
-    fn is_capture_event(&self) -> bool {
-        true
     }
 }

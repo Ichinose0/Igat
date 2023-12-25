@@ -5,20 +5,15 @@ use raw_window_handle::HasWindowHandle;
 
 use crate::{menu::Menubar, widget::Widget, Window};
 
-pub struct Cde<M>
-where
-    M: Send + std::fmt::Debug,
+pub struct Cde
 {
     acure: Acure,
     surface: acure::d2d1::D2D1Surface,
-    phantom: PhantomData<M>,
 }
 
-impl<M> Cde<M>
-where
-    M: Send + std::fmt::Debug,
+impl Cde
 {
-    pub fn new(handle: &Window<M>) -> Self {
+    pub fn new(handle: &Window) -> Self {
         let size = handle.inner.inner_size();
         let handle = handle.inner.window_handle().unwrap();
         match handle.as_raw() {
@@ -27,7 +22,6 @@ where
                 Self {
                     acure,
                     surface: acure::d2d1::D2D1Surface::new(isize::from(handle.hwnd)),
-                    phantom: PhantomData,
                 }
             }
             _ => panic!("Error"),
@@ -52,7 +46,7 @@ where
         }
     }
 
-    pub fn draw_menu(&mut self, window: &Window<M>, menu: &Menubar) {
+    pub fn draw_menu(&mut self, window: &Window, menu: &Menubar) {
         for i in menu.view(&window.inner) {
             self.acure.push(i);
         }

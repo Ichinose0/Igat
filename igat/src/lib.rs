@@ -322,20 +322,16 @@ impl Default for Theme {
     }
 }
 
-pub struct Window<M>
-where
-    M: Send + std::fmt::Debug,
+pub struct Window
 {
     pub(crate) inner: winit::window::Window,
     event_loop: Option<EventLoop<()>>,
-    comp: Component<M>,
+    comp: Component,
 }
 
-impl<M> Window<M>
-where
-    M: Send + std::fmt::Debug,
+impl Window
 {
-    pub fn new(ui: Component<M>) -> Self {
+    pub fn new(ui: Component) -> Self {
         let event_loop = EventLoop::new().unwrap();
 
         let inner = WindowBuilder::new()
@@ -352,23 +348,19 @@ where
     }
 }
 
-pub struct IApplicationBuilder<M>
-where
-    M: Send + Copy + std::fmt::Debug,
+pub struct IApplicationBuilder
 {
-    window: Option<Window<M>>,
+    window: Option<Window>,
     theme: Option<Theme>,
 }
 
-impl<M> IApplicationBuilder<M>
-where
-    M: Send + Copy + std::fmt::Debug,
+impl IApplicationBuilder
 {
     pub fn new() -> Self {
         Self::default()
     }
 
-    pub fn with(mut self, window: crate::Window<M>) -> Self {
+    pub fn with(mut self, window: crate::Window) -> Self {
         self.window = Some(window);
         self
     }
@@ -378,7 +370,7 @@ where
         self
     }
 
-    pub fn build(self) -> IApplication<M> {
+    pub fn build(self) -> IApplication {
         let window = self.window.unwrap();
         let theme = match self.theme {
             Some(t) => t,
@@ -392,9 +384,7 @@ where
     }
 }
 
-impl<M> Default for IApplicationBuilder<M>
-where
-    M: Send + Copy + std::fmt::Debug,
+impl Default for IApplicationBuilder
 {
     fn default() -> Self {
         Self {
@@ -404,29 +394,22 @@ where
     }
 }
 
-pub enum WindowEvent<M>
-where
-    M: Send + Copy + std::fmt::Debug,
+pub enum WindowEvent
 {
     Resized,
-    WidgetEvent(M),
 }
 
-pub struct IApplication<M>
-where
-    M: Send + Copy + std::fmt::Debug,
+pub struct IApplication
 {
-    window: Window<M>,
-    render_manager: RenderManager<M>,
+    window: Window,
+    render_manager: RenderManager,
 }
 
-impl<M> IApplication<M>
-where
-    M: Send + Copy + std::fmt::Debug + 'static,
+impl IApplication
 {
     pub fn run<F>(mut self, mut callback: F)
     where
-        F: FnMut(crate::WindowEvent<M>),
+        F: FnMut(crate::WindowEvent),
     {
         let event_loop = self.window.event_loop.unwrap();
 
@@ -457,12 +440,6 @@ where
                                             comp.message(widget::ClientMessage::OnHover);
                                             if unsafe { GetAsyncKeyState(VK_LBUTTON) != 0 } {
                                                 comp.message(widget::ClientMessage::OnClick);
-                                                match comp.on_click() {
-                                                    Some(e) => {
-                                                        callback(WindowEvent::WidgetEvent(e));
-                                                    }
-                                                    None => {}
-                                                }
                                             }
                                         }
                                     } else {
