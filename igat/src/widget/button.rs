@@ -86,6 +86,7 @@ where
 
     fn view(&self) -> Vec<acure::Command> {
         let y = self.y + self.menu_height;
+        println!("{:?}",self.shadow_color);
         vec![
             Command::FillRectangle(
                 self.x,
@@ -128,6 +129,7 @@ where
             ClientMessage::OnHover => {
                 self.background_color = Color::ARGB(255, 255, 255, 255);
                 self.shadow_color = Color::ARGB(255, 0, 170, 204);
+                println!("{:?}",self.shadow_color);
             }
             ClientMessage::Unfocus => {
                 self.background_color = Color::ARGB(255, 255, 255, 255);

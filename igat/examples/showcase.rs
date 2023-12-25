@@ -1,12 +1,14 @@
-use igat::{IApplicationBuilder,Window, Event};
+use igat::{IApplicationBuilder,Window, Event, Theme};
 
-#[derive(Debug)]
+#[derive(Clone,Copy,Debug)]
 pub enum Message {
     Resized
 }
 
 fn main() {
     let window = Window::new(Event::new(Message::Resized));
-    let app = IApplicationBuilder::new().with(window).build();
-    app.run();
+    let app = IApplicationBuilder::new().with(window).theme(Theme::DARK).build();
+    app.run(|event| {
+        
+    });
 }

@@ -20,11 +20,11 @@ use std::{fmt::Debug, marker::PhantomData, time::Duration};
 use cde::RenderManager;
 use cursor::Cursor;
 use menu::Menubar;
-use widget::{Component, RenderConfig, ContentPanel};
+use widget::{Component, RenderConfig, ContentPanel, Button};
 use winapi::um::winuser::{GetAsyncKeyState, VK_LBUTTON};
 
 //use cde::{Cde, RenderManager};
-use winit::{event_loop::EventLoop, window::WindowBuilder, event::WindowEvent};
+use winit::{event_loop::EventLoop, window::WindowBuilder};
 
 pub type CursorIcon = winit::window::CursorIcon;
 
@@ -223,60 +223,16 @@ pub struct Executable {
 //         let mut resizing = false;
 
 //         let _result = self.event_loop.run(move |event, elwt| {
-//             let mut ui = ctx.app.ui(render_manager.frame());
-//             match event {
-//                 Event::WindowEvent { event, window_id } if window_id == render_manager.frame().window.id() => {
-//                     let cursor = Cursor::get(&render_manager.frame().window);
-//                     match &mut ui {
-//                         Some(component) => {
-//                             for comp in &mut component.inner {
-//                                 if comp.is_capture_event() {
-//                                     let x = cursor.x();
-//                                     let y = cursor.y();
-//                                     if x > 0 && y > 0 {
-//                                         let area = comp.area();
-//                                         for area in area {
-//                                             let cx = (area.left) as i32;
-//                                             let cy = (area.top) as i32;
-//                                             let width = (area.right - area.left) as i32;
-//                                             let height = (area.bottom - area.top) as i32;
-//                                             if x >= cx && x <= cx + width {
-//                                                 if y >= cy && y <= cy + height {
-//                                                     comp
-//                                                         .message(widget::ClientMessage::OnHover);
-//                                                     if unsafe { GetAsyncKeyState(VK_LBUTTON) != 0 } {
-//                                                         comp
-//                                                             .message(widget::ClientMessage::OnClick);
-//                                                         if clicked == false {
-//                                                             match comp.on_click() {
-//                                                                 Some(e) => {
-//                                                                     ctx.app.message(
-//                                                                         ApplicationEvent::WidgetEvent,
-//                                                                         Some(e),
-//                                                                         render_manager.frame(),
-//                                                                     );
-//                                                                     clicked = true;
-//                                                                 }
-//                                                                 None => {}
-//                                                             }
-//                                                         }
-//                                                     }
-//                                                 }
-//                                             } else {
-//                                                 //state.event = WidgetEvent::StateChanged { state: widget::WidgetState::None };
-//                                             }
-//                                         }
-//                                     }
-//                                     // Cursor is out of window range
-//                                     else {
-//                                         //(*state).event = WidgetEvent::None;
-//                                         comp.message(widget::ClientMessage::Unfocus);
-//                                     }
-//                                 }
-//                             }
-//                         }
-//                         None => todo!(),
-//                     }
+            // let mut ui = ctx.app.ui(render_manager.frame());
+            // match event {
+            //     Event::WindowEvent { event, window_id } if window_id == render_manager.frame().window.id() => {
+            //         let cursor = Cursor::get(&render_manager.frame().window);
+            //         match &mut ui {
+            //             Some(component) => {
+                            
+            //             }
+            //             None => todo!(),
+            //         }
 
 //                     match event {
 //                         WindowEvent::Resized(size) => {
@@ -339,6 +295,12 @@ pub struct Executable {
 pub struct Theme {
     bgr: Color,
 }
+
+impl Theme {
+    pub const ORIGINAL: Theme = Theme { bgr: Color::White };
+    pub const DARK: Theme = Theme { bgr: Color::ARGB(255,72,72,72) };
+}
+
 
 impl Theme {
     pub fn new() -> Self {
@@ -411,14 +373,15 @@ where
 
 pub struct IApplicationBuilder<M> 
 where
-    M: Send + std::fmt::Debug 
+M: Send + Copy + std::fmt::Debug
 {
     window: Option<Window<M>>,
+    theme: Option<Theme>
 }
 
 impl<M> IApplicationBuilder<M> 
 where
-    M: Send + std::fmt::Debug 
+M: Send + Copy + std::fmt::Debug
 {
     pub fn new() -> Self {
         Self::default()
@@ -429,9 +392,18 @@ where
         self
     }
 
+    pub fn theme(mut self,theme: Theme) -> Self {
+        self.theme = Some(theme);
+        self
+    }
+
     pub fn build(self) -> IApplication<M> {
         let window = self.window.unwrap();
-        let render_manager = RenderManager::new(&window,Theme::default());
+        let theme = match self.theme {
+            Some(t) => t,
+            None => Theme::default()
+        };
+        let render_manager = RenderManager::new(&window,theme);
         IApplication {
             window,
             render_manager,
@@ -441,18 +413,27 @@ where
 
 impl<M> Default  for IApplicationBuilder<M> 
 where
-    M: Send + std::fmt::Debug
+M: Send + Copy + std::fmt::Debug
 {
     fn default() -> Self {
         Self {
             window: None,
+            theme: None
         }
     }
 }
 
+pub enum WindowEvent<M>
+where
+    M: Send + Copy + std::fmt::Debug
+{
+    Resized,
+    WidgetEvent(M)
+}
+
 pub struct IApplication<M> 
 where
-    M: Send + std::fmt::Debug
+M: Send + Copy + std::fmt::Debug
 {
     window: Window<M>,
     render_manager: RenderManager<M>
@@ -460,26 +441,95 @@ where
 
 impl<M> IApplication<M> 
 where
-    M: Send + std::fmt::Debug
+M: Send + Copy + std::fmt::Debug + 'static
 {
-    pub fn run(mut self) {
+    pub fn run<F>(mut self,mut callback: F) 
+    where
+        F: FnMut(crate::WindowEvent<M>)
+    {
         let event_loop = self.window.event_loop.unwrap();
 
         self.render_manager.set_background_color();
+
+        let mut is_enter_cursor = false;
+        let mut clicked = false;
+
+        self.window.panel.widgets.push(Box::new(Button::new().width(200).height(50).text("Hello".to_owned())));
         
+        let mut panel = &mut self.window.panel;
         event_loop.run(move |event, elwt| {
             
+            // Check if the cursor is over the widget
+            if is_enter_cursor {  
+                for comp in &mut panel.widgets {
+                    if comp.is_capture_event() {
+                        let cursor = Cursor::get(&self.window.inner);
+                        let x = cursor.x();
+                        let y = cursor.y();
+                        if x > 0 && y > 0 {
+                            let area = comp.area();
+                            for area in area {
+                                let cx = (area.left) as i32;
+                                let cy = (area.top) as i32;
+                                let width = (area.right - area.left) as i32;
+                                let height = (area.bottom - area.top) as i32;
+                                if x >= cx && x <= cx + width {
+                                    if y >= cy && y <= cy + height {
+                                        comp
+                                            .message(widget::ClientMessage::OnHover);
+                                        if unsafe { GetAsyncKeyState(VK_LBUTTON) != 0 } {
+                                            
+                                            comp
+                                                .message(widget::ClientMessage::OnClick);
+                                            if clicked == false {
+                                                match comp.on_click() {
+                                                    Some(e) => {
+                                                        callback(WindowEvent::WidgetEvent(e));
+                                                        clicked = true;
+                                                    }
+                                                    None => {}
+                                                }
+                                            }
+                                        }
+                                    }
+                                } else {
+                                    //state.event = WidgetEvent::StateChanged { state: widget::WidgetState::None };
+                                }
+                            }
+                        }
+                        // Cursor is out of window range
+                        else {
+                            //(*state).event = WidgetEvent::None;
+                            comp.message(widget::ClientMessage::Unfocus);
+                        }
+                    }
+                }
+            }
+
             match event {
-                winit::event::Event::WindowEvent { window_id, event } => {
+                winit::event::Event::WindowEvent { window_id: _, event } => {
                     match event {
-                        WindowEvent::RedrawRequested => {
+                        winit::event::WindowEvent::RedrawRequested => {
                             self.render_manager.begin();
+                            for i in &panel.widgets {
+                                self.render_manager.register(&i.view());
+                            }
                             self.render_manager.write();
+                            clicked = false;
                             self.window.inner.pre_present_notify();
                         }
 
-                        WindowEvent::Resized(_) => {
+                        winit::event::WindowEvent::Resized(_) => {
                             self.render_manager.resize(0, 0);
+                            callback(WindowEvent::Resized);
+                        }
+
+                        winit::event::WindowEvent::CursorLeft { device_id } => {
+                            is_enter_cursor = false;
+                        }
+
+                        winit::event::WindowEvent::CursorEntered { device_id } => {
+                            is_enter_cursor = true;
                         }
                             
                             _ => {}
