@@ -322,15 +322,13 @@ impl Default for Theme {
     }
 }
 
-pub struct Window
-{
+pub struct Window {
     pub(crate) inner: winit::window::Window,
     event_loop: Option<EventLoop<()>>,
     comp: Component,
 }
 
-impl Window
-{
+impl Window {
     pub fn new(ui: Component) -> Self {
         let event_loop = EventLoop::new().unwrap();
 
@@ -348,14 +346,12 @@ impl Window
     }
 }
 
-pub struct IApplicationBuilder
-{
+pub struct IApplicationBuilder {
     window: Option<Window>,
     theme: Option<Theme>,
 }
 
-impl IApplicationBuilder
-{
+impl IApplicationBuilder {
     pub fn new() -> Self {
         Self::default()
     }
@@ -384,8 +380,7 @@ impl IApplicationBuilder
     }
 }
 
-impl Default for IApplicationBuilder
-{
+impl Default for IApplicationBuilder {
     fn default() -> Self {
         Self {
             window: None,
@@ -394,19 +389,16 @@ impl Default for IApplicationBuilder
     }
 }
 
-pub enum WindowEvent
-{
+pub enum WindowEvent {
     Resized,
 }
 
-pub struct IApplication
-{
+pub struct IApplication {
     window: Window,
     render_manager: RenderManager,
 }
 
-impl IApplication
-{
+impl IApplication {
     pub fn run<F>(mut self, mut callback: F)
     where
         F: FnMut(crate::WindowEvent),

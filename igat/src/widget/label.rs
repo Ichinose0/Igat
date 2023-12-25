@@ -2,12 +2,12 @@ use acure::Command;
 
 use crate::{Color, Rect};
 
-use super::{ClientMessage, Widget};
+use super::{ClientMessage, Layout, Widget};
 
 #[derive(Debug)]
-pub struct Label<M>
+pub struct Label<E>
 where
-    M: Send + std::fmt::Debug,
+    E: Fn(ClientMessage),
 {
     width: u32,
     height: u32,
@@ -17,12 +17,12 @@ where
     color: Color,
     background_color: Color,
     text: String,
-    on_click: Option<M>,
+    on_message: Option<E>,
 }
 
-impl<M> Label<M>
+impl<E> Label<E>
 where
-    M: Send + std::fmt::Debug,
+    E: Fn(ClientMessage),
 {
     pub fn new() -> Self {
         Self {
@@ -32,7 +32,7 @@ where
             x: 0,
             y: 0,
             text: String::new(),
-            on_click: None,
+            on_message: None,
             color: Color::Black,
             background_color: Color::White,
         }
@@ -63,15 +63,15 @@ where
         self
     }
 
-    pub fn on_click(mut self, on_click: M) -> Self {
-        self.on_click = Some(on_click);
+    pub fn on_message(mut self, on_message: E) -> Self {
+        self.on_message = Some(on_message);
         self
     }
 }
 
-impl<M> Widget<M> for Label<M>
+impl<E> Layout for Label<E>
 where
-    M: Send + Copy + std::fmt::Debug,
+    E: Fn(ClientMessage),
 {
     fn area(&self) -> Vec<Rect> {
         vec![Rect {
@@ -82,20 +82,29 @@ where
         }]
     }
 
-    fn on_click(&self) -> Option<M> {
-        self.on_click
-    }
+    fn theme(&mut self, theme: crate::Theme) {}
 
+    fn is_capture_event(&self) -> bool {
+        true
+    }
+}
+
+impl<E> Widget for Label<E>
+where
+    E: Fn(ClientMessage),
+{
     fn message(&mut self, msg: ClientMessage) {
         match msg {
             ClientMessage::OnClick => {}
             ClientMessage::OnHover => {}
             ClientMessage::Unfocus => {}
         }
-    }
-
-    fn is_capture_event(&self) -> bool {
-        true
+        match &self.on_message {
+            Some(e) => {
+                e(msg);
+            }
+            None => {}
+        }
     }
 
     fn view(&self) -> Vec<acure::Command> {

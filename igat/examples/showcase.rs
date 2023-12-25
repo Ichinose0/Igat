@@ -1,5 +1,5 @@
 use igat::{
-    widget::{Button, Component, Panel, ClientMessage},
+    widget::{Button, ClientMessage, Component, Panel},
     IApplicationBuilder, Theme, Window, WindowEvent,
 };
 
@@ -15,7 +15,6 @@ fn main() {
         .theme(Theme::DARK)
         .build();
     app.run(|event| match event {
-
         _ => {}
     });
 }
@@ -25,14 +24,12 @@ fn ui() -> Component {
         .width(240)
         .height(40)
         .text("Click me".to_owned())
-        .on_message(|message| {
-            match message {
-                ClientMessage::OnClick => {
-                    println!("Clicked");
-                }
-
-                _ => {}
+        .on_message(|message| match message {
+            ClientMessage::OnClick => {
+                
             }
+
+            _ => {}
         });
     let panel = Panel::new().child(button);
     panel.into()

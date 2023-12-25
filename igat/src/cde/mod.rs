@@ -8,14 +8,12 @@ use crate::{menu::Menubar, Color, Theme, Window};
 #[cfg(target_os = "windows")]
 pub use self::windows::*;
 
-pub struct RenderManager
-{
+pub struct RenderManager {
     cde: Cde,
     theme: Theme,
 }
 
-impl RenderManager
-{
+impl RenderManager {
     pub fn new(window: &Window, theme: Theme) -> Self {
         Self {
             cde: Cde::new(window),

@@ -1,4 +1,4 @@
-use std::cell::RefCell;
+use std::{cell::RefCell, time::Duration};
 
 use acure::Command;
 
@@ -9,7 +9,7 @@ use super::{ClientMessage, Layout, Widget};
 #[derive(Debug)]
 pub struct Button<E>
 where
-    E: Fn(ClientMessage)
+    E: Fn(ClientMessage),
 {
     width: u32,
     height: u32,
@@ -20,12 +20,12 @@ where
     background_color: Color,
     shadow_color: Color,
     text: String,
-    on_message: RefCell<Option<E>>
+    on_message: RefCell<Option<E>>,
 }
 
 impl<E> Button<E>
 where
-    E: Fn(ClientMessage)
+    E: Fn(ClientMessage),
 {
     pub fn new() -> Self {
         Self {
@@ -75,7 +75,7 @@ where
 
 impl<E> Layout for Button<E>
 where
-    E: Fn(ClientMessage)
+    E: Fn(ClientMessage),
 {
     fn area(&self) -> Vec<Rect> {
         vec![Rect {
@@ -95,7 +95,7 @@ where
 
 impl<E> Widget for Button<E>
 where
-    E: Fn(ClientMessage)
+    E: Fn(ClientMessage),
 {
     fn view(&self) -> Vec<acure::Command> {
         let y = self.y + self.menu_height;
@@ -133,8 +133,6 @@ where
             ClientMessage::OnClick => {
                 self.background_color = Color::ARGB(255, 200, 200, 200);
                 self.shadow_color = Color::ARGB(255, 0, 70, 204);
-                let mut e = self.on_message.borrow_mut();
-                e.as_mut().unwrap()(msg);
             }
             ClientMessage::OnHover => {
                 self.background_color = Color::ARGB(255, 255, 255, 255);
@@ -145,5 +143,7 @@ where
                 self.shadow_color = Color::ARGB(255, 128, 128, 128);
             }
         }
+        let mut e = self.on_message.borrow_mut();
+        e.as_mut().unwrap()(msg);
     }
 }

@@ -5,14 +5,12 @@ use raw_window_handle::HasWindowHandle;
 
 use crate::{menu::Menubar, widget::Widget, Window};
 
-pub struct Cde
-{
+pub struct Cde {
     acure: Acure,
     surface: acure::d2d1::D2D1Surface,
 }
 
-impl Cde
-{
+impl Cde {
     pub fn new(handle: &Window) -> Self {
         let size = handle.inner.inner_size();
         let handle = handle.inner.window_handle().unwrap();

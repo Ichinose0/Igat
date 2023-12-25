@@ -1,12 +1,12 @@
 mod button;
-// mod label;
+mod label;
 mod panel;
-// mod text;
+mod text;
 
 pub use button::*;
-// pub use label::*;
+pub use label::*;
 pub use panel::*;
-// pub use text::*;
+pub use text::*;
 
 use crate::{Rect, Theme};
 
@@ -22,8 +22,7 @@ pub enum ClientMessage {
     Unfocus,
 }
 
-pub struct Component
-{
+pub struct Component {
     pub(crate) inner: Vec<Box<dyn Widget>>,
 }
 
@@ -41,7 +40,6 @@ pub trait Widget: Layout {
     fn message(&mut self, msg: ClientMessage);
 }
 
-pub struct ContentPanel
-{
+pub struct ContentPanel {
     pub(crate) widgets: Vec<Box<dyn Widget>>,
 }
