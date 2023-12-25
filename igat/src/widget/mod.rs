@@ -55,10 +55,11 @@ where
     }
 }
 
-
-pub struct ContentPanel<M> 
+pub struct ContentPanel<M>
 where
-    M: Send + std::fmt::Debug
+    M: Send + std::fmt::Debug,
 {
-    pub(crate) widgets: Vec<Box<dyn Widget<M>>>
+    pub(crate) widgets: Vec<Box<dyn Widget<M>>>,
 }
+
+impl<M> ContentPanel<M> where M: Send + Copy + std::fmt::Debug {}
