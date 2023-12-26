@@ -48,12 +48,12 @@ pub enum WidgetMessage {
     Unfocus,
 }
 
-pub struct Component<D> 
+pub struct Component<D>
 where
-    D: Data
+    D: Data,
 {
     pub(crate) inner: Vec<Box<dyn Widget<D>>>,
-    pub(crate) static_data: D
+    pub(crate) static_data: D,
 }
 
 pub trait Layout {
@@ -64,15 +64,13 @@ pub trait Layout {
     fn is_capture_event(&self) -> bool;
 }
 
-pub trait Widget<D>: Layout 
+pub trait Widget<D>: Layout
 where
-    D: Data
+    D: Data,
 {
     fn view(&self) -> Vec<acure::Command>;
 
-    fn message(&mut self, msg: WidgetMessage,data: &mut D);
+    fn message(&mut self, msg: WidgetMessage, data: &mut D);
 }
 
-pub trait Data {
-
-}
+pub trait Data {}

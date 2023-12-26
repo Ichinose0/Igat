@@ -2,22 +2,25 @@ use acure::Command;
 
 use crate::{Color, Rect};
 
-use super::{Component, Widget, WidgetMessage, Data};
+use super::{Component, Data, Widget, WidgetMessage};
 
-pub struct Panel<D> 
+pub struct Panel<D>
 where
-    D: Data
+    D: Data,
 {
     inner: Vec<Box<dyn Widget<D>>>,
-    data: D
+    data: D,
 }
 
-impl<D> Panel<D> 
+impl<D> Panel<D>
 where
-    D: Data
+    D: Data,
 {
     pub fn new(data: D) -> Self {
-        Self { inner: vec![], data }
+        Self {
+            inner: vec![],
+            data,
+        }
     }
 
     pub fn child<T>(mut self, widget: T) -> Self

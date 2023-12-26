@@ -3,7 +3,11 @@ use std::marker::PhantomData;
 use acure::{Acure, Command};
 use raw_window_handle::HasWindowHandle;
 
-use crate::{menu::Menubar, widget::{Widget, Data}, Window};
+use crate::{
+    menu::Menubar,
+    widget::{Data, Widget},
+    Window,
+};
 
 pub struct Cde {
     acure: Acure,
@@ -11,9 +15,9 @@ pub struct Cde {
 }
 
 impl Cde {
-    pub fn new<D>(handle: &Window<D>) -> Self 
+    pub fn new<D>(handle: &Window<D>) -> Self
     where
-        D: Data
+        D: Data,
     {
         let size = handle.inner.inner_size();
         let handle = handle.inner.window_handle().unwrap();
@@ -47,9 +51,9 @@ impl Cde {
         }
     }
 
-    pub fn draw_menu<D>(&mut self, window: &Window<D>, menu: &Menubar) 
+    pub fn draw_menu<D>(&mut self, window: &Window<D>, menu: &Menubar)
     where
-        D: Data
+        D: Data,
     {
         for i in menu.view(&window.inner) {
             self.acure.push(i);

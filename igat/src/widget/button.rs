@@ -1,10 +1,10 @@
-use std::{cell::RefCell, time::Duration, marker::PhantomData};
+use std::{cell::RefCell, marker::PhantomData, time::Duration};
 
 use acure::Command;
 
 use crate::{Color, Rect};
 
-use super::{ColorPair, Layout, Property, Widget, WidgetMessage, Data};
+use super::{ColorPair, Data, Layout, Property, Widget, WidgetMessage};
 
 const HOVERED_COLOR: ColorPair = ColorPair {
     color: Color::Black,
@@ -25,21 +25,21 @@ const NORMAL_COLOR: ColorPair = ColorPair {
 };
 
 #[derive(Debug)]
-pub struct Button<E,D>
+pub struct Button<E, D>
 where
-    E: Fn(WidgetMessage, &mut Property,&mut D),
-    D: Data
+    E: Fn(WidgetMessage, &mut Property, &mut D),
+    D: Data,
 {
     on_message: RefCell<Option<E>>,
     current_color: ColorPair,
     property: Property,
-    phantom: PhantomData<D>
+    phantom: PhantomData<D>,
 }
 
-impl<E,D> Button<E,D>
+impl<E, D> Button<E, D>
 where
-    E: Fn(WidgetMessage, &mut Property,&mut D),
-    D: Data
+    E: Fn(WidgetMessage, &mut Property, &mut D),
+    D: Data,
 {
     pub fn new() -> Self {
         Self {
@@ -90,10 +90,10 @@ where
     }
 }
 
-impl<E,D> Layout for Button<E,D>
+impl<E, D> Layout for Button<E, D>
 where
-    E: Fn(WidgetMessage, &mut Property,&mut D),
-    D: Data
+    E: Fn(WidgetMessage, &mut Property, &mut D),
+    D: Data,
 {
     fn area(&self) -> Vec<Rect> {
         vec![Rect {
@@ -115,10 +115,10 @@ where
     }
 }
 
-impl<E,D> Widget<D> for Button<E,D>
+impl<E, D> Widget<D> for Button<E, D>
 where
-    E: Fn(WidgetMessage, &mut Property,&mut D),
-    D: Data
+    E: Fn(WidgetMessage, &mut Property, &mut D),
+    D: Data,
 {
     fn view(&self) -> Vec<acure::Command> {
         let y = self.property.y;
@@ -150,7 +150,7 @@ where
         ]
     }
 
-    fn message(&mut self, msg: WidgetMessage,data: &mut D) {
+    fn message(&mut self, msg: WidgetMessage, data: &mut D) {
         match msg {
             WidgetMessage::OnClick => {
                 self.current_color = self.property.clicked_color;
@@ -163,6 +163,6 @@ where
             }
         }
         let mut e = self.on_message.borrow_mut();
-        e.as_mut().unwrap()(msg, &mut self.property,data);
+        e.as_mut().unwrap()(msg, &mut self.property, data);
     }
 }

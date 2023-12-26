@@ -20,7 +20,7 @@ use std::{fmt::Debug, marker::PhantomData, time::Duration};
 use cde::RenderManager;
 use cursor::Cursor;
 use menu::Menubar;
-use widget::{Button, ColorPair, Component, RenderConfig, Data};
+use widget::{Button, ColorPair, Component, Data, RenderConfig};
 use winapi::um::winuser::{GetAsyncKeyState, VK_LBUTTON};
 
 //use cde::{Cde, RenderManager};
@@ -135,7 +135,7 @@ impl Theme {
         hover: ColorPair {
             color: Color::White,
             bgr: Color::ARGB(255, 180, 180, 180),
-            shadow: Color::ARGB(255,200,200,200),
+            shadow: Color::ARGB(255, 200, 200, 200),
         },
         click: ColorPair {
             color: Color::White,
@@ -143,9 +143,9 @@ impl Theme {
             shadow: Color::White,
         },
         normal: ColorPair {
-            color: Color::ARGB(255,220,220,220),
+            color: Color::ARGB(255, 220, 220, 220),
             bgr: Color::ARGB(255, 72, 72, 72),
-            shadow: Color::ARGB(255,200,200,200),
+            shadow: Color::ARGB(255, 200, 200, 200),
         },
         window: WindowTheme::Dark,
         bgr: Color::ARGB(255, 72, 72, 72),
@@ -164,18 +164,18 @@ impl Default for Theme {
     }
 }
 
-pub struct Window<D> 
+pub struct Window<D>
 where
-    D: Data
+    D: Data,
 {
     pub(crate) inner: winit::window::Window,
     event_loop: Option<EventLoop<()>>,
     comp: Component<D>,
 }
 
-impl<D> Window<D> 
+impl<D> Window<D>
 where
-    D: Data 
+    D: Data,
 {
     pub fn new(ui: Component<D>) -> Self {
         let event_loop = EventLoop::new().unwrap();
@@ -194,18 +194,18 @@ where
     }
 }
 
-pub struct IApplicationBuilder<D> 
+pub struct IApplicationBuilder<D>
 where
-    D: Data
+    D: Data,
 {
     window: Option<Window<D>>,
     theme: Option<Theme>,
 }
 
-impl<D> IApplicationBuilder<D> 
+impl<D> IApplicationBuilder<D>
 where
-    D: Data
- {
+    D: Data,
+{
     pub fn new() -> Self {
         Self::default()
     }
@@ -235,10 +235,9 @@ where
     }
 }
 
-impl<D> Default for IApplicationBuilder<D> 
+impl<D> Default for IApplicationBuilder<D>
 where
-    D: Data
-
+    D: Data,
 {
     fn default() -> Self {
         Self {
@@ -252,19 +251,19 @@ pub enum WindowEvent {
     Resized,
 }
 
-pub struct IApplication<D> 
+pub struct IApplication<D>
 where
-    D: Data
+    D: Data,
 {
     window: Window<D>,
     theme: Theme,
     render_manager: RenderManager,
 }
 
-impl<D> IApplication<D> 
+impl<D> IApplication<D>
 where
-    D: Data
-     {
+    D: Data,
+{
     pub fn run<F>(mut self, mut callback: F)
     where
         F: FnMut(crate::WindowEvent),
@@ -302,22 +301,23 @@ where
                                     let height = (area.bottom - area.top) as i32;
                                     if x >= cx && x <= cx + width {
                                         if y >= cy && y <= cy + height {
-                                            comp.message(widget::WidgetMessage::OnHover,data);
+                                            comp.message(widget::WidgetMessage::OnHover, data);
                                             if unsafe { GetAsyncKeyState(VK_LBUTTON) != 0 } {
-                                                comp.message(widget::WidgetMessage::OnClick,data);
+                                                comp.message(widget::WidgetMessage::OnClick, data);
+                                                std::thread::sleep(Duration::from_millis(130));
                                             }
                                         } else {
-                                            comp.message(widget::WidgetMessage::Unfocus,data);
+                                            comp.message(widget::WidgetMessage::Unfocus, data);
                                         }
                                     } else {
-                                        comp.message(widget::WidgetMessage::Unfocus,data);
+                                        comp.message(widget::WidgetMessage::Unfocus, data);
                                     }
                                 }
                             }
                             // Cursor is out of window range
                             else {
                                 //(*state).event = WidgetEvent::None;
-                                comp.message(widget::WidgetMessage::Unfocus,data);
+                                comp.message(widget::WidgetMessage::Unfocus, data);
                             }
                         }
                     }
@@ -334,6 +334,7 @@ where
                                 self.render_manager.register(&i.view());
                             }
                             self.render_manager.write();
+
                             self.window.inner.pre_present_notify();
                         }
 
