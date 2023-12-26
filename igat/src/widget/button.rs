@@ -4,66 +4,79 @@ use acure::Command;
 
 use crate::{Color, Rect};
 
-use super::{ClientMessage, Layout, Widget};
+use super::{ColorPair, Layout, Widget, WidgetMessage, Property};
+
+const HOVERED_COLOR: ColorPair = ColorPair{
+    color: Color::Black,
+    bgr: Color::White,
+    shadow: Color::ARGB(255, 0, 170, 204),
+};
+
+const CLICKED_COLOR: ColorPair = ColorPair {
+    color: Color::Black,
+    bgr: Color::ARGB(255, 200, 200, 200),
+    shadow: Color::ARGB(255, 0, 70, 204)
+};
+
+const NORMAL_COLOR: ColorPair = ColorPair {
+    color: Color::Black,
+    bgr: Color::White,
+    shadow: Color::ARGB(255, 128, 128, 128)
+};
 
 #[derive(Debug)]
 pub struct Button<E>
 where
-    E: Fn(ClientMessage),
+    E: Fn(WidgetMessage,&mut Property),
 {
-    width: u32,
-    height: u32,
-    menu_height: u32,
-    x: u32,
-    y: u32,
-    color: Color,
-    background_color: Color,
-    shadow_color: Color,
-    text: String,
     on_message: RefCell<Option<E>>,
+    current_color: ColorPair,
+    property: Property,
 }
 
 impl<E> Button<E>
 where
-    E: Fn(ClientMessage),
+    E: Fn(WidgetMessage,&mut Property),
 {
     pub fn new() -> Self {
         Self {
-            width: 30,
-            height: 80,
-            menu_height: 0,
-            x: 0,
-            y: 0,
-            text: String::new(),
             on_message: RefCell::new(None),
-            color: Color::Black,
-            background_color: Color::White,
-            shadow_color: Color::ARGB(255, 128, 128, 128),
+            current_color: NORMAL_COLOR,
+            property: Property {
+                hovered_color: HOVERED_COLOR,
+                clicked_color: CLICKED_COLOR,
+                color: NORMAL_COLOR,
+                width: 80,
+                height: 30,
+                x: 0,
+                y: 0,
+                text: Default::default(),
+            },
         }
     }
 
     pub fn width(mut self, width: u32) -> Self {
-        self.width = width;
+        self.property.width = width;
         self
     }
 
     pub fn height(mut self, height: u32) -> Self {
-        self.height = height;
+        self.property.height = height;
         self
     }
 
     pub fn x(mut self, x: u32) -> Self {
-        self.x = x;
+        self.property.x = x;
         self
     }
 
     pub fn y(mut self, y: u32) -> Self {
-        self.y = y;
+        self.property.y = y;
         self
     }
 
     pub fn text(mut self, text: String) -> Self {
-        self.text = text;
+        self.property.text = text;
         self
     }
 
@@ -75,14 +88,14 @@ where
 
 impl<E> Layout for Button<E>
 where
-    E: Fn(ClientMessage),
+    E: Fn(WidgetMessage,&mut Property),
 {
     fn area(&self) -> Vec<Rect> {
         vec![Rect {
-            left: self.x,
-            top: self.y + self.menu_height,
-            right: self.x + self.width,
-            bottom: self.y + self.menu_height + self.height,
+            left: self.property.x,
+            top: self.property.y,
+            right: self.property.x + self.property.width,
+            bottom: self.property.y + self.property.height,
         }]
     }
 
@@ -95,55 +108,51 @@ where
 
 impl<E> Widget for Button<E>
 where
-    E: Fn(ClientMessage),
+    E: Fn(WidgetMessage,&mut Property),
 {
     fn view(&self) -> Vec<acure::Command> {
-        let y = self.y + self.menu_height;
+        let y = self.property.y;
         vec![
             Command::FillRectangle(
-                self.x,
+                self.property.x,
                 y,
-                self.width,
-                self.height,
+                self.property.width,
+                self.property.height,
                 4.2,
-                self.shadow_color.into(),
+                self.current_color.shadow.into(),
             ),
             Command::FillRectangle(
-                self.x + 1,
+                self.property.x + 1,
                 y + 1,
-                self.width - 2,
-                self.height - 2,
+                self.property.width - 2,
+                self.property.height - 2,
                 4.2,
-                self.background_color.into(),
+                self.current_color.bgr.into(),
             ),
             Command::WriteString(
-                self.x,
+                self.property.x,
                 y,
-                self.width,
-                self.height,
-                self.color.into(),
-                self.text.clone(),
+                self.property.width,
+                self.property.height,
+                self.current_color.color.into(),
+                self.property.text.clone(),
             ),
         ]
     }
 
-    fn message(&mut self, msg: ClientMessage) {
-        self.background_color = Color::White;
+    fn message(&mut self, msg: WidgetMessage) {
         match msg {
-            ClientMessage::OnClick => {
-                self.background_color = Color::ARGB(255, 200, 200, 200);
-                self.shadow_color = Color::ARGB(255, 0, 70, 204);
+            WidgetMessage::OnClick => {
+                self.current_color = self.property.clicked_color;
             }
-            ClientMessage::OnHover => {
-                self.background_color = Color::ARGB(255, 255, 255, 255);
-                self.shadow_color = Color::ARGB(255, 0, 170, 204);
+            WidgetMessage::OnHover => {
+                self.current_color = self.property.hovered_color;
             }
-            ClientMessage::Unfocus => {
-                self.background_color = Color::ARGB(255, 255, 255, 255);
-                self.shadow_color = Color::ARGB(255, 128, 128, 128);
+            WidgetMessage::Unfocus => {
+                self.current_color = self.property.color;
             }
         }
         let mut e = self.on_message.borrow_mut();
-        e.as_mut().unwrap()(msg);
+        e.as_mut().unwrap()(msg,&mut self.property);
     }
 }

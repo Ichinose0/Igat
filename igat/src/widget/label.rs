@@ -2,12 +2,12 @@ use acure::Command;
 
 use crate::{Color, Rect};
 
-use super::{ClientMessage, Layout, Widget};
+use super::{Layout, Widget, WidgetMessage};
 
 #[derive(Debug)]
 pub struct Label<E>
 where
-    E: Fn(ClientMessage),
+    E: Fn(WidgetMessage),
 {
     width: u32,
     height: u32,
@@ -22,7 +22,7 @@ where
 
 impl<E> Label<E>
 where
-    E: Fn(ClientMessage),
+    E: Fn(WidgetMessage),
 {
     pub fn new() -> Self {
         Self {
@@ -71,7 +71,7 @@ where
 
 impl<E> Layout for Label<E>
 where
-    E: Fn(ClientMessage),
+    E: Fn(WidgetMessage),
 {
     fn area(&self) -> Vec<Rect> {
         vec![Rect {
@@ -91,13 +91,13 @@ where
 
 impl<E> Widget for Label<E>
 where
-    E: Fn(ClientMessage),
+    E: Fn(WidgetMessage),
 {
-    fn message(&mut self, msg: ClientMessage) {
+    fn message(&mut self, msg: WidgetMessage) {
         match msg {
-            ClientMessage::OnClick => {}
-            ClientMessage::OnHover => {}
-            ClientMessage::Unfocus => {}
+            WidgetMessage::OnClick => {}
+            WidgetMessage::OnHover => {}
+            WidgetMessage::Unfocus => {}
         }
         match &self.on_message {
             Some(e) => {

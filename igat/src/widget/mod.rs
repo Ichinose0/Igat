@@ -8,7 +8,33 @@ pub use label::*;
 pub use panel::*;
 pub use text::*;
 
-use crate::{Rect, Theme};
+use crate::{Color, Rect, Theme};
+
+#[derive(Debug)]
+pub struct Property {
+    pub hovered_color: ColorPair,
+    pub clicked_color: ColorPair,
+    pub color: ColorPair,
+    pub width: u32,
+    pub height: u32,
+    pub x: u32,
+    pub y: u32,
+
+    pub text: String,
+}
+
+#[derive(Clone,Copy,Debug)]
+pub struct ColorPair {
+    pub color: Color,
+    pub bgr: Color,
+    pub shadow: Color,
+}
+
+impl ColorPair {
+    pub fn new(color: Color, bgr: Color, shadow: Color) -> Self {
+        Self { color, bgr, shadow }
+    }
+}
 
 pub struct RenderConfig {
     pub thickness: u32,
@@ -16,7 +42,7 @@ pub struct RenderConfig {
 }
 
 #[derive(Debug)]
-pub enum ClientMessage {
+pub enum WidgetMessage {
     OnClick,
     OnHover,
     Unfocus,
@@ -37,7 +63,7 @@ pub trait Layout {
 pub trait Widget: Layout {
     fn view(&self) -> Vec<acure::Command>;
 
-    fn message(&mut self, msg: ClientMessage);
+    fn message(&mut self, msg: WidgetMessage);
 }
 
 pub struct ContentPanel {

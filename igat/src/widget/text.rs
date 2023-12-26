@@ -2,12 +2,12 @@ use acure::Command;
 
 use crate::{Color, Rect};
 
-use super::{ClientMessage, Layout, Widget};
+use super::{Layout, Widget, WidgetMessage};
 
 #[derive(Debug)]
 pub struct Text<E>
 where
-    E: Fn(ClientMessage),
+    E: Fn(WidgetMessage),
 {
     width: u32,
     height: u32,
@@ -22,7 +22,7 @@ where
 
 impl<E> Text<E>
 where
-    E: Fn(ClientMessage),
+    E: Fn(WidgetMessage),
 {
     pub fn new() -> Self {
         Self {
@@ -71,7 +71,7 @@ where
 
 impl<E> Layout for Text<E>
 where
-    E: Fn(ClientMessage),
+    E: Fn(WidgetMessage),
 {
     fn area(&self) -> Vec<Rect> {
         vec![Rect {
@@ -91,9 +91,9 @@ where
 
 impl<E> Widget for Text<E>
 where
-    E: Fn(ClientMessage),
+    E: Fn(WidgetMessage),
 {
-    fn message(&mut self, _msg: ClientMessage) {}
+    fn message(&mut self, _msg: WidgetMessage) {}
 
     fn view(&self) -> Vec<acure::Command> {
         vec![Command::WriteString(

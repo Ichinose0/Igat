@@ -2,7 +2,7 @@ use acure::Command;
 
 use crate::{Color, Rect};
 
-use super::{ClientMessage, Component, Widget};
+use super::{Component, Widget, WidgetMessage};
 
 pub struct Panel {
     inner: Vec<Box<dyn Widget>>,

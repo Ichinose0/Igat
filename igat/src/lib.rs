@@ -429,20 +429,20 @@ impl IApplication {
                                     let height = (area.bottom - area.top) as i32;
                                     if x >= cx && x <= cx + width {
                                         if y >= cy && y <= cy + height {
-                                            comp.message(widget::ClientMessage::OnHover);
+                                            comp.message(widget::WidgetMessage::OnHover);
                                             if unsafe { GetAsyncKeyState(VK_LBUTTON) != 0 } {
-                                                comp.message(widget::ClientMessage::OnClick);
+                                                comp.message(widget::WidgetMessage::OnClick);
                                             }
                                         }
                                     } else {
-                                        comp.message(widget::ClientMessage::Unfocus);
+                                        comp.message(widget::WidgetMessage::Unfocus);
                                     }
                                 }
                             }
                             // Cursor is out of window range
                             else {
                                 //(*state).event = WidgetEvent::None;
-                                comp.message(widget::ClientMessage::Unfocus);
+                                comp.message(widget::WidgetMessage::Unfocus);
                             }
                         }
                     }
