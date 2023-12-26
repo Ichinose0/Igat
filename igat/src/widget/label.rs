@@ -2,9 +2,9 @@ use std::{cell::RefCell, marker::PhantomData};
 
 use acure::Command;
 
-use crate::{Color, Rect};
+use crate::{Color, CursorIcon, Rect};
 
-use super::{Layout, Widget, WidgetMessage, Property, Data, ColorPair};
+use super::{ColorPair, Data, Layout, Property, Widget, WidgetMessage};
 
 const NORMAL_COLOR: ColorPair = ColorPair {
     color: Color::Black,
@@ -24,7 +24,7 @@ where
     phantom: PhantomData<D>,
 }
 
-impl<E,D> Label<E, D>
+impl<E, D> Label<E, D>
 where
     E: Fn(WidgetMessage, &mut Property, &mut D),
     D: Data,
@@ -43,7 +43,7 @@ where
             },
             current_color: NORMAL_COLOR,
             on_message: RefCell::new(None),
-            phantom: PhantomData
+            phantom: PhantomData,
         }
     }
 
@@ -78,7 +78,7 @@ where
     }
 }
 
-impl<E,D> Layout for Label<E, D>
+impl<E, D> Layout for Label<E, D>
 where
     E: Fn(WidgetMessage, &mut Property, &mut D),
     D: Data,
@@ -101,12 +101,12 @@ where
     }
 }
 
-impl<E,D> Widget<D> for Label<E, D>
+impl<E, D> Widget<D> for Label<E, D>
 where
     E: Fn(WidgetMessage, &mut Property, &mut D),
     D: Data,
 {
-    fn message(&mut self, msg: WidgetMessage,data: &mut D) {
+    fn message(&mut self, msg: WidgetMessage, data: &mut D) {
         let mut e = self.on_message.borrow_mut();
         e.as_mut().unwrap()(msg, &mut self.property, data);
     }

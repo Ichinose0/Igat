@@ -5,8 +5,9 @@ mod panel;
 pub use button::*;
 pub use label::*;
 pub use panel::*;
+use winit::window::CursorIcon;
 
-use crate::{Color, Rect, Theme};
+use crate::{cursor::Cursor, Color, Rect, Theme};
 
 #[derive(Debug)]
 pub struct Property {
@@ -58,6 +59,10 @@ pub trait Layout {
     fn area(&self) -> Vec<Rect>;
 
     fn theme(&mut self, theme: Theme);
+
+    fn cursor(&self) -> CursorIcon {
+        CursorIcon::default()
+    }
 
     fn is_capture_event(&self) -> bool;
 }
