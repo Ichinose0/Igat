@@ -2,10 +2,7 @@
 
 use std::ptr::{null, null_mut};
 
-pub type MESSEAGEPROCPTR = fn();
-pub type UIPROCPTR = fn();
-pub type SETUPPROCPTR = fn();
-pub type THEMEPROCPTR = fn(theme: Theme);
+use igat::{IApplication, IApplicationBuilder, widget::Panel};
 
 #[repr(C)]
 #[derive(Clone, Copy, Debug)]
@@ -16,26 +13,38 @@ pub struct Rect {
     pub bottom: u32,
 }
 
-#[repr(C)]
 pub enum Menubar {}
 
-#[repr(C)]
 pub enum Menu {}
 
-#[repr(C)]
 pub enum Theme {}
 
-#[repr(C)]
-pub enum Frame {}
+pub enum Window {}
 
-#[repr(C)]
 pub enum Application {}
 
-pub struct DefaultApplication {
-    ui: UIPROCPTR,
+#[repr(C)]
+pub struct IgatApplicationCreateInfo {
+    window: *mut Window,
+    theme: *mut Theme
 }
 
 #[no_mangle]
-pub extern "C" fn CreateApplication() -> *mut Application {
-    null_mut();
+pub extern "C" fn IgatCreateApplication() -> *mut Application {
+    let app = IApplicationBuilder::new().with(igat::Window::new(Panel::new().into())).theme(igat::Theme::ORIGINAL).build();
+    let app = Box::new(app);
+    Box::into_raw(app) as *mut Application
+}
+
+#[no_mangle]
+pub extern "C" fn IgatRunApplication(application: *mut Application) {
+    let app = unsafe { Box::from_raw(application as *mut IApplication) };
+    app.run(|event| {
+
+    })
+}
+
+#[no_mangle]
+pub extern "C" fn IgatGetDarkTheme() -> *mut Theme {
+    Box::into_raw(Box::new(igat::Theme::DARK)) as *mut Theme
 }
