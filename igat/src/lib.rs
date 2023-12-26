@@ -20,13 +20,14 @@ use std::{fmt::Debug, marker::PhantomData, time::Duration};
 use cde::RenderManager;
 use cursor::Cursor;
 use menu::Menubar;
-use widget::{Button, Component, ContentPanel, RenderConfig};
+use widget::{Button, ColorPair, Component, ContentPanel, RenderConfig};
 use winapi::um::winuser::{GetAsyncKeyState, VK_LBUTTON};
 
 //use cde::{Cde, RenderManager};
 use winit::{event_loop::EventLoop, window::WindowBuilder};
 
 pub type CursorIcon = winit::window::CursorIcon;
+pub type WindowTheme = winit::window::Theme;
 
 /// Represents an area on the screen
 ///
@@ -293,12 +294,50 @@ pub struct Executable {
 
 #[derive(Clone, Copy, Debug)]
 pub struct Theme {
+    hover: ColorPair,
+    click: ColorPair,
+    normal: ColorPair,
+    window: WindowTheme,
     bgr: Color,
 }
 
 impl Theme {
-    pub const ORIGINAL: Theme = Theme { bgr: Color::White };
+    pub const LIGHT: Theme = Theme {
+        hover: ColorPair {
+            color: Color::Black,
+            bgr: Color::White,
+            shadow: Color::ARGB(255, 0, 170, 204),
+        },
+        click: ColorPair {
+            color: Color::Black,
+            bgr: Color::ARGB(255, 200, 200, 200),
+            shadow: Color::ARGB(255, 0, 70, 204),
+        },
+        normal: ColorPair {
+            color: Color::Black,
+            bgr: Color::White,
+            shadow: Color::ARGB(255, 128, 128, 128),
+        },
+        window: WindowTheme::Light,
+        bgr: Color::ARGB(255, 240, 240, 240),
+    };
     pub const DARK: Theme = Theme {
+        hover: ColorPair {
+            color: Color::White,
+            bgr: Color::ARGB(255, 180, 180, 180),
+            shadow: Color::ARGB(255,200,200,200),
+        },
+        click: ColorPair {
+            color: Color::White,
+            bgr: Color::ARGB(255, 144, 144, 144),
+            shadow: Color::White,
+        },
+        normal: ColorPair {
+            color: Color::ARGB(255,220,220,220),
+            bgr: Color::ARGB(255, 72, 72, 72),
+            shadow: Color::ARGB(255,200,200,200),
+        },
+        window: WindowTheme::Dark,
         bgr: Color::ARGB(255, 72, 72, 72),
     };
 }
@@ -307,18 +346,11 @@ impl Theme {
     pub fn new() -> Self {
         Default::default()
     }
-
-    pub fn bgr(mut self, bgr: Color) -> Self {
-        self.bgr = bgr;
-        self
-    }
 }
 
 impl Default for Theme {
     fn default() -> Self {
-        Self {
-            bgr: Color::ARGB(255, 240, 240, 240),
-        }
+        Self::LIGHT
     }
 }
 
@@ -375,6 +407,7 @@ impl IApplicationBuilder {
         let render_manager = RenderManager::new(&window, theme);
         IApplication {
             window,
+            theme,
             render_manager,
         }
     }
@@ -395,6 +428,7 @@ pub enum WindowEvent {
 
 pub struct IApplication {
     window: Window,
+    theme: Theme,
     render_manager: RenderManager,
 }
 
@@ -410,6 +444,11 @@ impl IApplication {
         let mut is_enter_cursor = false;
 
         let mut component = self.window.comp;
+        self.window.inner.set_theme(Some(self.theme.window));
+
+        for comp in &mut component.inner {
+            comp.theme(self.theme);
+        }
 
         event_loop
             .run(move |event, elwt| {
@@ -433,6 +472,8 @@ impl IApplication {
                                             if unsafe { GetAsyncKeyState(VK_LBUTTON) != 0 } {
                                                 comp.message(widget::WidgetMessage::OnClick);
                                             }
+                                        } else {
+                                            comp.message(widget::WidgetMessage::Unfocus);
                                         }
                                     } else {
                                         comp.message(widget::WidgetMessage::Unfocus);

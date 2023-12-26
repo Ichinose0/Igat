@@ -103,7 +103,11 @@ where
         true
     }
 
-    fn theme(&mut self, theme: crate::Theme) {}
+    fn theme(&mut self, theme: crate::Theme) {
+        self.property.clicked_color = theme.click;
+        self.property.hovered_color = theme.hover;
+        self.property.color = theme.normal;
+    }
 }
 
 impl<E> Widget for Button<E>
