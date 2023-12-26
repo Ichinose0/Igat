@@ -20,7 +20,7 @@ use std::{fmt::Debug, marker::PhantomData, time::Duration};
 use cde::RenderManager;
 use cursor::Cursor;
 use menu::Menubar;
-use widget::{Button, ColorPair, Component, ContentPanel, RenderConfig};
+use widget::{Button, ColorPair, Component, RenderConfig, Data};
 use winapi::um::winuser::{GetAsyncKeyState, VK_LBUTTON};
 
 //use cde::{Cde, RenderManager};
@@ -354,14 +354,20 @@ impl Default for Theme {
     }
 }
 
-pub struct Window {
+pub struct Window<D> 
+where
+    D: Data
+{
     pub(crate) inner: winit::window::Window,
     event_loop: Option<EventLoop<()>>,
-    comp: Component,
+    comp: Component<D>,
 }
 
-impl Window {
-    pub fn new(ui: Component) -> Self {
+impl<D> Window<D> 
+where
+    D: Data 
+{
+    pub fn new(ui: Component<D>) -> Self {
         let event_loop = EventLoop::new().unwrap();
 
         let inner = WindowBuilder::new()
@@ -378,17 +384,23 @@ impl Window {
     }
 }
 
-pub struct IApplicationBuilder {
-    window: Option<Window>,
+pub struct IApplicationBuilder<D> 
+where
+    D: Data
+{
+    window: Option<Window<D>>,
     theme: Option<Theme>,
 }
 
-impl IApplicationBuilder {
+impl<D> IApplicationBuilder<D> 
+where
+    D: Data
+ {
     pub fn new() -> Self {
         Self::default()
     }
 
-    pub fn with(mut self, window: crate::Window) -> Self {
+    pub fn with(mut self, window: crate::Window<D>) -> Self {
         self.window = Some(window);
         self
     }
@@ -398,7 +410,7 @@ impl IApplicationBuilder {
         self
     }
 
-    pub fn build(self) -> IApplication {
+    pub fn build(self) -> IApplication<D> {
         let window = self.window.unwrap();
         let theme = match self.theme {
             Some(t) => t,
@@ -413,7 +425,11 @@ impl IApplicationBuilder {
     }
 }
 
-impl Default for IApplicationBuilder {
+impl<D> Default for IApplicationBuilder<D> 
+where
+    D: Data
+
+{
     fn default() -> Self {
         Self {
             window: None,
@@ -426,13 +442,19 @@ pub enum WindowEvent {
     Resized,
 }
 
-pub struct IApplication {
-    window: Window,
+pub struct IApplication<D> 
+where
+    D: Data
+{
+    window: Window<D>,
     theme: Theme,
     render_manager: RenderManager,
 }
 
-impl IApplication {
+impl<D> IApplication<D> 
+where
+    D: Data
+     {
     pub fn run<F>(mut self, mut callback: F)
     where
         F: FnMut(crate::WindowEvent),
@@ -449,6 +471,8 @@ impl IApplication {
         for comp in &mut component.inner {
             comp.theme(self.theme);
         }
+
+        let mut data = &mut component.static_data;
 
         event_loop
             .run(move |event, elwt| {
@@ -468,22 +492,22 @@ impl IApplication {
                                     let height = (area.bottom - area.top) as i32;
                                     if x >= cx && x <= cx + width {
                                         if y >= cy && y <= cy + height {
-                                            comp.message(widget::WidgetMessage::OnHover);
+                                            comp.message(widget::WidgetMessage::OnHover,data);
                                             if unsafe { GetAsyncKeyState(VK_LBUTTON) != 0 } {
-                                                comp.message(widget::WidgetMessage::OnClick);
+                                                comp.message(widget::WidgetMessage::OnClick,data);
                                             }
                                         } else {
-                                            comp.message(widget::WidgetMessage::Unfocus);
+                                            comp.message(widget::WidgetMessage::Unfocus,data);
                                         }
                                     } else {
-                                        comp.message(widget::WidgetMessage::Unfocus);
+                                        comp.message(widget::WidgetMessage::Unfocus,data);
                                     }
                                 }
                             }
                             // Cursor is out of window range
                             else {
                                 //(*state).event = WidgetEvent::None;
-                                comp.message(widget::WidgetMessage::Unfocus);
+                                comp.message(widget::WidgetMessage::Unfocus,data);
                             }
                         }
                     }

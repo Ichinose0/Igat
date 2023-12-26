@@ -1,12 +1,12 @@
 mod button;
-mod label;
+//mod label;
 mod panel;
-mod text;
+//mod text;
 
 pub use button::*;
-pub use label::*;
+//pub use label::*;
 pub use panel::*;
-pub use text::*;
+//pub use text::*;
 
 use crate::{Color, Rect, Theme};
 
@@ -48,8 +48,12 @@ pub enum WidgetMessage {
     Unfocus,
 }
 
-pub struct Component {
-    pub(crate) inner: Vec<Box<dyn Widget>>,
+pub struct Component<D> 
+where
+    D: Data
+{
+    pub(crate) inner: Vec<Box<dyn Widget<D>>>,
+    pub(crate) static_data: D
 }
 
 pub trait Layout {
@@ -60,12 +64,15 @@ pub trait Layout {
     fn is_capture_event(&self) -> bool;
 }
 
-pub trait Widget: Layout {
+pub trait Widget<D>: Layout 
+where
+    D: Data
+{
     fn view(&self) -> Vec<acure::Command>;
 
-    fn message(&mut self, msg: WidgetMessage);
+    fn message(&mut self, msg: WidgetMessage,data: &mut D);
 }
 
-pub struct ContentPanel {
-    pub(crate) widgets: Vec<Box<dyn Widget>>,
+pub trait Data {
+
 }

@@ -3,7 +3,7 @@ pub mod windows;
 use acure::Command;
 use raw_window_handle::HasWindowHandle;
 
-use crate::{menu::Menubar, Color, Theme, Window};
+use crate::{menu::Menubar, Color, Theme, Window, widget::Data};
 
 #[cfg(target_os = "windows")]
 pub use self::windows::*;
@@ -14,7 +14,10 @@ pub struct RenderManager {
 }
 
 impl RenderManager {
-    pub fn new(window: &Window, theme: Theme) -> Self {
+    pub fn new<D>(window: &Window<D>, theme: Theme) -> Self 
+    where
+        D: Data
+    {
         Self {
             cde: Cde::new(window),
             theme,
