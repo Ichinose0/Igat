@@ -1,120 +1,124 @@
+use std::{cell::RefCell, marker::PhantomData};
+
 use acure::Command;
 
 use crate::{Color, Rect};
 
-use super::{Layout, Widget, WidgetMessage};
+use super::{Layout, Widget, WidgetMessage, Property, Data, ColorPair};
+
+const NORMAL_COLOR: ColorPair = ColorPair {
+    color: Color::Black,
+    bgr: Color::White,
+    shadow: Color::ARGB(255, 128, 128, 128),
+};
 
 #[derive(Debug)]
-pub struct Label<E>
+pub struct Label<E, D>
 where
-    E: Fn(WidgetMessage),
+    E: Fn(WidgetMessage, &mut Property, &mut D),
+    D: Data,
 {
-    width: u32,
-    height: u32,
-    menu_height: u32,
-    x: u32,
-    y: u32,
-    color: Color,
-    background_color: Color,
-    text: String,
-    on_message: Option<E>,
+    on_message: RefCell<Option<E>>,
+    current_color: ColorPair,
+    property: Property,
+    phantom: PhantomData<D>,
 }
 
-impl<E> Label<E>
+impl<E,D> Label<E, D>
 where
-    E: Fn(WidgetMessage),
+    E: Fn(WidgetMessage, &mut Property, &mut D),
+    D: Data,
 {
     pub fn new() -> Self {
         Self {
-            width: 30,
-            height: 80,
-            menu_height: 0,
-            x: 0,
-            y: 0,
-            text: String::new(),
-            on_message: None,
-            color: Color::Black,
-            background_color: Color::White,
+            property: Property {
+                hovered_color: NORMAL_COLOR,
+                clicked_color: NORMAL_COLOR,
+                color: NORMAL_COLOR,
+                width: 0,
+                height: 0,
+                x: 0,
+                y: 0,
+                text: String::new(),
+            },
+            current_color: NORMAL_COLOR,
+            on_message: RefCell::new(None),
+            phantom: PhantomData
         }
     }
 
     pub fn width(mut self, width: u32) -> Self {
-        self.width = width;
+        self.property.width = width;
         self
     }
 
     pub fn height(mut self, height: u32) -> Self {
-        self.height = height;
+        self.property.height = height;
         self
     }
 
     pub fn x(mut self, x: u32) -> Self {
-        self.x = x;
+        self.property.x = x;
         self
     }
 
     pub fn y(mut self, y: u32) -> Self {
-        self.y = y;
+        self.property.y = y;
         self
     }
 
     pub fn text(mut self, text: String) -> Self {
-        self.text = text;
+        self.property.text = text;
         self
     }
 
     pub fn on_message(mut self, on_message: E) -> Self {
-        self.on_message = Some(on_message);
+        self.on_message = RefCell::new(Some(on_message));
         self
     }
 }
 
-impl<E> Layout for Label<E>
+impl<E,D> Layout for Label<E, D>
 where
-    E: Fn(WidgetMessage),
+    E: Fn(WidgetMessage, &mut Property, &mut D),
+    D: Data,
 {
     fn area(&self) -> Vec<Rect> {
         vec![Rect {
-            left: self.x,
-            top: self.y + self.menu_height,
-            right: self.x + self.width,
-            bottom: self.y + self.menu_height + self.height,
+            left: self.property.x,
+            top: self.property.y,
+            right: self.property.x + self.property.width,
+            bottom: self.property.y + self.property.height,
         }]
     }
 
-    fn theme(&mut self, theme: crate::Theme) {}
+    fn theme(&mut self, theme: crate::Theme) {
+        self.current_color = theme.normal;
+    }
 
     fn is_capture_event(&self) -> bool {
         true
     }
 }
 
-impl<E> Widget for Label<E>
+impl<E,D> Widget<D> for Label<E, D>
 where
-    E: Fn(WidgetMessage),
+    E: Fn(WidgetMessage, &mut Property, &mut D),
+    D: Data,
 {
-    fn message(&mut self, msg: WidgetMessage) {
-        match msg {
-            WidgetMessage::OnClick => {}
-            WidgetMessage::OnHover => {}
-            WidgetMessage::Unfocus => {}
-        }
-        match &self.on_message {
-            Some(e) => {
-                e(msg);
-            }
-            None => {}
-        }
+    fn message(&mut self, msg: WidgetMessage,data: &mut D) {
+        let mut e = self.on_message.borrow_mut();
+        e.as_mut().unwrap()(msg, &mut self.property, data);
     }
 
     fn view(&self) -> Vec<acure::Command> {
         vec![Command::WriteString(
-            self.x,
-            self.y,
-            self.width,
-            self.height,
-            self.background_color.into(),
-            self.text.clone(),
+            self.property.x,
+            self.property.y,
+            self.property.width,
+            self.property.height,
+            self.current_color.color.into(),
+            self.property.text.clone(),
         )]
     }
 }

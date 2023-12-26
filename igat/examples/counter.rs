@@ -1,5 +1,5 @@
 use igat::{
-    widget::{Button, Component, Data, Panel, WidgetMessage},
+    widget::{Button, Component, Data, Panel, WidgetMessage, Label},
     IApplicationBuilder, Theme, Window, WindowEvent,
 };
 
@@ -50,7 +50,7 @@ fn ui(counter: Counter) -> Component<Counter> {
 
             _ => {}
         });
-    let count = Button::new()
+    let count = Label::new()
         .width(190)
         .height(40)
         .x(180)

@@ -1,12 +1,10 @@
 mod button;
-//mod label;
+mod label;
 mod panel;
-//mod text;
 
 pub use button::*;
-//pub use label::*;
+pub use label::*;
 pub use panel::*;
-//pub use text::*;
 
 use crate::{Color, Rect, Theme};
 
