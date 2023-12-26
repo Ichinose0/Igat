@@ -23,7 +23,7 @@ pub struct Property {
     pub text: String,
 }
 
-#[derive(Clone,Copy,Debug)]
+#[derive(Clone, Copy, Debug)]
 pub struct ColorPair {
     pub color: Color,
     pub bgr: Color,

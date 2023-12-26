@@ -26,7 +26,7 @@ fn ui() -> Component {
         .width(240)
         .height(40)
         .text("Click me".to_owned())
-        .on_message(|message,prop| match message {
+        .on_message(|message, prop| match message {
             WidgetMessage::OnClick => {
                 prop.text = String::from_str("Clicked!").unwrap();
             }

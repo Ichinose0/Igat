@@ -4,9 +4,9 @@ use acure::Command;
 
 use crate::{Color, Rect};
 
-use super::{ColorPair, Layout, Widget, WidgetMessage, Property};
+use super::{ColorPair, Layout, Property, Widget, WidgetMessage};
 
-const HOVERED_COLOR: ColorPair = ColorPair{
+const HOVERED_COLOR: ColorPair = ColorPair {
     color: Color::Black,
     bgr: Color::White,
     shadow: Color::ARGB(255, 0, 170, 204),
@@ -15,19 +15,19 @@ const HOVERED_COLOR: ColorPair = ColorPair{
 const CLICKED_COLOR: ColorPair = ColorPair {
     color: Color::Black,
     bgr: Color::ARGB(255, 200, 200, 200),
-    shadow: Color::ARGB(255, 0, 70, 204)
+    shadow: Color::ARGB(255, 0, 70, 204),
 };
 
 const NORMAL_COLOR: ColorPair = ColorPair {
     color: Color::Black,
     bgr: Color::White,
-    shadow: Color::ARGB(255, 128, 128, 128)
+    shadow: Color::ARGB(255, 128, 128, 128),
 };
 
 #[derive(Debug)]
 pub struct Button<E>
 where
-    E: Fn(WidgetMessage,&mut Property),
+    E: Fn(WidgetMessage, &mut Property),
 {
     on_message: RefCell<Option<E>>,
     current_color: ColorPair,
@@ -36,7 +36,7 @@ where
 
 impl<E> Button<E>
 where
-    E: Fn(WidgetMessage,&mut Property),
+    E: Fn(WidgetMessage, &mut Property),
 {
     pub fn new() -> Self {
         Self {
@@ -88,7 +88,7 @@ where
 
 impl<E> Layout for Button<E>
 where
-    E: Fn(WidgetMessage,&mut Property),
+    E: Fn(WidgetMessage, &mut Property),
 {
     fn area(&self) -> Vec<Rect> {
         vec![Rect {
@@ -108,7 +108,7 @@ where
 
 impl<E> Widget for Button<E>
 where
-    E: Fn(WidgetMessage,&mut Property),
+    E: Fn(WidgetMessage, &mut Property),
 {
     fn view(&self) -> Vec<acure::Command> {
         let y = self.property.y;
@@ -153,6 +153,6 @@ where
             }
         }
         let mut e = self.on_message.borrow_mut();
-        e.as_mut().unwrap()(msg,&mut self.property);
+        e.as_mut().unwrap()(msg, &mut self.property);
     }
 }
