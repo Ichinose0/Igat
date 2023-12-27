@@ -14,7 +14,7 @@ fn main() {
     let window = Window::new(ui(counter));
     let app = IApplicationBuilder::new()
         .with(window)
-        .theme(Theme::DARK)
+        .theme(Theme::LIGHT)
         .build();
     app.run(|event| match event {
         _ => {}

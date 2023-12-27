@@ -44,6 +44,7 @@ where
     D: Data,
 {
     on_message: RefCell<Option<E>>,
+    check_color: ColorPair,
     current_color: ColorPair,
     property: CheckboxProperty,
     phantom: PhantomData<D>,
@@ -57,6 +58,7 @@ where
     pub fn new() -> Self {
         Self {
             on_message: RefCell::new(None),
+            check_color: NORMAL_COLOR,
             current_color: NORMAL_COLOR,
             property: CheckboxProperty {
                 hovered_color: HOVERED_COLOR,
@@ -121,6 +123,7 @@ where
         self.property.clicked_color = theme.click;
         self.property.hovered_color = theme.hover;
         self.property.color = theme.normal;
+        self.check_color = ColorPair::new(self.property.clicked_color.color.inversion(),self.property.hovered_color.shadow,self.property.hovered_color.shadow);
     }
 }
 
@@ -163,18 +166,25 @@ where
     fn message(&mut self, msg: WidgetMessage, data: &mut D) {
         match msg {
             WidgetMessage::OnClick => {
-                self.current_color = self.property.clicked_color;
                 if self.property.is_check {
                     self.property.is_check = false;
+                    self.current_color = self.property.color;
                 } else {
                     self.property.is_check = true;
+                    self.current_color = self.check_color;
                 }
             }
             WidgetMessage::OnHover => {
-                self.current_color = self.property.hovered_color;
+                if !self.property.is_check {
+                    self.current_color = self.property.hovered_color;
+                }
+                
             }
             WidgetMessage::Unfocus => {
-                self.current_color = self.property.color;
+                if !self.property.is_check {
+                    self.current_color = self.property.color;
+                }
+                
             }
         }
         let mut e = self.on_message.borrow_mut();

@@ -78,6 +78,16 @@ pub enum Color {
     ARGB(u8, u8, u8, u8),
 }
 
+impl Color {
+    pub fn inversion(&self) -> Color {
+        match self {
+            Color::Black => Color::White,
+            Color::White => Color::Black,
+            Color::ARGB(a, r, g, b) => Color::ARGB(*a,u8::MAX-(*r),u8::MAX-(*g),u8::MAX-(*b)),
+        }
+    }
+}
+
 impl Into<acure::Color> for Color {
     fn into(self) -> acure::Color {
         match self {
