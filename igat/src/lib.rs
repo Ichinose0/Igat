@@ -304,7 +304,7 @@ where
                                             self.window.inner.set_cursor_icon(comp.cursor());
                                             if get_key_state(VK_LBUTTON) {
                                                 comp.message(widget::WidgetMessage::OnClick, data);
-                                                std::thread::sleep(Duration::from_millis(130));
+                                                std::thread::sleep(Duration::from_millis(200));
                                             }
                                         } else {
                                             comp.message(widget::WidgetMessage::Unfocus, data);
