@@ -2,7 +2,7 @@ use std::{cell::RefCell, marker::PhantomData, time::Duration};
 
 use acure::Command;
 
-use crate::{Color, Rect, cursor::Cursor, CursorIcon};
+use crate::{cursor::Cursor, Color, CursorIcon, Rect};
 
 use super::{ColorPair, Data, Layout, Property, Widget, WidgetMessage};
 

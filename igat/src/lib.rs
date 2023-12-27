@@ -12,6 +12,7 @@ extern crate log;
 pub(crate) mod cde;
 #[doc(hidden)]
 pub(crate) mod cursor;
+pub mod keyboard;
 pub mod menu;
 pub mod widget;
 
@@ -19,10 +20,9 @@ use std::{fmt::Debug, marker::PhantomData, time::Duration};
 
 use cde::RenderManager;
 use cursor::Cursor;
+use keyboard::{get_key_state, VK_LBUTTON};
 use menu::Menubar;
 use widget::{Button, ColorPair, Component, Data, RenderConfig};
-use winapi::um::winuser::{GetAsyncKeyState, VK_LBUTTON};
-
 //use cde::{Cde, RenderManager};
 use winit::{event_loop::EventLoop, window::WindowBuilder};
 
@@ -302,7 +302,7 @@ where
                                         if y >= cy && y <= cy + height {
                                             comp.message(widget::WidgetMessage::OnHover, data);
                                             self.window.inner.set_cursor_icon(comp.cursor());
-                                            if unsafe { GetAsyncKeyState(VK_LBUTTON) != 0 } {
+                                            if get_key_state(VK_LBUTTON) {
                                                 comp.message(widget::WidgetMessage::OnClick, data);
                                                 std::thread::sleep(Duration::from_millis(130));
                                             }
@@ -350,6 +350,10 @@ where
 
                         winit::event::WindowEvent::CursorEntered { device_id } => {
                             is_enter_cursor = true;
+                        }
+
+                        winit::event::WindowEvent::CloseRequested => {
+                            elwt.exit();
                         }
 
                         _ => {}
