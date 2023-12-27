@@ -1,5 +1,5 @@
 use igat::{
-    widget::{Component, Data, Panel},
+    widget::{Checkbox, Component, Data, Panel},
     IApplicationBuilder, Theme, Window,
 };
 

@@ -1,8 +1,10 @@
 mod button;
+mod checkbox;
 mod label;
 mod panel;
 
 pub use button::*;
+pub use checkbox::*;
 pub use label::*;
 pub use panel::*;
 use winit::window::CursorIcon;
