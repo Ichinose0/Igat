@@ -1,6 +1,6 @@
 use igat::{
     widget::{Checkbox, Component, Data, Label, Panel},
-    IApplicationBuilder, Theme, Window,
+    ApplicationBuilder, Theme, Window,
 };
 
 pub struct Gallery {
@@ -12,9 +12,9 @@ impl Data for Gallery {}
 fn main() {
     let counter = Gallery { check: false };
     let window = Window::new(ui(counter));
-    let app = IApplicationBuilder::new()
+    let app = ApplicationBuilder::new()
         .with(window)
-        .theme(Theme::LIGHT)
+        .theme(Theme::LIGHT_HIGH_CONTRAST)
         .build();
     app.run(|event| match event {
         _ => {}

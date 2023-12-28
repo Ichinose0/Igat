@@ -1,6 +1,6 @@
 use igat::{
     widget::{Button, Component, Data, Label, Panel, WidgetMessage},
-    IApplicationBuilder, Theme, Window, WindowEvent,
+    ApplicationBuilder, Theme, Window, WindowEvent,
 };
 
 pub struct Counter {
@@ -18,7 +18,7 @@ impl Data for Counter {}
 fn main() {
     let counter = Counter::new();
     let window = Window::new(ui(counter));
-    let app = IApplicationBuilder::new()
+    let app = ApplicationBuilder::new()
         .with(window)
         .theme(Theme::LIGHT)
         .build();

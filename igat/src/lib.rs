@@ -160,6 +160,46 @@ impl Theme {
         window: WindowTheme::Dark,
         bgr: Color::ARGB(255, 72, 72, 72),
     };
+
+    pub const LIGHT_HIGH_CONTRAST: Theme = Theme {
+        hover: ColorPair {
+            color: Color::Black,
+            bgr: Color::White,
+            shadow: Color::ARGB(255,0,108,255),
+        },
+        click: ColorPair {
+            color: Color::Black,
+            bgr: Color::White,
+            shadow: Color::ARGB(255,39,135,255),
+        },
+        normal: ColorPair {
+            color: Color::Black,
+            bgr: Color::White,
+            shadow: Color::ARGB(255,255,255,255),
+        },
+        window: WindowTheme::Light,
+        bgr: Color::White,
+    };
+
+    pub const DARK_HIGH_CONTRAST: Theme = Theme {
+        hover: ColorPair {
+            color: Color::White,
+            bgr: Color::Black,
+            shadow: Color::ARGB(255,255,159,59),
+        },
+        click: ColorPair {
+            color: Color::White,
+            bgr: Color::Black,
+            shadow: Color::ARGB(255,255,135,0),
+        },
+        normal: ColorPair {
+            color: Color::White,
+            bgr: Color::Black,
+            shadow: Color::ARGB(255,0,255,224),
+        },
+        window: WindowTheme::Dark,
+        bgr: Color::Black,
+    };
 }
 
 impl Theme {
@@ -204,7 +244,7 @@ where
     }
 }
 
-pub struct IApplicationBuilder<D>
+pub struct ApplicationBuilder<D>
 where
     D: Data,
 {
@@ -212,7 +252,7 @@ where
     theme: Option<Theme>,
 }
 
-impl<D> IApplicationBuilder<D>
+impl<D> ApplicationBuilder<D>
 where
     D: Data,
 {
@@ -230,14 +270,14 @@ where
         self
     }
 
-    pub fn build(self) -> IApplication<D> {
+    pub fn build(self) -> Application<D> {
         let window = self.window.unwrap();
         let theme = match self.theme {
             Some(t) => t,
             None => Theme::default(),
         };
         let render_manager = RenderManager::new(&window, theme);
-        IApplication {
+        Application {
             window,
             theme,
             render_manager,
@@ -245,7 +285,7 @@ where
     }
 }
 
-impl<D> Default for IApplicationBuilder<D>
+impl<D> Default for ApplicationBuilder<D>
 where
     D: Data,
 {
@@ -261,7 +301,7 @@ pub enum WindowEvent {
     Resized,
 }
 
-pub struct IApplication<D>
+pub struct Application<D>
 where
     D: Data,
 {
@@ -270,7 +310,7 @@ where
     render_manager: RenderManager,
 }
 
-impl<D> IApplication<D>
+impl<D> Application<D>
 where
     D: Data,
 {

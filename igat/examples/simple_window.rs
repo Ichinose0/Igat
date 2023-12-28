@@ -1,6 +1,6 @@
 use igat::{
     widget::{Checkbox, Component, Data, Panel},
-    IApplicationBuilder, Theme, Window,
+    ApplicationBuilder, Theme, Window,
 };
 
 pub struct MyApp;
@@ -10,7 +10,7 @@ impl Data for MyApp {}
 fn main() {
     let counter = MyApp;
     let window = Window::new(ui(counter));
-    let app = IApplicationBuilder::new()
+    let app = ApplicationBuilder::new()
         .with(window)
         .theme(Theme::LIGHT)
         .build();
