@@ -35,7 +35,7 @@ impl Cde {
     }
 
     pub fn resize(&mut self, width: u32, height: u32) {
-        self.surface.resize();
+        //self.surface.resize();
     }
 
     pub fn begin(&mut self) {

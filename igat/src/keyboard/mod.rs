@@ -1,11 +1,15 @@
 #[cfg(target_os = "windows")]
 pub mod windows;
+#[cfg(target_os = "linux")]
+pub mod linux;
 use std::ffi::c_int;
 
 #[cfg(target_os = "windows")]
 pub(crate) use self::windows::*;
+#[cfg(target_os = "linux")]
+pub(crate) use self::linux::*;
 
-pub type KeyId = c_int;
+pub type KeyId = u32;
 
 pub const VK_NULL: KeyId = 0x0;
 
