@@ -16,13 +16,13 @@ pub mod keyboard;
 pub mod menu;
 pub mod widget;
 
-use std::{fmt::Debug, marker::PhantomData, time::Duration};
+use std::{cell::RefCell, fmt::Debug, marker::PhantomData, time::Duration};
 
 use cde::RenderManager;
 use cursor::Cursor;
 use keyboard::{get_key_state, VK_LBUTTON};
 use menu::Menubar;
-use widget::{Button, ColorPair, Component, Data, RenderConfig};
+use widget::{Button, ColorPair, Component, Container, Data, RenderConfig};
 //use cde::{Cde, RenderManager};
 use winit::{event_loop::EventLoop, window::WindowBuilder};
 
@@ -216,20 +216,23 @@ impl Default for Theme {
     }
 }
 
-pub struct Window<D>
+pub struct Window<C, D>
 where
+    C: Container<D>,
     D: Data,
 {
     pub(crate) inner: winit::window::Window,
     event_loop: Option<EventLoop<()>>,
-    comp: Component<D>,
+    container: RefCell<C>,
+    phantom: PhantomData<D>,
 }
 
-impl<D> Window<D>
+impl<C, D> Window<C, D>
 where
+    C: Container<D>,
     D: Data,
 {
-    pub fn new(ui: Component<D>) -> Self {
+    pub fn new(container: C) -> Self {
         let event_loop = EventLoop::new().unwrap();
 
         let inner = WindowBuilder::new()
@@ -241,21 +244,25 @@ where
         Self {
             inner,
             event_loop: Some(event_loop),
-            comp: ui,
+            container: RefCell::new(container),
+            phantom: PhantomData,
         }
     }
 }
 
-pub struct ApplicationBuilder<D>
+pub struct ApplicationBuilder<C, D>
 where
+    C: Container<D>,
     D: Data,
 {
-    window: Option<Window<D>>,
+    window: Option<Window<C, D>>,
     theme: Option<Theme>,
+    phantom: PhantomData<D>,
 }
 
-impl<D> ApplicationBuilder<D>
+impl<C, D> ApplicationBuilder<C, D>
 where
+    C: Container<D>,
     D: Data,
 {
     pub fn new() -> Self {
@@ -263,7 +270,7 @@ where
     }
 
     #[must_use]
-    pub fn with(mut self, window: crate::Window<D>) -> Self {
+    pub fn with(mut self, window: crate::Window<C, D>) -> Self {
         self.window = Some(window);
         self
     }
@@ -273,7 +280,7 @@ where
         self
     }
 
-    pub fn build(self) -> Application<D> {
+    pub fn build(self, data: D) -> Application<C, D> {
         let window = match self.window {
             Some(w) => w,
             None => panic!("There is no window to tie the application to."),
@@ -293,18 +300,21 @@ where
             window,
             theme,
             render_manager,
+            data,
         }
     }
 }
 
-impl<D> Default for ApplicationBuilder<D>
+impl<C, D> Default for ApplicationBuilder<C, D>
 where
+    C: Container<D>,
     D: Data,
 {
     fn default() -> Self {
         Self {
             window: None,
             theme: None,
+            phantom: PhantomData,
         }
     }
 }
@@ -313,17 +323,20 @@ pub enum WindowEvent {
     Resized,
 }
 
-pub struct Application<D>
+pub struct Application<C, D>
 where
+    C: Container<D>,
     D: Data,
 {
-    window: Window<D>,
+    window: Window<C, D>,
     theme: Theme,
     render_manager: RenderManager,
+    data: D,
 }
 
-impl<D> Application<D>
+impl<C, D> Application<C, D>
 where
+    C: Container<D>,
     D: Data,
 {
     pub fn run<F>(mut self, mut callback: F)
@@ -337,9 +350,10 @@ where
         let mut is_enter_cursor = false;
         let mut request_redraw = true;
 
-        let mut component = self.window.comp;
+        let mut container = self.window.container.borrow_mut();
+        let mut component = container.childrens();
 
-        let len = component.inner.len();
+        let len = component.len();
         if len == 0 {
             warn!("There are no widgets scheduled to be drawn");
         } else {
@@ -348,19 +362,16 @@ where
 
         self.window.inner.set_theme(Some(self.theme.window));
 
-        for comp in &mut component.inner {
+        for comp in &mut *component {
             comp.theme(self.theme);
         }
 
-        info!(
-            "Theme applied to the widget : {} widgets",
-            component.inner.len()
-        );
+        info!("Theme applied to the widget : {} widgets", len);
         debug!("Theme {:#?}", self.theme);
 
         // Obtain variable references to data tied to the component
         // This is passed to the widget when a message is generated
-        let mut data = &mut component.static_data;
+        let mut data = &mut self.data;
 
         info!("The application will run now");
 
@@ -368,7 +379,7 @@ where
             .run(move |event, elwt| {
                 // Check if the cursor is over the widget
                 if is_enter_cursor {
-                    for comp in &mut component.inner {
+                    for comp in &mut *component {
                         if comp.is_capture_event() {
                             let cursor = Cursor::get(&self.window.inner);
                             let x = cursor.x();
@@ -415,7 +426,7 @@ where
                         winit::event::WindowEvent::RedrawRequested => {
                             if request_redraw {
                                 self.render_manager.begin();
-                                for i in &component.inner {
+                                for i in &mut *component {
                                     self.render_manager.register(&i.view());
                                 }
                                 self.render_manager.write();

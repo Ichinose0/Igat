@@ -2,14 +2,22 @@ mod button;
 mod checkbox;
 mod label;
 mod panel;
+mod stackpanel;
 
 pub use button::*;
 pub use checkbox::*;
 pub use label::*;
 pub use panel::*;
+pub use stackpanel::*;
 use winit::window::CursorIcon;
 
 use crate::{cursor::Cursor, Color, Rect, Theme};
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum Align {
+    Vertical,
+    Horizontal,
+}
 
 #[derive(Debug)]
 pub struct Property {
@@ -49,6 +57,7 @@ pub enum WidgetMessage {
     Unfocus,
 }
 
+#[deprecated(since = "0.0.5", note = "Use a Container implementation such as Panel instead of Component")]
 pub struct Component<D>
 where
     D: Data,

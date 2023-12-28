@@ -3,6 +3,7 @@ use igat::{
     ApplicationBuilder, Theme, Window,
 };
 
+#[derive(Clone, Copy, Debug)]
 pub struct Gallery {
     check: bool,
 }
@@ -17,13 +18,13 @@ fn main() {
     let app = ApplicationBuilder::new()
         .with(window)
         //.theme(Theme::LIGHT_HIGH_CONTRAST)
-        .build();
+        .build(counter);
     app.run(|event| match event {
         _ => {}
     });
 }
 
-fn ui(gallery: Gallery) -> Component<Gallery> {
+fn ui(gallery: Gallery) -> Panel<Gallery> {
     let check =
         Checkbox::new()
             .width(40)
@@ -44,5 +45,5 @@ fn ui(gallery: Gallery) -> Component<Gallery> {
                 }
             });
     let panel = Panel::new(gallery).child(check).child(text);
-    panel.into_component()
+    panel
 }
