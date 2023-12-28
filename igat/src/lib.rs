@@ -83,7 +83,9 @@ impl Color {
         match self {
             Color::Black => Color::White,
             Color::White => Color::Black,
-            Color::ARGB(a, r, g, b) => Color::ARGB(*a,u8::MAX-(*r),u8::MAX-(*g),u8::MAX-(*b)),
+            Color::ARGB(a, r, g, b) => {
+                Color::ARGB(*a, u8::MAX - (*r), u8::MAX - (*g), u8::MAX - (*b))
+            }
         }
     }
 }
@@ -165,17 +167,17 @@ impl Theme {
         hover: ColorPair {
             color: Color::Black,
             bgr: Color::White,
-            shadow: Color::ARGB(255,0,108,255),
+            shadow: Color::ARGB(255, 0, 108, 255),
         },
         click: ColorPair {
             color: Color::Black,
             bgr: Color::White,
-            shadow: Color::ARGB(255,39,135,255),
+            shadow: Color::ARGB(255, 39, 135, 255),
         },
         normal: ColorPair {
             color: Color::Black,
             bgr: Color::White,
-            shadow: Color::ARGB(255,255,255,255),
+            shadow: Color::ARGB(255, 40, 40, 40),
         },
         window: WindowTheme::Light,
         bgr: Color::White,
@@ -185,17 +187,17 @@ impl Theme {
         hover: ColorPair {
             color: Color::White,
             bgr: Color::Black,
-            shadow: Color::ARGB(255,255,159,59),
+            shadow: Color::ARGB(255, 255, 159, 59),
         },
         click: ColorPair {
             color: Color::White,
             bgr: Color::Black,
-            shadow: Color::ARGB(255,255,135,0),
+            shadow: Color::ARGB(255, 255, 135, 0),
         },
         normal: ColorPair {
             color: Color::White,
             bgr: Color::Black,
-            shadow: Color::ARGB(255,0,255,224),
+            shadow: Color::ARGB(255, 0, 255, 224),
         },
         window: WindowTheme::Dark,
         bgr: Color::Black,
@@ -260,6 +262,7 @@ where
         Self::default()
     }
 
+    #[must_use]
     pub fn with(mut self, window: crate::Window<D>) -> Self {
         self.window = Some(window);
         self
@@ -271,10 +274,19 @@ where
     }
 
     pub fn build(self) -> Application<D> {
-        let window = self.window.unwrap();
+        let window = match self.window {
+            Some(w) => w,
+            None => panic!("There is no window to tie the application to."),
+        };
         let theme = match self.theme {
             Some(t) => t,
-            None => Theme::default(),
+            None => {
+                let theme = Theme::default();
+                warn!("No theme is specified.");
+                info!("Apply the default theme as the application theme");
+                debug!("{:#?}", theme);
+                theme
+            }
         };
         let render_manager = RenderManager::new(&window, theme);
         Application {
@@ -323,15 +335,35 @@ where
         self.render_manager.set_background_color();
 
         let mut is_enter_cursor = false;
+        let mut request_redraw = true;
 
         let mut component = self.window.comp;
+
+        let len = component.inner.len();
+        if len == 0 {
+            warn!("There are no widgets scheduled to be drawn");
+        } else {
+            info!("Scheduled drawing widget : {}", len)
+        }
+
         self.window.inner.set_theme(Some(self.theme.window));
 
         for comp in &mut component.inner {
             comp.theme(self.theme);
         }
 
+        info!(
+            "Theme applied to the widget : {} widgets",
+            component.inner.len()
+        );
+        debug!("Theme {:#?}", self.theme);
+
+        // Obtain variable references to data tied to the component
+        // This is passed to the widget when a message is generated
         let mut data = &mut component.static_data;
+
+        info!("The application will run now");
+
         event_loop
             .run(move |event, elwt| {
                 // Check if the cursor is over the widget
@@ -341,6 +373,7 @@ where
                             let cursor = Cursor::get(&self.window.inner);
                             let x = cursor.x();
                             let y = cursor.y();
+
                             if x > 0 && y > 0 {
                                 let area = comp.area();
                                 for area in area {
@@ -352,8 +385,10 @@ where
                                         if y >= cy && y <= cy + height {
                                             comp.message(widget::WidgetMessage::OnHover, data);
                                             self.window.inner.set_cursor_icon(comp.cursor());
+                                            request_redraw = true;
                                             if get_key_state(VK_LBUTTON) {
                                                 comp.message(widget::WidgetMessage::OnClick, data);
+                                                request_redraw = true;
                                                 std::thread::sleep(Duration::from_millis(200));
                                             }
                                         } else {
@@ -378,13 +413,16 @@ where
                         event,
                     } => match event {
                         winit::event::WindowEvent::RedrawRequested => {
-                            self.render_manager.begin();
-                            for i in &component.inner {
-                                self.render_manager.register(&i.view());
-                            }
-                            self.render_manager.write();
+                            if request_redraw {
+                                self.render_manager.begin();
+                                for i in &component.inner {
+                                    self.render_manager.register(&i.view());
+                                }
+                                self.render_manager.write();
 
-                            self.window.inner.set_cursor_icon(CursorIcon::Default);
+                                self.window.inner.set_cursor_icon(CursorIcon::Default);
+                                request_redraw = false;
+                            }
 
                             self.window.inner.pre_present_notify();
                         }

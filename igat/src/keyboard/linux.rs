@@ -1,5 +1,8 @@
-use x11::{keysym::*, xlib::{XOpenDisplay, XQueryKeymap}};
 use std::ptr::null;
+use x11::{
+    keysym::*,
+    xlib::{XOpenDisplay, XQueryKeymap},
+};
 
 use super::KeyId;
 
@@ -37,11 +40,11 @@ pub const _VK_TAB: KeyId = XK_Tab;
 pub const _VK_SHIFT: KeyId = XK_Shift_L;
 
 fn convert_lower_case(id: KeyId) -> KeyId {
-    id+32
+    id + 32
 }
 
 fn conver_upper_case(id: KeyId) -> KeyId {
-    id-32
+    id - 32
 }
 
 pub fn _get_key_state(id: KeyId) -> bool {
@@ -61,7 +64,7 @@ pub fn _get_keyboard_state() -> Vec<u8> {
     if display.is_null() {
         panic!("Can't open display.");
     }
-    let mut state:Vec<u8> = vec![0; 256];
+    let mut state: Vec<u8> = vec![0; 256];
     unsafe {
         XQueryKeymap(display, state.as_mut_ptr() as *mut i8);
     }

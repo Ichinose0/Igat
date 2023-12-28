@@ -10,11 +10,13 @@ pub struct Gallery {
 impl Data for Gallery {}
 
 fn main() {
+    std::env::set_var("RUST_LOG", "info");
+    env_logger::init();
     let counter = Gallery { check: false };
     let window = Window::new(ui(counter));
     let app = ApplicationBuilder::new()
         .with(window)
-        .theme(Theme::LIGHT_HIGH_CONTRAST)
+        //.theme(Theme::LIGHT_HIGH_CONTRAST)
         .build();
     app.run(|event| match event {
         _ => {}

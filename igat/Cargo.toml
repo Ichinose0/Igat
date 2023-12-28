@@ -20,3 +20,6 @@ features = [
 
 [target."cfg(unix)".dependencies]
 x11 = { version = "2.21.0", features = ["xlib"] }
+
+[dev-dependencies]
+env_logger = "0.10.1"

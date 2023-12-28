@@ -25,10 +25,7 @@ impl Cde {
             raw_window_handle::RawWindowHandle::Xlib(handle) => {
                 let acure = Acure::new();
                 let surface = acure::x11::X11Surface::new(handle.window);
-                Self {
-                    acure,
-                    surface
-                }
+                Self { acure, surface }
             }
             _ => panic!("Error"),
         }

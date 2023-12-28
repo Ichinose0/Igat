@@ -2,12 +2,14 @@ use igat::{
     widget::{Checkbox, Component, Data, Panel},
     ApplicationBuilder, Theme, Window,
 };
+use simple_logger::SimpleLogger;
 
 pub struct MyApp;
 
 impl Data for MyApp {}
 
 fn main() {
+    SimpleLogger::new().init().unwrap();
     let counter = MyApp;
     let window = Window::new(ui(counter));
     let app = ApplicationBuilder::new()

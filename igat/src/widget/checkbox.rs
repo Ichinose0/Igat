@@ -123,7 +123,11 @@ where
         self.property.clicked_color = theme.click;
         self.property.hovered_color = theme.hover;
         self.property.color = theme.normal;
-        self.check_color = ColorPair::new(self.property.clicked_color.color.inversion(),self.property.hovered_color.shadow,self.property.hovered_color.shadow);
+        self.check_color = ColorPair::new(
+            self.property.clicked_color.color.inversion(),
+            self.property.hovered_color.shadow,
+            self.property.hovered_color.shadow,
+        );
     }
 }
 
@@ -178,13 +182,11 @@ where
                 if !self.property.is_check {
                     self.current_color = self.property.hovered_color;
                 }
-                
             }
             WidgetMessage::Unfocus => {
                 if !self.property.is_check {
                     self.current_color = self.property.color;
                 }
-                
             }
         }
         let mut e = self.on_message.borrow_mut();

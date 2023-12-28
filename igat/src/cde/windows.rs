@@ -19,7 +19,6 @@ impl Cde {
     where
         D: Data,
     {
-        let size = handle.inner.inner_size();
         let handle = handle.inner.window_handle().unwrap();
         match handle.as_raw() {
             raw_window_handle::RawWindowHandle::Win32(handle) => {

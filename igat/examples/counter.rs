@@ -2,6 +2,7 @@ use igat::{
     widget::{Button, Component, Data, Label, Panel, WidgetMessage},
     ApplicationBuilder, Theme, Window, WindowEvent,
 };
+use simple_logger::SimpleLogger;
 
 pub struct Counter {
     pub count: i32,
@@ -16,6 +17,7 @@ impl Counter {
 impl Data for Counter {}
 
 fn main() {
+    SimpleLogger::new().init().unwrap();
     let counter = Counter::new();
     let window = Window::new(ui(counter));
     let app = ApplicationBuilder::new()
