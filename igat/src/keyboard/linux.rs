@@ -1,5 +1,5 @@
 use x11::{keysym::*, xlib::{XOpenDisplay, XQueryKeymap}};
-
+use std::ptr::null;
 
 use super::KeyId;
 
@@ -53,6 +53,7 @@ pub fn _get_key_state(id: KeyId) -> bool {
     unsafe {
         XQueryKeymap(display, state.as_mut_ptr());
     }
+    state[id as usize] != 0
 }
 
 pub fn _get_keyboard_state() -> Vec<u8> {
@@ -60,9 +61,9 @@ pub fn _get_keyboard_state() -> Vec<u8> {
     if display.is_null() {
         panic!("Can't open display.");
     }
-    let mut state = vec![0; 256];
+    let mut state:Vec<u8> = vec![0; 256];
     unsafe {
-        XQueryKeymap(display, state.as_mut_ptr());
+        XQueryKeymap(display, state.as_mut_ptr() as *mut i8);
     }
     state
 }
