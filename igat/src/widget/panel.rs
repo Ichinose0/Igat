@@ -2,7 +2,7 @@ use acure::Command;
 
 use crate::{Color, Rect};
 
-use super::{Component, Data, Widget, WidgetMessage};
+use super::{Component, Container, Data, Layout, Widget, WidgetMessage};
 
 pub struct Panel<D>
 where
@@ -36,5 +36,49 @@ where
             inner: self.inner,
             static_data: self.data,
         }
+    }
+}
+
+impl<D> Layout for Panel<D>
+where
+    D: Data,
+{
+    fn area(&self) -> Vec<Rect> {
+        todo!()
+    }
+
+    fn theme(&mut self, theme: crate::Theme) {
+        todo!()
+    }
+
+    fn is_capture_event(&self) -> bool {
+        todo!()
+    }
+
+    fn x(&mut self, x: u32) {
+        //self.property.x = x;
+    }
+
+    fn y(&mut self, y: u32) {
+        //self.property.y = y;
+    }
+
+    fn width(&mut self, width: u32) {
+        //self.property.width = width;
+    }
+
+    fn height(&mut self, height: u32) {
+        //self.property.height = height;
+    }
+}
+
+impl<D> Container<D> for Panel<D>
+where
+    D: Data,
+{
+    fn format(&mut self) {}
+
+    fn childrens(&mut self) -> &mut [Box<dyn Widget<D>>] {
+        &mut self.inner
     }
 }

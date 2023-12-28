@@ -57,6 +57,14 @@ where
     pub(crate) static_data: D,
 }
 
+pub trait Container<D>: Layout
+where
+    D: Data,
+{
+    fn format(&mut self);
+    fn childrens(&mut self) -> &mut [Box<dyn Widget<D>>];
+}
+
 pub trait Layout {
     fn area(&self) -> Vec<Rect>;
 
@@ -67,6 +75,11 @@ pub trait Layout {
     }
 
     fn is_capture_event(&self) -> bool;
+
+    fn x(&mut self, x: u32);
+    fn y(&mut self, y: u32);
+    fn width(&mut self, width: u32);
+    fn height(&mut self, height: u32);
 }
 
 pub trait Widget<D>: Layout

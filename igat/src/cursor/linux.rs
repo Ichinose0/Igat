@@ -1,7 +1,7 @@
 use std::ptr::null;
 
 use raw_window_handle::HasWindowHandle;
-use x11::xlib::{XDefaultRootWindow, XOpenDisplay, XQueryPointer};
+use x11::xlib::{XCloseDisplay, XDefaultRootWindow, XOpenDisplay, XQueryPointer};
 
 pub struct Cursor {
     root_x: i32,
@@ -31,6 +31,7 @@ impl Cursor {
                     &mut win_y,
                     &mut mask,
                 );
+                XCloseDisplay(display);
                 Self {
                     root_x,
                     root_y,

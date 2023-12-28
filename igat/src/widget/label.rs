@@ -47,21 +47,25 @@ where
         }
     }
 
+    #[deprecated(since = "0.0.5", note = "Use the Layout::width method instead")]
     pub fn width(mut self, width: u32) -> Self {
         self.property.width = width;
         self
     }
 
+    #[deprecated(since = "0.0.5", note = "Use the Layout::height method instead")]
     pub fn height(mut self, height: u32) -> Self {
         self.property.height = height;
         self
     }
 
+    #[deprecated(since = "0.0.5", note = "Use the Layout::x method instead")]
     pub fn x(mut self, x: u32) -> Self {
         self.property.x = x;
         self
     }
 
+    #[deprecated(since = "0.0.5", note = "Use the Layout::y method instead")]
     pub fn y(mut self, y: u32) -> Self {
         self.property.y = y;
         self
@@ -98,6 +102,22 @@ where
 
     fn is_capture_event(&self) -> bool {
         true
+    }
+
+    fn x(&mut self, x: u32) {
+        self.property.x = x;
+    }
+
+    fn y(&mut self, y: u32) {
+        self.property.y = y;
+    }
+
+    fn width(&mut self, width: u32) {
+        self.property.width = width;
+    }
+
+    fn height(&mut self, height: u32) {
+        self.property.height = height;
     }
 }
 
