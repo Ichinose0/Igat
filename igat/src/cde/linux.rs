@@ -5,7 +5,7 @@ use raw_window_handle::HasWindowHandle;
 
 use crate::{
     menu::Menubar,
-    widget::{Data, Widget},
+    widget::{Container, Data, Widget},
     Window,
 };
 
@@ -15,8 +15,9 @@ pub struct Cde {
 }
 
 impl Cde {
-    pub fn new<D>(handle: &Window<D>) -> Self
+    pub fn new<C,D>(handle: &Window<C,D>) -> Self
     where
+        C: Container<D>,
         D: Data,
     {
         let size = handle.inner.inner_size();
@@ -49,8 +50,9 @@ impl Cde {
         }
     }
 
-    pub fn draw_menu<D>(&mut self, window: &Window<D>, menu: &Menubar)
+    pub fn draw_menu<C,D>(&mut self, window: &Window<C,D>, menu: &Menubar)
     where
+        C: Container<D>,
         D: Data,
     {
         for i in menu.view(&window.inner) {

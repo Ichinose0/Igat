@@ -62,7 +62,7 @@ pub fn _get_key_state(id: KeyId) -> bool {
                 AnyModifier,
                 root,
                 False,
-                ButtonPressMask,
+                ButtonPressMask as i32,
                 GrabModeAsync,
                 GrabModeAsync,
                 0,
