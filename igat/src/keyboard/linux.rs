@@ -1,7 +1,10 @@
 use std::ptr::null;
 use x11::{
     keysym::*,
-    xlib::{XOpenDisplay, XQueryKeymap},
+    xlib::{
+        AnyModifier, Button1, ButtonPressMask, False, XCloseDisplay, XDefaultRootWindow,
+        XGrabButton, XNextEvent, XOpenDisplay, XQueryKeymap,
+    },
 };
 
 use super::KeyId;
@@ -48,15 +51,38 @@ fn conver_upper_case(id: KeyId) -> KeyId {
 }
 
 pub fn _get_key_state(id: KeyId) -> bool {
-    let display = unsafe { XOpenDisplay(null()) };
-    if display.is_null() {
-        panic!("Can't open display.");
+    if id == _VK_LBUTTON {
+        unsafe {
+            let display = XOpenDisplay(null());
+            let root = XDefaultRootWindow(display);
+            let mut ev = std::mem::MaybeUninit::uninit().assume_init();
+            XGrabButton(
+                display,
+                Button1,
+                AnyModifier,
+                root,
+                False,
+                ButtonPressMask,
+                GrabModeAsync,
+                GrabModeAsync,
+                0,
+                0,
+            );
+            XNextEvent(display, &mut ev);
+            XCloseDisplay(display);
+            return ev.button.button == Button1;
+        }
+    } else {
+        let display = unsafe { XOpenDisplay(null()) };
+        if display.is_null() {
+            panic!("Can't open display.");
+        }
+        let mut state = vec![0; 256];
+        unsafe {
+            XQueryKeymap(display, state.as_mut_ptr());
+        }
+        state[id as usize] != 0
     }
-    let mut state = vec![0; 256];
-    unsafe {
-        XQueryKeymap(display, state.as_mut_ptr());
-    }
-    state[id as usize] != 0
 }
 
 pub fn _get_keyboard_state() -> Vec<u8> {

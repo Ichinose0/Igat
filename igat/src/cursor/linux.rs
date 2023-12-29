@@ -44,10 +44,10 @@ impl Cursor {
     }
 
     pub fn x(&self) -> i32 {
-        self.win_x - self.root_x
+        self.root_x
     }
 
     pub fn y(&self) -> i32 {
-        self.win_y - self.root_y
+        self.root_y
     }
 }
