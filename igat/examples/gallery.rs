@@ -15,10 +15,7 @@ fn main() {
     env_logger::init();
     let counter = Gallery { check: false };
     let window = Window::new(ui(counter));
-    let app = ApplicationBuilder::new()
-        .with(window)
-        //.theme(Theme::LIGHT_HIGH_CONTRAST)
-        .build(counter);
+    let app = ApplicationBuilder::new().with(window).build(counter);
     app.run(|event| match event {
         _ => {}
     });

@@ -11,19 +11,35 @@ where
     D: Data,
 {
     inner: Vec<Box<dyn Widget<D>>>,
+    auto_resize: bool,
     orientation: Align,
-    data: RefCell<D>,
+    rect: Rect,
 }
 
 impl<D> StackPanel<D>
 where
     D: Data,
 {
-    pub fn new(data: D, align: Align) -> Self {
+    pub fn new(rect: Option<Rect>, orientation: Align) -> Self {
+        let mut auto_resize = false;
+        let rect = match rect {
+            Some(r) => r,
+            None => {
+                auto_resize = true;
+                Rect {
+                    left: 0,
+                    top: 0,
+                    right: 0,
+                    bottom: 0,
+                }
+            }
+        };
+
         Self {
             inner: vec![],
-            orientation: align,
-            data: RefCell::new(data),
+            rect,
+            auto_resize,
+            orientation,
         }
     }
 
@@ -75,7 +91,36 @@ impl<D> Container<D> for StackPanel<D>
 where
     D: Data,
 {
-    fn format(&mut self) {}
+    fn format(&mut self, window_rect: Rect) {
+        if self.auto_resize {
+            self.rect = window_rect;
+        }
+
+        match self.orientation {
+            Align::Vertical => {
+                let mut y = 0;
+                let size = self.rect.height() / self.inner.len() as u32;
+                for i in &mut self.inner {
+                    i.width(self.rect.width());
+                    i.height(size);
+                    i.x(0);
+                    i.y(y);
+                    y += size;
+                }
+            }
+            Align::Horizontal => {
+                let mut x = 0;
+                let size = self.rect.width() / self.inner.len() as u32;
+                for i in &mut self.inner {
+                    i.width(size);
+                    i.height(self.rect.height());
+                    i.x(x);
+                    i.y(0);
+                    x += size;
+                }
+            }
+        }
+    }
 
     fn childrens(&mut self) -> &mut [Box<dyn Widget<D>>] {
         &mut self.inner

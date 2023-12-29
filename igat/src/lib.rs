@@ -248,6 +248,16 @@ where
             phantom: PhantomData,
         }
     }
+
+    pub fn rect(&self) -> Rect {
+        let size = self.inner.inner_size();
+        Rect {
+            left: 0,
+            top: 0,
+            right: size.width,
+            bottom: size.height,
+        }
+    }
 }
 
 pub struct ApplicationBuilder<C, D>
@@ -343,6 +353,7 @@ where
     where
         F: FnMut(crate::WindowEvent),
     {
+        let rect = self.window.rect();
         let event_loop = self.window.event_loop.unwrap();
 
         self.render_manager.set_background_color();
@@ -351,9 +362,8 @@ where
         let mut request_redraw = true;
 
         let mut container = self.window.container.borrow_mut();
-        let mut component = container.childrens();
-
-        let len = component.len();
+        container.format(rect);
+        let len = container.childrens().len();
         if len == 0 {
             warn!("There are no widgets scheduled to be drawn");
         } else {
@@ -362,7 +372,7 @@ where
 
         self.window.inner.set_theme(Some(self.theme.window));
 
-        for comp in &mut *component {
+        for comp in container.childrens() {
             comp.theme(self.theme);
         }
 
@@ -379,7 +389,7 @@ where
             .run(move |event, elwt| {
                 // Check if the cursor is over the widget
                 if is_enter_cursor {
-                    for comp in &mut *component {
+                    for comp in container.childrens() {
                         if comp.is_capture_event() {
                             let cursor = Cursor::get(&self.window.inner);
                             let x = cursor.x();
@@ -426,7 +436,7 @@ where
                         winit::event::WindowEvent::RedrawRequested => {
                             if request_redraw {
                                 self.render_manager.begin();
-                                for i in &mut *component {
+                                for i in container.childrens() {
                                     self.render_manager.register(&i.view());
                                 }
                                 self.render_manager.write();
@@ -438,8 +448,14 @@ where
                             self.window.inner.pre_present_notify();
                         }
 
-                        winit::event::WindowEvent::Resized(_) => {
+                        winit::event::WindowEvent::Resized(size) => {
                             self.render_manager.resize(0, 0);
+                            container.format(Rect {
+                                left: 0,
+                                top: 0,
+                                right: size.width,
+                                bottom: size.height,
+                            });
                             callback(WindowEvent::Resized);
                         }
 

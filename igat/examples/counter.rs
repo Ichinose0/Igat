@@ -1,8 +1,7 @@
 use igat::{
-    widget::{Button, Component, Data, Label, Panel, WidgetMessage},
-    ApplicationBuilder, Theme, Window, WindowEvent,
+    widget::{Align, Button, Component, Data, Label, Layout, Panel, StackPanel, WidgetMessage},
+    ApplicationBuilder, Rect, Theme, Window, WindowEvent,
 };
-use simple_logger::SimpleLogger;
 
 pub struct Counter {
     pub count: i32,
@@ -17,53 +16,55 @@ impl Counter {
 impl Data for Counter {}
 
 fn main() {
-    SimpleLogger::new().init().unwrap();
+    std::env::set_var("RUST_LOG", "info");
+    env_logger::init();
     let counter = Counter::new();
-    let window = Window::new(ui(counter));
+    let window = Window::new(ui(&counter));
     let app = ApplicationBuilder::new()
         .with(window)
         .theme(Theme::LIGHT)
-        .build();
+        .build(counter);
     app.run(|event| match event {
         _ => {}
     });
 }
 
-fn ui(counter: Counter) -> Component<Counter> {
-    let countup = Button::new()
-        .width(240)
-        .height(80)
-        .x(10)
-        .y(100)
-        .text("Up".to_owned())
-        .on_message(|msg, prop, counter: &mut Counter| match msg {
-            WidgetMessage::OnClick => counter.count += 1,
+fn ui(counter: &Counter) -> StackPanel<Counter> {
+    let mut countup = Button::new();
+    countup.width(240);
+    countup.height(80);
+    countup.x(10);
+    countup.y(100);
+    countup.text("Up".to_owned());
+    countup.on_message(|msg, prop, counter: &mut Counter| match msg {
+        WidgetMessage::OnClick => counter.count += 1,
 
-            _ => {}
-        });
-    let countdown = Button::new()
-        .width(240)
-        .height(80)
-        .x(280)
-        .y(100)
-        .text("Down".to_owned())
-        .on_message(|msg, prop, counter: &mut Counter| match msg {
-            WidgetMessage::OnClick => counter.count -= 1,
+        _ => {}
+    });
+    let mut countdown = Button::new();
+    countdown.width(240);
+    countdown.height(80);
+    countdown.x(280);
+    countdown.y(100);
+    countdown.text("Down".to_owned());
+    countdown.on_message(|msg, prop, counter: &mut Counter| match msg {
+        WidgetMessage::OnClick => counter.count -= 1,
 
-            _ => {}
-        });
-    let count = Label::new()
-        .width(190)
-        .height(40)
-        .x(180)
-        .y(20)
-        .text(counter.count.to_string())
-        .on_message(|msg, prop, counter: &mut Counter| {
-            prop.text = counter.count.to_string();
-        });
-    let panel = Panel::new(counter)
+        _ => {}
+    });
+    let mut count = Label::new();
+    count.width(190);
+    count.height(40);
+    count.x(180);
+    count.y(20);
+    count.text(counter.count.to_string());
+    count.on_message(|msg, prop, counter: &mut Counter| {
+        prop.text = counter.count.to_string();
+    });
+    let panel = StackPanel::new(None, Align::Vertical)
+        .child(count)
         .child(countup)
-        .child(countdown)
-        .child(count);
-    panel.into_component()
+        .child(countdown);
+
+    panel
 }

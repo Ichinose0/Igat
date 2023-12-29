@@ -47,38 +47,12 @@ where
         }
     }
 
-    #[deprecated(since = "0.0.5", note = "Use the Layout::width method instead")]
-    pub fn width(mut self, width: u32) -> Self {
-        self.property.width = width;
-        self
-    }
-
-    #[deprecated(since = "0.0.5", note = "Use the Layout::height method instead")]
-    pub fn height(mut self, height: u32) -> Self {
-        self.property.height = height;
-        self
-    }
-
-    #[deprecated(since = "0.0.5", note = "Use the Layout::x method instead")]
-    pub fn x(mut self, x: u32) -> Self {
-        self.property.x = x;
-        self
-    }
-
-    #[deprecated(since = "0.0.5", note = "Use the Layout::y method instead")]
-    pub fn y(mut self, y: u32) -> Self {
-        self.property.y = y;
-        self
-    }
-
-    pub fn text(mut self, text: String) -> Self {
+    pub fn text(&mut self, text: String) {
         self.property.text = text;
-        self
     }
 
-    pub fn on_message(mut self, on_message: E) -> Self {
+    pub fn on_message(&mut self, on_message: E) {
         self.on_message = RefCell::new(Some(on_message));
-        self
     }
 }
 

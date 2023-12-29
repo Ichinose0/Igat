@@ -57,7 +57,10 @@ pub enum WidgetMessage {
     Unfocus,
 }
 
-#[deprecated(since = "0.0.5", note = "Use a Container implementation such as Panel instead of Component")]
+#[deprecated(
+    since = "0.0.5",
+    note = "Use a Container implementation such as Panel instead of Component"
+)]
 pub struct Component<D>
 where
     D: Data,
@@ -70,7 +73,7 @@ pub trait Container<D>: Layout
 where
     D: Data,
 {
-    fn format(&mut self);
+    fn format(&mut self, window_rect: Rect);
     fn childrens(&mut self) -> &mut [Box<dyn Widget<D>>];
 }
 

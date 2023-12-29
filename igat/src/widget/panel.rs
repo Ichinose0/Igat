@@ -9,17 +9,33 @@ where
     D: Data,
 {
     inner: Vec<Box<dyn Widget<D>>>,
-    data: D,
+    auto_resize: bool,
+    rect: Rect,
 }
 
 impl<D> Panel<D>
 where
     D: Data,
 {
-    pub fn new(data: D) -> Self {
+    pub fn new(rect: Option<Rect>) -> Self {
+        let mut auto_resize = false;
+        let rect = match rect {
+            Some(r) => r,
+            None => {
+                auto_resize = true;
+                Rect {
+                    left: 0,
+                    top: 0,
+                    right: 0,
+                    bottom: 0,
+                }
+            }
+        };
+
         Self {
             inner: vec![],
-            data,
+            rect,
+            auto_resize,
         }
     }
 
@@ -30,13 +46,6 @@ where
         self.inner.push(Box::new(widget));
         self
     }
-
-    pub fn into_component(self) -> Component<D> {
-        Component {
-            inner: self.inner,
-            static_data: self.data,
-        }
-    }
 }
 
 impl<D> Layout for Panel<D>
@@ -44,15 +53,13 @@ where
     D: Data,
 {
     fn area(&self) -> Vec<Rect> {
-        todo!()
+        vec![]
     }
 
-    fn theme(&mut self, theme: crate::Theme) {
-        todo!()
-    }
+    fn theme(&mut self, theme: crate::Theme) {}
 
     fn is_capture_event(&self) -> bool {
-        todo!()
+        true
     }
 
     fn x(&mut self, x: u32) {
@@ -76,7 +83,7 @@ impl<D> Container<D> for Panel<D>
 where
     D: Data,
 {
-    fn format(&mut self) {}
+    fn format(&mut self, window_rect: Rect) {}
 
     fn childrens(&mut self) -> &mut [Box<dyn Widget<D>>] {
         &mut self.inner
