@@ -2,12 +2,16 @@ use raw_window_handle::HasWindowHandle;
 use winapi::shared::windef::{HWND, POINT};
 use winapi::um::winuser::{GetCursorPos, ScreenToClient};
 
+use crate::Window;
+use crate::widget::{Container, Data};
+
 pub struct Cursor {
     point: POINT,
 }
 
 impl Cursor {
-    pub fn get(window: &impl HasWindowHandle) -> Self {
+    pub fn get(window: &impl HasWindowHandle) -> Self 
+    {
         match window.window_handle().unwrap().as_raw() {
             raw_window_handle::RawWindowHandle::Win32(handle) => {
                 let mut point = POINT { x: 0, y: 0 };
