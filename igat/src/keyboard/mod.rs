@@ -2,7 +2,6 @@
 pub mod linux;
 #[cfg(target_os = "windows")]
 pub mod windows;
-use std::ffi::c_int;
 
 #[cfg(target_os = "linux")]
 pub(crate) use self::linux::*;

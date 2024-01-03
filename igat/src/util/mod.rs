@@ -6,8 +6,3 @@ use crate::Rect;
 
 #[cfg(target_os = "windows")]
 pub use self::windows::*;
-
-
-// pub fn get_suitable_rect(handle: &impl HasWindowHandle) -> Rect {
-    
-// }

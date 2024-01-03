@@ -1,10 +1,6 @@
-use std::cell::RefCell;
+use crate::Rect;
 
-use acure::Command;
-
-use crate::{Color, Rect};
-
-use super::{Align, Component, Container, Data, Layout, Widget, WidgetMessage};
+use super::{Align, Container, Data, Layout, Widget};
 
 pub struct StackPanel<D>
 where
@@ -60,7 +56,7 @@ where
         vec![]
     }
 
-    fn theme(&mut self, theme: crate::Theme) {}
+    fn theme(&mut self, _theme: crate::Theme) {}
 
     fn is_capture_event(&self) -> bool {
         true

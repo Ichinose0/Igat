@@ -21,9 +21,7 @@ use std::{cell::RefCell, fmt::Debug, marker::PhantomData, time::Duration};
 use cde::RenderManager;
 use cursor::Cursor;
 use keyboard::{get_key_state, VK_LBUTTON};
-use menu::Menubar;
-use widget::{Button, ColorPair, Component, Container, Data, RenderConfig};
-//use cde::{Cde, RenderManager};
+use widget::{ColorPair, Container, Data};
 use winit::{event_loop::EventLoop, window::WindowBuilder};
 
 pub type CursorIcon = winit::window::CursorIcon;
@@ -104,14 +102,6 @@ pub enum ApplicationEvent {
     RedrawRequested,
     WidgetEvent,
     KeyboardInput(char),
-}
-
-pub enum ApplicationResponse {
-    ReloadUi,
-}
-
-pub struct Executable {
-    event_loop: EventLoop<()>,
 }
 
 #[derive(Clone, Copy, Debug)]
@@ -398,7 +388,7 @@ where
 
         // Obtain variable references to data tied to the component
         // This is passed to the widget when a message is generated
-        let mut data = &mut self.data;
+        let data = &mut self.data;
 
         info!("The application will run now");
 
@@ -494,13 +484,13 @@ where
                             callback(WindowEvent::Resized);
                         }
 
-                        winit::event::WindowEvent::CursorLeft { device_id } => {
+                        winit::event::WindowEvent::CursorLeft { device_id: _ } => {
                             if is_enter_cursor == true {
                                 is_enter_cursor = false;
                             }
                         }
 
-                        winit::event::WindowEvent::CursorEntered { device_id } => {
+                        winit::event::WindowEvent::CursorEntered { device_id: _ } => {
                             if is_enter_cursor == false {
                                 is_enter_cursor = true;
                             }
@@ -512,10 +502,6 @@ where
 
                         _ => {}
                     },
-
-                    // winit::event::Event::AboutToWait => {
-                    //     self.window.inner.request_redraw();
-                    // }
 
                     _ => {}
                 }

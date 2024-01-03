@@ -1,11 +1,9 @@
-use std::marker::PhantomData;
-
 use acure::{Acure, Command};
 use raw_window_handle::HasWindowHandle;
 
 use crate::{
     menu::Menubar,
-    widget::{Container, Data, Widget},
+    widget::{Container, Data},
     Window,
 };
 
@@ -26,7 +24,9 @@ impl Cde {
                 let acure = Acure::new();
                 Self {
                     acure,
-                    surface: unsafe { acure::d2d1::D2D1Surface::new(isize::from(handle.hwnd)).unwrap() },
+                    surface: unsafe {
+                        acure::d2d1::D2D1Surface::new(isize::from(handle.hwnd)).unwrap()
+                    },
                 }
             }
             _ => panic!("Error"),
@@ -68,7 +68,7 @@ impl Cde {
     }
 
     pub fn write(&mut self) {
-        self.acure.write(&mut self.surface);
+        self.acure.write(&mut self.surface).unwrap();
         self.acure.clear();
     }
 }

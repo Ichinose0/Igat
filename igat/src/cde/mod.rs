@@ -3,12 +3,10 @@ pub mod linux;
 #[cfg(target_os = "windows")]
 pub mod windows;
 use acure::Command;
-use raw_window_handle::HasWindowHandle;
 
 use crate::{
-    menu::Menubar,
     widget::{Container, Data},
-    Color, Theme, Window,
+    Theme, Window,
 };
 
 #[cfg(target_os = "linux")]

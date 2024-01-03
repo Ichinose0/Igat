@@ -1,6 +1,6 @@
 use igat::{
-    widget::{Align, Button, Component, Data, Label, Layout, Panel, StackPanel, WidgetMessage},
-    ApplicationBuilder, Rect, Theme, Window, WindowEvent,
+    widget::{Align, Button, Data, Label, Layout, StackPanel, WidgetMessage},
+    ApplicationBuilder, Theme, Window,
 };
 
 pub struct Counter {
@@ -36,7 +36,7 @@ fn ui(counter: &Counter) -> StackPanel<Counter> {
     countup.x(10);
     countup.y(100);
     countup.text("Up".to_owned());
-    countup.on_message(|msg, prop, counter: &mut Counter| match msg {
+    countup.on_message(|msg, _, counter: &mut Counter| match msg {
         WidgetMessage::OnClick => counter.count += 1,
 
         _ => {}
@@ -47,7 +47,7 @@ fn ui(counter: &Counter) -> StackPanel<Counter> {
     countdown.x(280);
     countdown.y(100);
     countdown.text("Down".to_owned());
-    countdown.on_message(|msg, prop, counter: &mut Counter| match msg {
+    countdown.on_message(|msg, _, counter: &mut Counter| match msg {
         WidgetMessage::OnClick => counter.count -= 1,
 
         _ => {}
@@ -58,7 +58,7 @@ fn ui(counter: &Counter) -> StackPanel<Counter> {
     count.x(180);
     count.y(20);
     count.text(counter.count.to_string());
-    count.on_message(|msg, prop, counter: &mut Counter| {
+    count.on_message(|_, prop, counter: &mut Counter| {
         prop.text = counter.count.to_string();
     });
     let panel = StackPanel::new(None, Align::Vertical)

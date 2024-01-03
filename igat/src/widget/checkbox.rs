@@ -1,10 +1,10 @@
-use std::{cell::RefCell, marker::PhantomData, time::Duration};
+use std::{cell::RefCell, marker::PhantomData};
 
 use acure::Command;
 
-use crate::{cursor::Cursor, Color, CursorIcon, Rect};
+use crate::{Color, Rect};
 
-use super::{ColorPair, Data, Layout, Property, Widget, WidgetMessage};
+use super::{ColorPair, Data, Layout, Widget, WidgetMessage};
 
 const HOVERED_COLOR: ColorPair = ColorPair {
     color: Color::Black,

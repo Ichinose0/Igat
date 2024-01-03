@@ -2,9 +2,6 @@ use raw_window_handle::HasWindowHandle;
 use winapi::shared::windef::{HWND, POINT};
 use winapi::um::winuser::{GetCursorPos, ScreenToClient};
 
-use crate::widget::{Container, Data};
-use crate::Window;
-
 pub struct Cursor {
     point: POINT,
 }

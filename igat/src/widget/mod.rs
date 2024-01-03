@@ -11,7 +11,7 @@ pub use panel::*;
 pub use stackpanel::*;
 use winit::window::CursorIcon;
 
-use crate::{cursor::Cursor, Color, Rect, Theme};
+use crate::{Color, Rect, Theme};
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum Align {
@@ -55,18 +55,6 @@ pub enum WidgetMessage {
     OnClick,
     OnHover,
     Unfocus,
-}
-
-#[deprecated(
-    since = "0.0.5",
-    note = "Use a Container implementation such as Panel instead of Component"
-)]
-pub struct Component<D>
-where
-    D: Data,
-{
-    pub(crate) inner: Vec<Box<dyn Widget<D>>>,
-    pub(crate) static_data: D,
 }
 
 pub trait Container<D>: Layout

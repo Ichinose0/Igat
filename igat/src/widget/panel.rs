@@ -1,8 +1,6 @@
-use acure::Command;
+use crate::Rect;
 
-use crate::{Color, Rect};
-
-use super::{Component, Container, Data, Layout, Widget, WidgetMessage};
+use super::{Container, Data, Layout, Widget};
 
 pub struct Panel<D>
 where
