@@ -26,7 +26,7 @@ impl Cde {
                 let acure = Acure::new();
                 Self {
                     acure,
-                    surface: acure::d2d1::D2D1Surface::new(isize::from(handle.hwnd)),
+                    surface: unsafe { acure::d2d1::D2D1Surface::new(isize::from(handle.hwnd)).unwrap() },
                 }
             }
             _ => panic!("Error"),

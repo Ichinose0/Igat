@@ -23,7 +23,6 @@ fn main() {
     let app = ApplicationBuilder::new()
         .with(window)
         .theme(Theme::LIGHT)
-        .use_managed_rendering(false)
         .build(counter);
     app.run(|event| match event {
         _ => {}

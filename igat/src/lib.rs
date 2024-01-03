@@ -402,9 +402,19 @@ where
 
         info!("The application will run now");
 
+        if use_managed_rendering {
+            self.render_manager.as_mut().unwrap().begin();
+            for i in container.childrens() {
+                self.render_manager.as_mut().unwrap().register(&i.view());
+            }
+            self.render_manager.as_mut().unwrap().write();
+
+            self.window.inner.set_cursor_icon(CursorIcon::Default);
+        }
+
         event_loop
             .run(move |event, elwt| {
-                // Check if the cursor is over the widget
+                //Check if the cursor is over the widget
                 if use_managed_rendering {
                     if is_enter_cursor {
                         for comp in container.childrens() {
@@ -450,28 +460,25 @@ where
                     }
                 }
 
+                if request_redraw && use_managed_rendering {
+                    self.render_manager.as_mut().unwrap().begin();
+                    for i in container.childrens() {
+                        self.render_manager.as_mut().unwrap().register(&i.view());
+                    }
+                    self.render_manager.as_mut().unwrap().write();
+
+                    self.window.inner.set_cursor_icon(CursorIcon::Default);
+                    request_redraw = false;
+                }
+
                 match event {
                     winit::event::Event::WindowEvent {
                         window_id: _,
                         event,
                     } => match event {
-                        winit::event::WindowEvent::RedrawRequested => {
-                            if request_redraw && use_managed_rendering {
-                                self.render_manager.as_mut().unwrap().begin();
-                                for i in container.childrens() {
-                                    self.render_manager.as_mut().unwrap().register(&i.view());
-                                }
-                                self.render_manager.as_mut().unwrap().write();
-
-                                self.window.inner.set_cursor_icon(CursorIcon::Default);
-                                request_redraw = false;
-                            }
-
-                            self.window.inner.pre_present_notify();
-                        }
-
                         winit::event::WindowEvent::Resized(size) => {
                             if use_managed_rendering {
+                                request_redraw = true;
                                 self.render_manager
                                     .as_mut()
                                     .unwrap()
@@ -488,11 +495,15 @@ where
                         }
 
                         winit::event::WindowEvent::CursorLeft { device_id } => {
-                            is_enter_cursor = false;
+                            if is_enter_cursor == true {
+                                is_enter_cursor = false;
+                            }
                         }
 
                         winit::event::WindowEvent::CursorEntered { device_id } => {
-                            is_enter_cursor = true;
+                            if is_enter_cursor == false {
+                                is_enter_cursor = true;
+                            }
                         }
 
                         winit::event::WindowEvent::CloseRequested => {
@@ -502,9 +513,9 @@ where
                         _ => {}
                     },
 
-                    winit::event::Event::AboutToWait => {
-                        self.window.inner.request_redraw();
-                    }
+                    // winit::event::Event::AboutToWait => {
+                    //     self.window.inner.request_redraw();
+                    // }
 
                     _ => {}
                 }
