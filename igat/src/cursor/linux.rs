@@ -1,9 +1,15 @@
 use std::ptr::null;
 
 use raw_window_handle::HasWindowHandle;
-use x11::xlib::{XCloseDisplay, XDefaultRootWindow, XOpenDisplay, XQueryPointer, XWindowAttributes, XGetWindowAttributes};
+use x11::xlib::{
+    XCloseDisplay, XDefaultRootWindow, XGetWindowAttributes, XOpenDisplay, XQueryPointer,
+    XWindowAttributes,
+};
 
-use crate::{Window, widget::{Container, Data}};
+use crate::{
+    widget::{Container, Data},
+    Window,
+};
 
 pub struct Cursor {
     root_x: i32,
@@ -14,9 +20,7 @@ pub struct Cursor {
 }
 
 impl Cursor {
-    pub fn get(window: &impl HasWindowHandle) -> Self 
-    
-    {
+    pub fn get(window: &impl HasWindowHandle) -> Self {
         match window.window_handle().unwrap().as_raw() {
             raw_window_handle::RawWindowHandle::Xlib(mut handle) => unsafe {
                 let display = XOpenDisplay(null());
@@ -51,11 +55,11 @@ impl Cursor {
     }
 
     pub fn x(&self) -> i32 {
-        self.root_x-self.attributes.x
+        self.root_x - self.attributes.x
     }
 
     pub fn y(&self) -> i32 {
-        self.root_y-self.attributes.y
+        self.root_y - self.attributes.y
     }
 }
 

@@ -15,7 +15,7 @@ pub struct Cde {
 }
 
 impl Cde {
-    pub fn new<C,D>(handle: &Window<C,D>) -> Self
+    pub fn new<C, D>(handle: &Window<C, D>) -> Self
     where
         C: Container<D>,
         D: Data,
@@ -50,7 +50,7 @@ impl Cde {
         }
     }
 
-    pub fn draw_menu<C,D>(&mut self, window: &Window<C,D>, menu: &Menubar)
+    pub fn draw_menu<C, D>(&mut self, window: &Window<C, D>, menu: &Menubar)
     where
         C: Container<D>,
         D: Data,

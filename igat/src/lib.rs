@@ -267,6 +267,7 @@ where
 {
     window: Option<Window<C, D>>,
     theme: Option<Theme>,
+    use_managed_rendering: bool,
     phantom: PhantomData<D>,
 }
 
@@ -290,6 +291,11 @@ where
         self
     }
 
+    pub fn use_managed_rendering(mut self, use_managed_rendering: bool) -> Self {
+        self.use_managed_rendering = use_managed_rendering;
+        self
+    }
+
     pub fn build(self, data: D) -> Application<C, D> {
         let window = match self.window {
             Some(w) => w,
@@ -305,7 +311,12 @@ where
                 theme
             }
         };
-        let render_manager = RenderManager::new(&window, theme);
+        let render_manager = if self.use_managed_rendering {
+            Some(RenderManager::new(&window, theme))
+        } else {
+            None
+        };
+
         Application {
             window,
             theme,
@@ -324,6 +335,7 @@ where
         Self {
             window: None,
             theme: None,
+            use_managed_rendering: true,
             phantom: PhantomData,
         }
     }
@@ -340,7 +352,7 @@ where
 {
     window: Window<C, D>,
     theme: Theme,
-    render_manager: RenderManager,
+    render_manager: Option<RenderManager>,
     data: D,
 }
 
@@ -356,7 +368,12 @@ where
         let rect = self.window.rect();
         let event_loop = self.window.event_loop.unwrap();
 
-        self.render_manager.set_background_color();
+        match self.render_manager.as_mut() {
+            Some(r) => r.set_background_color(),
+            None => {}
+        };
+
+        let use_managed_rendering = self.render_manager.is_some();
 
         let mut is_enter_cursor = false;
         let mut request_redraw = true;
@@ -388,41 +405,46 @@ where
         event_loop
             .run(move |event, elwt| {
                 // Check if the cursor is over the widget
-                if is_enter_cursor {
-                    for comp in container.childrens() {
-                        if comp.is_capture_event() {
-                            let cursor = Cursor::get(&self.window.inner);
-                            let x = cursor.x();
-                            let y = cursor.y();
+                if use_managed_rendering {
+                    if is_enter_cursor {
+                        for comp in container.childrens() {
+                            if comp.is_capture_event() {
+                                let cursor = Cursor::get(&self.window.inner);
+                                let x = cursor.x();
+                                let y = cursor.y();
 
-                            if x > 0 && y > 0 {
-                                let area = comp.area();
-                                for area in area {
-                                    let cx = (area.left) as i32;
-                                    let cy = (area.top) as i32;
-                                    let width = (area.right - area.left) as i32;
-                                    let height = (area.bottom - area.top) as i32;
-                                    if x >= cx && x <= cx + width {
-                                        if y >= cy && y <= cy + height {
-                                            comp.message(widget::WidgetMessage::OnHover, data);
-                                            self.window.inner.set_cursor_icon(comp.cursor());
-                                            request_redraw = true;
-                                            if get_key_state(VK_LBUTTON) {
-                                                comp.message(widget::WidgetMessage::OnClick, data);
+                                if x > 0 && y > 0 {
+                                    let area = comp.area();
+                                    for area in area {
+                                        let cx = (area.left) as i32;
+                                        let cy = (area.top) as i32;
+                                        let width = (area.right - area.left) as i32;
+                                        let height = (area.bottom - area.top) as i32;
+                                        if x >= cx && x <= cx + width {
+                                            if y >= cy && y <= cy + height {
+                                                comp.message(widget::WidgetMessage::OnHover, data);
+                                                self.window.inner.set_cursor_icon(comp.cursor());
                                                 request_redraw = true;
-                                                std::thread::sleep(Duration::from_millis(200));
+                                                if get_key_state(VK_LBUTTON) {
+                                                    comp.message(
+                                                        widget::WidgetMessage::OnClick,
+                                                        data,
+                                                    );
+                                                    request_redraw = true;
+                                                    std::thread::sleep(Duration::from_millis(200));
+                                                }
+                                            } else {
+                                                comp.message(widget::WidgetMessage::Unfocus, data);
                                             }
                                         } else {
                                             comp.message(widget::WidgetMessage::Unfocus, data);
                                         }
-                                    } else {
-                                        comp.message(widget::WidgetMessage::Unfocus, data);
                                     }
                                 }
-                            }
-                            // Cursor is out of window range
-                            else {
-                                comp.message(widget::WidgetMessage::Unfocus, data);
+                                // Cursor is out of window range
+                                else {
+                                    comp.message(widget::WidgetMessage::Unfocus, data);
+                                }
                             }
                         }
                     }
@@ -434,12 +456,12 @@ where
                         event,
                     } => match event {
                         winit::event::WindowEvent::RedrawRequested => {
-                            if request_redraw {
-                                self.render_manager.begin();
+                            if request_redraw && use_managed_rendering {
+                                self.render_manager.as_mut().unwrap().begin();
                                 for i in container.childrens() {
-                                    self.render_manager.register(&i.view());
+                                    self.render_manager.as_mut().unwrap().register(&i.view());
                                 }
-                                self.render_manager.write();
+                                self.render_manager.as_mut().unwrap().write();
 
                                 self.window.inner.set_cursor_icon(CursorIcon::Default);
                                 request_redraw = false;
@@ -449,13 +471,19 @@ where
                         }
 
                         winit::event::WindowEvent::Resized(size) => {
-                            self.render_manager.resize(0, 0);
-                            container.format(Rect {
-                                left: 0,
-                                top: 0,
-                                right: size.width,
-                                bottom: size.height,
-                            });
+                            if use_managed_rendering {
+                                self.render_manager
+                                    .as_mut()
+                                    .unwrap()
+                                    .resize(size.width, size.height);
+                                container.format(Rect {
+                                    left: 0,
+                                    top: 0,
+                                    right: size.width,
+                                    bottom: size.height,
+                                });
+                            }
+
                             callback(WindowEvent::Resized);
                         }
 
