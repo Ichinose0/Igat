@@ -72,11 +72,3 @@ impl Cde {
         self.acure.clear();
     }
 }
-
-fn color_to_acure_color(color: crate::Color) -> acure::Color {
-    match color {
-        crate::Color::Black => acure::Color::ARGB(255, 0, 0, 0),
-        crate::Color::White => acure::Color::ARGB(255, 255, 255, 255),
-        crate::Color::ARGB(a, r, g, b) => acure::Color::ARGB(a, r, g, b),
-    }
-}

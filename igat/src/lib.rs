@@ -21,11 +21,15 @@ use std::{cell::RefCell, fmt::Debug, marker::PhantomData, time::Duration};
 use cde::RenderManager;
 use cursor::Cursor;
 use keyboard::{get_key_state, VK_LBUTTON};
-use widget::{ColorPair, Container, Data};
-use winit::{event_loop::EventLoop, window::WindowBuilder};
+use widget::{ColorPair, Container, Data, Panel};
+use winit::{
+    dpi::{LogicalPosition, Position},
+    event_loop::EventLoop, window::Icon,
+};
 
 pub type CursorIcon = winit::window::CursorIcon;
 pub type WindowTheme = winit::window::Theme;
+pub type WindowLevel = winit::window::WindowLevel;
 
 /// Represents an area on the screen
 ///
@@ -62,6 +66,21 @@ impl Rect {
     /// Get height
     pub fn height(&self) -> u32 {
         self.bottom - self.top
+    }
+
+    pub fn from_coordinate(x: u32, y: u32, width: u32, height: u32) -> Self {
+        Self {
+            left: x,
+            top: y,
+            right: x + width,
+            bottom: y + height,
+        }
+    }
+}
+
+impl Default for Rect {
+    fn default() -> Self {
+        Self::from_coordinate(0, 0, 800, 600)
     }
 }
 
@@ -206,6 +225,87 @@ impl Default for Theme {
     }
 }
 
+pub struct WindowBuilder<'a, C, D>
+where
+    C: Container<D>,
+    D: Data,
+{
+    title: &'a str,
+    rect: Rect,
+    level: WindowLevel,
+    icon: Option<Icon>,
+    container: Option<C>,
+    phantom: PhantomData<D>,
+}
+
+impl<'a, C, D> WindowBuilder<'a, C, D>
+where
+    C: Container<D>,
+    D: Data,
+{
+    pub fn new() -> Self {
+        Self {
+            title: "",
+            rect: Rect::default(),
+            level: WindowLevel::Normal,
+            icon: None,
+            container: None,
+            phantom: PhantomData,
+        }
+    }
+
+    pub fn title(mut self,title: &'a str) -> Self {
+        self.title = title;
+        self
+    }
+
+    pub fn ui(mut self, container: C) -> Self {
+        self.container = Some(container);
+        self
+    }
+
+    pub fn rect(mut self, rect: Rect) -> Self {
+        self.rect = rect;
+        self
+    }
+
+    pub fn level(mut self,level: WindowLevel) -> Self {
+        self.level = level;
+        self
+    }
+
+    pub fn build(self) -> Window<C, D> {
+        let event_loop = EventLoop::new().unwrap();
+
+        let inner = winit::window::WindowBuilder::new()
+            .with_title(self.title)
+            .with_inner_size(winit::dpi::LogicalSize::new(
+                self.rect.width(),
+                self.rect.height(),
+            ))
+            .with_window_level(self.level)
+            .with_window_icon(self.icon)
+            .build(&event_loop)
+            .unwrap();
+
+        if self.rect.x() != 0 && self.rect.y() != 0 {
+            inner.set_outer_position(Position::Logical(LogicalPosition::new(
+                self.rect.x() as f64,
+                self.rect.y() as f64,
+            )));
+        }
+
+        let container = RefCell::new(self.container.unwrap());
+
+        Window {
+            inner,
+            event_loop: Some(event_loop),
+            container,
+            phantom: PhantomData,
+        }
+    }
+}
+
 pub struct Window<C, D>
 where
     C: Container<D>,
@@ -222,23 +322,6 @@ where
     C: Container<D>,
     D: Data,
 {
-    pub fn new(container: C) -> Self {
-        let event_loop = EventLoop::new().unwrap();
-
-        let inner = WindowBuilder::new()
-            .with_title("None")
-            .with_inner_size(winit::dpi::LogicalSize::new(800.0, 600.0))
-            .build(&event_loop)
-            .unwrap();
-
-        Self {
-            inner,
-            event_loop: Some(event_loop),
-            container: RefCell::new(container),
-            phantom: PhantomData,
-        }
-    }
-
     pub fn rect(&self) -> Rect {
         let size = self.inner.inner_size();
         Rect {

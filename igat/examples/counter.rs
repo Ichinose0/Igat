@@ -1,6 +1,6 @@
 use igat::{
     widget::{Align, Button, Data, Label, Layout, StackPanel, WidgetMessage},
-    ApplicationBuilder, Theme, Window,
+    ApplicationBuilder, Theme, WindowBuilder,
 };
 
 pub struct Counter {
@@ -19,7 +19,7 @@ fn main() {
     std::env::set_var("RUST_LOG", "info");
     env_logger::init();
     let counter = Counter::new();
-    let window = Window::new(ui(&counter));
+    let window = WindowBuilder::new().title("Simple counter").ui(ui(&counter)).build();
     let app = ApplicationBuilder::new()
         .with(window)
         .theme(Theme::LIGHT)
